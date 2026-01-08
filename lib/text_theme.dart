@@ -13,9 +13,8 @@ TextTheme createTextTheme(
     baseTextTheme,
   );
 
-  TextTheme displayTextTheme = GoogleFonts.getTextTheme(
-    displayFontString,
-    baseTextTheme,
+  TextTheme displayTextTheme = baseTextTheme.apply(
+    fontFamily: displayFontString,
   );
 
   TextTheme textTheme = displayTextTheme.copyWith(

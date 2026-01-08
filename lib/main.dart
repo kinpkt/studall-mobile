@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'text_theme.dart';
 import 'material_theme.dart';
 
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final brightness = View.of(context).platformDispatcher.platformBrightness;
-    TextTheme textTheme = createTextTheme(context, "Sarabun", "GoogleSans");
+    TextTheme textTheme = createTextTheme(context, "Sarabun", "Google Sans");
     MaterialTheme theme = MaterialTheme(textTheme);
 
     return MaterialApp(
@@ -42,23 +43,11 @@ class _HomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('สวัสดี', style: Theme.of(context).textTheme.displayLarge),
-                Text(
-                  'สวัสดี',
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
+                Text('สวัสดี', style: Theme.of(context).textTheme.displayMedium),
                 Text('สวัสดี', style: Theme.of(context).textTheme.displaySmall),
-                Text(
-                  'สวัสดี',
-                  style: Theme.of(context).textTheme.headlineLarge,
-                ),
-                Text(
-                  'สวัสดี',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                Text(
-                  'สวัสดี',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
+                Text('สวัสดี', style: Theme.of(context).textTheme.headlineLarge),
+                Text('สวัสดี', style: Theme.of(context).textTheme.headlineMedium),
+                Text('สวัสดี', style: Theme.of(context).textTheme.headlineSmall),
                 Text('สวัสดี', style: Theme.of(context).textTheme.titleLarge),
                 Text('สวัสดี', style: Theme.of(context).textTheme.titleMedium),
                 Text('สวัสดี', style: Theme.of(context).textTheme.titleSmall),
