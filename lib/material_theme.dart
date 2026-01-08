@@ -335,18 +335,17 @@ class MaterialTheme {
     return theme(darkHighContrastScheme());
   }
 
-
   ThemeData theme(ColorScheme colorScheme) => ThemeData(
-     useMaterial3: true,
-     brightness: colorScheme.brightness,
-     colorScheme: colorScheme,
-     textTheme: textTheme.apply(
-       bodyColor: colorScheme.onSurface,
-       displayColor: colorScheme.onSurface,
-     ),
-     // ignore: deprecated_member_use
-     scaffoldBackgroundColor: colorScheme.background,
-     canvasColor: colorScheme.surface,
+    useMaterial3: true,
+    brightness: colorScheme.brightness,
+    colorScheme: colorScheme,
+    textTheme: textTheme.apply(
+      bodyColor: colorScheme.onSurface,
+      displayColor: colorScheme.onSurface,
+    ),
+    // ignore: deprecated_member_use
+    scaffoldBackgroundColor: colorScheme.background,
+    canvasColor: colorScheme.surface,
   );
 
   /// Sunday
@@ -643,6 +642,215 @@ class MaterialTheme {
     ),
   );
 
+  /// Blue
+  static const blue = ExtendedColor(
+    seed: Color(0xff3b82f6),
+    value: Color(0xff3b82f6),
+    light: ColorFamily(
+      color: Color(0xff0058be),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff2170e4),
+      onColorContainer: Color(0xfffefcff),
+    ),
+    lightMediumContrast: ColorFamily(
+      color: Color(0xff0058be),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff2170e4),
+      onColorContainer: Color(0xfffefcff),
+    ),
+    lightHighContrast: ColorFamily(
+      color: Color(0xff0058be),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff2170e4),
+      onColorContainer: Color(0xfffefcff),
+    ),
+    dark: ColorFamily(
+      color: Color(0xffadc6ff),
+      onColor: Color(0xff002e6a),
+      colorContainer: Color(0xff4d8eff),
+      onColorContainer: Color(0xff001c46),
+    ),
+    darkMediumContrast: ColorFamily(
+      color: Color(0xffadc6ff),
+      onColor: Color(0xff002e6a),
+      colorContainer: Color(0xff4d8eff),
+      onColorContainer: Color(0xff001c46),
+    ),
+    darkHighContrast: ColorFamily(
+      color: Color(0xffadc6ff),
+      onColor: Color(0xff002e6a),
+      colorContainer: Color(0xff4d8eff),
+      onColorContainer: Color(0xff001c46),
+    ),
+  );
+
+  /// Orange
+  static const orange = ExtendedColor(
+    seed: Color(0xfff59e0b),
+    value: Color(0xfff59e0b),
+    light: ColorFamily(
+      color: Color(0xff855300),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xfff59e0b),
+      onColorContainer: Color(0xff613b00),
+    ),
+    lightMediumContrast: ColorFamily(
+      color: Color(0xff855300),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xfff59e0b),
+      onColorContainer: Color(0xff613b00),
+    ),
+    lightHighContrast: ColorFamily(
+      color: Color(0xff855300),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xfff59e0b),
+      onColorContainer: Color(0xff613b00),
+    ),
+    dark: ColorFamily(
+      color: Color(0xffffc174),
+      onColor: Color(0xff472a00),
+      colorContainer: Color(0xfff59e0b),
+      onColorContainer: Color(0xff613b00),
+    ),
+    darkMediumContrast: ColorFamily(
+      color: Color(0xffffc174),
+      onColor: Color(0xff472a00),
+      colorContainer: Color(0xfff59e0b),
+      onColorContainer: Color(0xff613b00),
+    ),
+    darkHighContrast: ColorFamily(
+      color: Color(0xffffc174),
+      onColor: Color(0xff472a00),
+      colorContainer: Color(0xfff59e0b),
+      onColorContainer: Color(0xff613b00),
+    ),
+  );
+
+  /// Grey
+  static const grey = ExtendedColor(
+    seed: Color(0xff5f6368),
+    value: Color(0xff5f6368),
+    light: ColorFamily(
+      color: Color(0xff474b50),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff5f6368),
+      onColorContainer: Color(0xffdcdfe5),
+    ),
+    lightMediumContrast: ColorFamily(
+      color: Color(0xff474b50),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff5f6368),
+      onColorContainer: Color(0xffdcdfe5),
+    ),
+    lightHighContrast: ColorFamily(
+      color: Color(0xff474b50),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff5f6368),
+      onColorContainer: Color(0xffdcdfe5),
+    ),
+    dark: ColorFamily(
+      color: Color(0xffc3c7cc),
+      onColor: Color(0xff2d3135),
+      colorContainer: Color(0xff5f6368),
+      onColorContainer: Color(0xffdcdfe5),
+    ),
+    darkMediumContrast: ColorFamily(
+      color: Color(0xffc3c7cc),
+      onColor: Color(0xff2d3135),
+      colorContainer: Color(0xff5f6368),
+      onColorContainer: Color(0xffdcdfe5),
+    ),
+    darkHighContrast: ColorFamily(
+      color: Color(0xffc3c7cc),
+      onColor: Color(0xff2d3135),
+      colorContainer: Color(0xff5f6368),
+      onColorContainer: Color(0xffdcdfe5),
+    ),
+  );
+
+  /// Purple
+  static const purple = ExtendedColor(
+    seed: Color(0xff8b5cf6),
+    value: Color(0xff8b5cf6),
+    light: ColorFamily(
+      color: Color(0xff6b38d4),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff8455ef),
+      onColorContainer: Color(0xfffffbff),
+    ),
+    lightMediumContrast: ColorFamily(
+      color: Color(0xff6b38d4),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff8455ef),
+      onColorContainer: Color(0xfffffbff),
+    ),
+    lightHighContrast: ColorFamily(
+      color: Color(0xff6b38d4),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff8455ef),
+      onColorContainer: Color(0xfffffbff),
+    ),
+    dark: ColorFamily(
+      color: Color(0xffd0bcff),
+      onColor: Color(0xff3c0091),
+      colorContainer: Color(0xffa078ff),
+      onColorContainer: Color(0xff14003b),
+    ),
+    darkMediumContrast: ColorFamily(
+      color: Color(0xffd0bcff),
+      onColor: Color(0xff3c0091),
+      colorContainer: Color(0xffa078ff),
+      onColorContainer: Color(0xff14003b),
+    ),
+    darkHighContrast: ColorFamily(
+      color: Color(0xffd0bcff),
+      onColor: Color(0xff3c0091),
+      colorContainer: Color(0xffa078ff),
+      onColorContainer: Color(0xff14003b),
+    ),
+  );
+
+  /// Green
+  static const green = ExtendedColor(
+    seed: Color(0xff10b981),
+    value: Color(0xff10b981),
+    light: ColorFamily(
+      color: Color(0xff006c49),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff10b981),
+      onColorContainer: Color(0xff00422b),
+    ),
+    lightMediumContrast: ColorFamily(
+      color: Color(0xff006c49),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff10b981),
+      onColorContainer: Color(0xff00422b),
+    ),
+    lightHighContrast: ColorFamily(
+      color: Color(0xff006c49),
+      onColor: Color(0xffffffff),
+      colorContainer: Color(0xff10b981),
+      onColorContainer: Color(0xff00422b),
+    ),
+    dark: ColorFamily(
+      color: Color(0xff4edea3),
+      onColor: Color(0xff003824),
+      colorContainer: Color(0xff10b981),
+      onColorContainer: Color(0xff00422b),
+    ),
+    darkMediumContrast: ColorFamily(
+      color: Color(0xff4edea3),
+      onColor: Color(0xff003824),
+      colorContainer: Color(0xff10b981),
+      onColorContainer: Color(0xff00422b),
+    ),
+    darkHighContrast: ColorFamily(
+      color: Color(0xff4edea3),
+      onColor: Color(0xff003824),
+      colorContainer: Color(0xff10b981),
+      onColorContainer: Color(0xff00422b),
+    ),
+  );
 
   List<ExtendedColor> get extendedColors => [
     sunday,
@@ -652,6 +860,11 @@ class MaterialTheme {
     thursday,
     friday,
     saturday,
+    blue,
+    orange,
+    grey,
+    purple,
+    green,
   ];
 }
 

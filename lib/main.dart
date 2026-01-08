@@ -12,10 +12,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final brightness = View.of(context).platformDispatcher.platformBrightness;
-
-    TextTheme textTheme = createTextTheme(context, "Sarabun", "Open Sans");
-
+    TextTheme textTheme = createTextTheme(context, "Sarabun", "GoogleSans");
     MaterialTheme theme = MaterialTheme(textTheme);
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: brightness == Brightness.light ? theme.light() : theme.dark(),
@@ -43,11 +42,23 @@ class _HomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('สวัสดี', style: Theme.of(context).textTheme.displayLarge),
-                Text('สวัสดี', style: Theme.of(context).textTheme.displayMedium),
+                Text(
+                  'สวัสดี',
+                  style: Theme.of(context).textTheme.displayMedium,
+                ),
                 Text('สวัสดี', style: Theme.of(context).textTheme.displaySmall),
-                Text('สวัสดี', style: Theme.of(context).textTheme.headlineLarge),
-                Text('สวัสดี', style: Theme.of(context).textTheme.headlineMedium),
-                Text('สวัสดี', style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                  'สวัสดี',
+                  style: Theme.of(context).textTheme.headlineLarge,
+                ),
+                Text(
+                  'สวัสดี',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                Text(
+                  'สวัสดี',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
                 Text('สวัสดี', style: Theme.of(context).textTheme.titleLarge),
                 Text('สวัสดี', style: Theme.of(context).textTheme.titleMedium),
                 Text('สวัสดี', style: Theme.of(context).textTheme.titleSmall),
