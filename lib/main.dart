@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'text_theme.dart';
-import 'material_theme.dart';
+import 'src/theme/text_theme.dart';
+import 'src/theme/material_theme.dart';
 
 void main() {
   runApp(const MyApp());
