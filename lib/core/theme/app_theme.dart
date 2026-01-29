@@ -114,5 +114,14 @@ final appTextStyle = ShadTextTheme(
       height: 24 / 16,
       letterSpacing: 0,
     ),
+    'xsmall': const TextStyle(
+      fontSize: 13,
+      decoration: TextDecoration.none,
+      fontFamily: 'Google Sans',
+      fontStyle: FontStyle.normal,
+      fontWeight: FontWeight.w500,
+      height: 14 / 13,
+      letterSpacing: 0,
+    ),
   },
 );

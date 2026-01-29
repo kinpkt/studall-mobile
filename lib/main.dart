@@ -4,6 +4,7 @@ import 'package:studall/core/theme/app_theme.dart';
 import 'package:studall/core/theme/theme_extension.dart';
 import 'package:studall/core/theme/theme_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:studall/features/auth/presentation/screens/login_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -20,7 +21,7 @@ class MyApp extends ConsumerWidget {
       themeMode: themeMode,
       theme: appThemeLight,
       darkTheme: appThemeDark,
-      home: const MyHomePage(),
+      home: const LoginScreen(),
     );
   }
 }
@@ -370,6 +371,7 @@ class _HomePageState extends State<MyHomePage> {
                     Text('สวัสดี', style: theme.textTheme.custom['large24']!),
                     Text('สวัสดี', style: theme.textTheme.custom['medium']!),
                     Text('สวัสดี', style: theme.textTheme.small),
+                    Text('สวัสดี', style: theme.textTheme.custom['xsmall']!),
                     Text('สวัสดี', style: theme.textTheme.muted),
                   ],
                 ),
