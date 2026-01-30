@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import '../providers/login_controller.dart';
 import '../widgets/google_sign_in_button.dart';
-import '../../../dashboard/presentation/dashboard_screen.dart';
+import '../../../dashboard/presentation/screens/dashboard_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
