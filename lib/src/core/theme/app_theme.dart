@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/core/theme/input_theme.dart';
+import 'package:studall/src/core/theme/color_scheme.dart';
+
+final appThemeLight = ShadThemeData(
+  brightness: Brightness.light,
+  colorScheme: AppColorScheme.lightScheme,
+  textTheme: appTextStyle,
+  inputTheme: appInputTheme,
+);
+
+final appThemeDark = ShadThemeData(
+  brightness: Brightness.dark,
+  colorScheme: AppColorScheme.darkScheme,
+  textTheme: appTextStyle,
+  inputTheme: appInputTheme,
+);
+
+final appTextStyle = ShadTextTheme(
+  family: 'Google Sans',
+  custom: {
+    'large24': const TextStyle(
+      fontSize: 18,
+      decoration: TextDecoration.none,
+      fontFamily: 'Google Sans',
+      fontStyle: FontStyle.normal,
+      fontWeight: FontWeight.w600,
+      height: 24 / 18,
+      letterSpacing: 0,
+    ),
+    'medium': const TextStyle(
+      fontSize: 16,
+      decoration: TextDecoration.none,
+      fontFamily: 'Google Sans',
+      fontStyle: FontStyle.normal,
+      fontWeight: FontWeight.w500,
+      height: 24 / 16,
+      letterSpacing: 0,
+    ),
+    'xsmall': const TextStyle(
+      fontSize: 13,
+      decoration: TextDecoration.none,
+      fontFamily: 'Google Sans',
+      fontStyle: FontStyle.normal,
+      fontWeight: FontWeight.w500,
+      height: 14 / 13,
+      letterSpacing: 0,
+    ),
+  },
+);
