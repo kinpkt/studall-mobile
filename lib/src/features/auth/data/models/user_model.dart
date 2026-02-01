@@ -1,58 +1,61 @@
+import 'package:json_annotation/json_annotation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import './role.dart';
+
+part 'user_model.g.dart';
+
+@JsonSerializable()
 class UserModel {
   final String id;
   final String email;
-  final String? displayName;
+  final String username;
+  final String fullName;
   final String? photoUrl;
+  final bool isBanned;
+  final List<Role> roles;
 
-  UserModel({
+  const UserModel({
     required this.id,
     required this.email,
-    this.displayName,
+    required this.username,
+    required this.fullName,
     this.photoUrl,
+    this.isBanned = false,
+    this.roles = const [],
   });
 
-  // Factory constructor from Firebase User
-  factory UserModel.fromFirebase(dynamic firebaseUser) {
+  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserModelToJson(this);
+
+  factory UserModel.fromFirebase(User firebaseUser) {
     return UserModel(
       id: firebaseUser.uid,
       email: firebaseUser.email ?? '',
-      displayName: firebaseUser.displayName,
+      username: '',
+      fullName: firebaseUser.displayName ?? '',
       photoUrl: firebaseUser.photoURL,
+      isBanned: false,
     );
   }
 
-  // Factory constructor from JSON
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      displayName: json['displayName'] as String?,
-      photoUrl: json['photoUrl'] as String?,
-    );
-  }
-
-  // Convert to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'email': email,
-      'displayName': displayName,
-      'photoUrl': photoUrl,
-    };
-  }
-
-  // CopyWith method for immutability
   UserModel copyWith({
     String? id,
     String? email,
-    String? displayName,
+    String? username,
+    String? fullName,
     String? photoUrl,
+    bool? isBanned,
+    List<Role>? roles,
   }) {
     return UserModel(
       id: id ?? this.id,
       email: email ?? this.email,
-      displayName: displayName ?? this.displayName,
+      username: username ?? this.username,
+      fullName: fullName ?? this.fullName,
       photoUrl: photoUrl ?? this.photoUrl,
+      isBanned: isBanned ?? this.isBanned,
+      roles: roles ?? this.roles,
     );
   }
 }
