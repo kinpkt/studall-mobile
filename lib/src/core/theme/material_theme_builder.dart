@@ -58,6 +58,19 @@ ThemeData materialThemeBuilder(BuildContext context, ThemeData theme) {
         );
       }),
     ),
+    tabBarTheme: TabBarThemeData(
+      indicatorSize: TabBarIndicatorSize.tab,
+      indicatorColor: shadColorScheme.foreground,
+      indicator: UnderlineTabIndicator(
+        borderSide: BorderSide(color: shadColorScheme.foreground, width: 2),
+      ),
+      labelColor: shadColorScheme.foreground,
+      labelStyle: shadTextStyle.small.copyWith(fontWeight: FontWeight.w600),
+      unselectedLabelColor: shadColorScheme.mutedForeground,
+      unselectedLabelStyle: shadTextStyle.small,
+      dividerColor: shadColorScheme.border,
+      dividerHeight: 1,
+    ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: shadColorScheme.primary,
       foregroundColor: shadColorScheme.primaryForeground,
