@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import './activity_model.dart';
+import 'activity_model.dart';
 
 part 'schedule_model.g.dart';
 

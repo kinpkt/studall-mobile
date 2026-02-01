@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
-import 'package:studall/src/features/courses/data/models/course_model.dart';
+import 'package:studall/src/features/user/courses/data/models/course_model.dart';
 
 part 'activity_model.g.dart';
 

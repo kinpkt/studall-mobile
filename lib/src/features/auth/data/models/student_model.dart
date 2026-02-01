@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:studall/src/features/home/data/models/schedule_model.dart';
-import 'package:studall/src/features/tasks/data/models/task_model.dart';
+import 'package:studall/src/features/user/home/data/models/schedule_model.dart';
+import 'package:studall/src/features/user/tasks/data/models/task_model.dart';
 import './user_model.dart';
 import './role.dart';
 

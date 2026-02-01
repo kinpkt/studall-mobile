@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:studall/src/features/courses/data/models/course_model.dart';
+import 'package:studall/src/features/user/courses/data/models/course_model.dart';
 
 part 'semester_model.g.dart';
 
