@@ -18,6 +18,11 @@ StudentModel _$StudentModelFromJson(Map<String, dynamic> json) => StudentModel(
   fullName: json['fullName'] as String,
   photoUrl: json['photoUrl'] as String?,
   isBanned: json['isBanned'] as bool? ?? false,
+  roles:
+      (json['roles'] as List<dynamic>?)
+          ?.map((e) => $enumDecode(_$RoleEnumMap, e))
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$StudentModelToJson(StudentModel instance) =>
@@ -28,7 +33,14 @@ Map<String, dynamic> _$StudentModelToJson(StudentModel instance) =>
       'fullName': instance.fullName,
       'photoUrl': instance.photoUrl,
       'isBanned': instance.isBanned,
-      'tasks': instance.tasks,
+      'roles': instance.roles.map((e) => _$RoleEnumMap[e]!).toList(),
       'institute': instance.institute,
-      'schedule': instance.schedule,
+      'schedule': instance.schedule.toJson(),
+      'tasks': instance.tasks.map((e) => e.toJson()).toList(),
     };
+
+const _$RoleEnumMap = {
+  Role.admin: 'admin',
+  Role.student: 'student',
+  Role.partner: 'partner',
+};
