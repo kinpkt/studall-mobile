@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'widgets/tasks_appbar.dart';
+import 'widgets/tasks_tab_bar.dart';
 
 class TasksScreen extends StatelessWidget {
   const TasksScreen({super.key});
