@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:studall/src/features/user/common_widgets/user_app_bar.dart';
 import 'package:studall/src/features/user/tasks/presentation/tasks_screen.dart';
 import '../providers/dashboard_controller.dart';
 
@@ -24,7 +25,7 @@ class DashboardScreen extends ConsumerWidget {
     NavigationDestination(
       icon: Icon(PhosphorIconsRegular.chalkboardSimple),
       selectedIcon: Icon(PhosphorIconsFill.chalkboardSimple),
-      label: 'วิชา',
+      label: 'รายวิชา',
     ),
     NavigationDestination(
       icon: Icon(PhosphorIconsRegular.listChecks),
@@ -32,14 +33,14 @@ class DashboardScreen extends ConsumerWidget {
       label: 'ที่ต้องทำ',
     ),
     NavigationDestination(
+      icon: Icon(PhosphorIconsRegular.notebook),
+      selectedIcon: Icon(PhosphorIconsFill.notebook),
+      label: 'บันทึก',
+    ),
+    NavigationDestination(
       icon: Icon(PhosphorIconsRegular.compass),
       selectedIcon: Icon(PhosphorIconsFill.compass),
       label: 'สำรวจ',
-    ),
-    NavigationDestination(
-      icon: Icon(PhosphorIconsRegular.squaresFour),
-      selectedIcon: Icon(PhosphorIconsFill.squaresFour),
-      label: 'เครื่องมือ',
     ),
   ];
 
@@ -47,23 +48,34 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(dashboardControllerProvider);
 
-    return Scaffold(
-      body: IndexedStack(
-        index: currentIndex,
-        children: _pages,
-      ),
+    const pageTitles = [
+      null,
+      'รายวิชา',
+      'ที่ต้องทำ',
+      'บันทึก',
+      'สำรวจ',
+    ];
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: const Icon(PhosphorIconsRegular.plus),
-      ),
-
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          ref.read(dashboardControllerProvider.notifier).setIndex(index);
-        },
-        destinations: _destinations,
+    return SafeArea(
+      bottom: false,
+      child: Scaffold(
+        appBar: UserAppbar(
+          showNextEvent: currentIndex == 0,
+          showSubtitle: currentIndex != 4,
+          pageTitle: pageTitles[currentIndex],
+        ),
+        body: IndexedStack(index: currentIndex, children: _pages),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(PhosphorIconsRegular.plus),
+        ),
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: currentIndex,
+          onDestinationSelected: (index) {
+            ref.read(dashboardControllerProvider.notifier).setIndex(index);
+          },
+          destinations: _destinations,
+        ),
       ),
     );
   }
