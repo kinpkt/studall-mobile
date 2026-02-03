@@ -3,7 +3,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
 
-class UserAppbar extends StatefulWidget implements PreferredSizeWidget {
+class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
   final String? pageTitle;
   final bool showNextEvent;
   final bool showSubtitle;
@@ -15,7 +15,7 @@ class UserAppbar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onProfileTap;
   final VoidCallback? onAnimationTap;
 
-  const UserAppbar({
+  const StudentAppbar({
     super.key,
     this.pageTitle,
     this.showNextEvent = false,
@@ -30,13 +30,13 @@ class UserAppbar extends StatefulWidget implements PreferredSizeWidget {
   });
 
   @override
-  State<UserAppbar> createState() => _UserAppbarState();
+  State<StudentAppbar> createState() => _StudentAppbarState();
 
   @override
   Size get preferredSize => const Size.fromHeight(136);
 }
 
-class _UserAppbarState extends State<UserAppbar>
+class _StudentAppbarState extends State<StudentAppbar>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _dateSlideAnimation;

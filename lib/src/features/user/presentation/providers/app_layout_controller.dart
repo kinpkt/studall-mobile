@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final dashboardControllerProvider = NotifierProvider<DashboardController, int>(
+final appLayoutControllerProvider = NotifierProvider<AppLayoutController, int>(
   () {
-    return DashboardController();
+    return AppLayoutController();
   },
 );
 
-class DashboardController extends Notifier<int> {
+class AppLayoutController extends Notifier<int> {
   @override
   int build() {
     return 0;

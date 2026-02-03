@@ -4,21 +4,21 @@
 // import '../widgets/auth_text_field.dart';
 // import '../widgets/google_sign_in_button.dart';
 // import '../widgets/or_divider.dart';
-
+//
 // class SignupScreen extends ConsumerStatefulWidget {
 //   const SignupScreen({super.key});
-
+//
 //   @override
 //   ConsumerState<SignupScreen> createState() => _SignupScreenState();
 // }
-
+//
 // class _SignupScreenState extends ConsumerState<SignupScreen> {
 //   final _formKey = GlobalKey<FormState>();
 //   final _nameController = TextEditingController();
 //   final _emailController = TextEditingController();
 //   final _passwordController = TextEditingController();
 //   final _confirmPasswordController = TextEditingController();
-
+//
 //   @override
 //   void dispose() {
 //     _nameController.dispose();
@@ -27,7 +27,7 @@
 //     _confirmPasswordController.dispose();
 //     super.dispose();
 //   }
-
+//
 //   Future<void> _handleSignup() async {
 //     if (_formKey.currentState?.validate() ?? false) {
 //       await ref
@@ -37,7 +37,7 @@
 //             password: _passwordController.text,
 //             displayName: _nameController.text.trim(),
 //           );
-
+//
 //       if (mounted) {
 //         final error = ref.read(authControllerProvider).error;
 //         if (error != null) {
@@ -48,10 +48,10 @@
 //       }
 //     }
 //   }
-
+//
 //   Future<void> _handleGoogleSignIn() async {
 //     await ref.read(authControllerProvider.notifier).signInWithGoogle();
-
+//
 //     if (mounted) {
 //       final error = ref.read(authControllerProvider).error;
 //       if (error != null) {
@@ -61,15 +61,15 @@
 //       }
 //     }
 //   }
-
+//
 //   void _navigateToLogin() {
 //     Navigator.pop(context);
 //   }
-
+//
 //   @override
 //   Widget build(BuildContext context) {
 //     final authState = ref.watch(authControllerProvider);
-
+//
 //     return Scaffold(
 //       body: SafeArea(
 //         child: SingleChildScrollView(
@@ -80,7 +80,7 @@
 //               crossAxisAlignment: CrossAxisAlignment.stretch,
 //               children: [
 //                 const SizedBox(height: 40),
-
+//
 //                 // Title
 //                 const Text(
 //                   'Create Account',
@@ -94,7 +94,7 @@
 //                   textAlign: TextAlign.center,
 //                 ),
 //                 const SizedBox(height: 40),
-
+//
 //                 // Name Field
 //                 AuthTextField(
 //                   controller: _nameController,
@@ -110,7 +110,7 @@
 //                   },
 //                 ),
 //                 const SizedBox(height: 16),
-
+//
 //                 // Email Field
 //                 AuthTextField(
 //                   controller: _emailController,
@@ -130,7 +130,7 @@
 //                   },
 //                 ),
 //                 const SizedBox(height: 16),
-
+//
 //                 // Password Field
 //                 AuthTextField(
 //                   controller: _passwordController,
@@ -150,7 +150,7 @@
 //                   },
 //                 ),
 //                 const SizedBox(height: 16),
-
+//
 //                 // Confirm Password Field
 //                 AuthTextField(
 //                   controller: _confirmPasswordController,
@@ -170,7 +170,7 @@
 //                   },
 //                 ),
 //                 const SizedBox(height: 32),
-
+//
 //                 // Sign Up Button
 //                 ElevatedButton(
 //                   onPressed: authState.isLoading ? null : _handleSignup,
@@ -200,18 +200,18 @@
 //                         ),
 //                 ),
 //                 const SizedBox(height: 24),
-
+//
 //                 // Divider
 //                 const OrDivider(),
 //                 const SizedBox(height: 24),
-
+//
 //                 // Google Sign In Button
 //                 GoogleSignInButton(
 //                   onPressed: _handleGoogleSignIn,
 //                   isLoading: authState.isLoading,
 //                 ),
 //                 const SizedBox(height: 24),
-
+//
 //                 // Login Link
 //                 Row(
 //                   mainAxisAlignment: MainAxisAlignment.center,
