@@ -39,8 +39,7 @@ class AppLayoutScreen extends ConsumerWidget {
           Center(child: Text('สำรวจ')), // TODO: ใส่ ExploreScreen()
           Center(child: Text('เครื่องมือ')), // TODO: ใส่ ToolsScreen()
         ];
-      default:
-        return [];
+
     }
   }
 
@@ -120,8 +119,6 @@ class AppLayoutScreen extends ConsumerWidget {
             label: 'พนักงาน',
           ),
         ];
-      default:
-        return [];
     }
   }
 
@@ -149,8 +146,6 @@ class AppLayoutScreen extends ConsumerWidget {
         );
       case Role.partner:
         return PlainTextAppBar(text: 'Partner');
-      default:
-        return AppBar();
     }
   }
 
