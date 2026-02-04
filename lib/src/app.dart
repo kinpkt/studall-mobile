@@ -7,6 +7,7 @@ import 'package:studall/src/core/theme/theme_provider.dart';
 import 'package:studall/src/core/theme/material_theme_builder.dart';
 import 'package:studall/src/features/auth/data/models/role.dart';
 import 'package:studall/src/features/auth/presentation/screens/login_screen.dart';
+import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:studall/src/features/user/home/presentation/screens/admin_home_screen.dart';
 import 'package:studall/src/features/user/presentation/screens/app_layout_screen.dart';
 
@@ -25,6 +26,7 @@ class MyApp extends ConsumerWidget {
       materialThemeBuilder: (context, theme) =>
           materialThemeBuilder(context, theme),
       home: const LoginScreen(),
+
     );
   }
 }

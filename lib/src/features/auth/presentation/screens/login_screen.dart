@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
 import '../../data/models/role.dart';
 import '../providers/login_controller.dart';
 import '../widgets/google_sign_in_button.dart';
@@ -39,8 +40,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _validatePassword(String value) {
     if (value.isEmpty) {
       return 'กรุณากรอกรหัสผ่าน';
-    } else if (value.length < 6) {
-      return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
+    } else if (value.length < 8) {
+      return 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร';
     }
     return null;
   }
@@ -68,12 +69,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.all(24),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 380),
+              constraints: const BoxConstraints(maxWidth: 392),
               child: Form(
                 key: _formKey,
-                // autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -99,7 +99,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ],
                     ),
-
                     ShadInputFormField(
                       controller: _emailController,
                       label: const Text('อีเมล'),
@@ -117,7 +116,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Text('รหัสผ่าน'),
                           GestureDetector(
                             onTap: () {
-                              // TODO: Navigate to Forgot Password
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AppLayoutScreen(role: Role.admin),
+                                ),
+                              );
                             },
                             child: Text(
                               'ลืมรหัสผ่าน',
@@ -154,7 +159,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 24),
                     ShadButton.secondary(
-                      width: double.infinity,
                       size: ShadButtonSize.lg,
                       onPressed: isLoading
                           ? null
@@ -162,7 +166,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               final email = _emailController.text.trim();
                               final password = _passwordController.text;
 
-                              if (_formKey.currentState == null &&
+                              if (_formKey.currentState != null &&
                                   _formKey.currentState!.validate()) {
                                 ref
                                     .read(loginControllerProvider.notifier)
@@ -189,12 +193,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            // TODO: Navigate to Sign Up
-                            Navigator.pushReplacement(
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const AppLayoutScreen(role: Role.admin),
+                                builder: (context) => const SignUpScreen(),
                               ),
                             );
                           },
