@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
 import '../../data/models/role.dart';
 import '../providers/login_controller.dart';
 import '../widgets/google_sign_in_button.dart';
@@ -27,6 +28,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  String? _validateEmail(String value) {
+    if (value.isEmpty) {
+      return 'กรุณากรอกอีเมล';
+    } else if (!value.contains('@') || !value.contains('.')) {
+      return 'รูปแบบอีเมลไม่ถูกต้อง';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String value) {
+    if (value.isEmpty) {
+      return 'กรุณากรอกรหัสผ่าน';
+    } else if (value.length < 8) {
+      return 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
@@ -50,9 +69,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.all(24),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 380),
+              constraints: const BoxConstraints(maxWidth: 392),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -80,14 +99,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ],
                     ),
-
-                    const SizedBox(height: 24),
-
                     ShadInputFormField(
                       controller: _emailController,
                       label: const Text('อีเมล'),
                       placeholder: const Text('m@example.com'),
                       keyboardType: TextInputType.emailAddress,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: _validateEmail,
                     ),
                     const SizedBox(height: 16),
                     ShadInputFormField(
@@ -98,7 +116,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Text('รหัสผ่าน'),
                           GestureDetector(
                             onTap: () {
-                              // TODO: Navigate to Forgot Password
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AppLayoutScreen(role: Role.admin),
+                                ),
+                              );
                             },
                             child: Text(
                               'ลืมรหัสผ่าน',
@@ -110,6 +134,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ],
                       ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: _validatePassword,
                       obscureText: _obscurePassword,
                       placeholder: const Text('••••••••'),
                       trailing: ShadIconButton.ghost(
@@ -133,35 +159,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 24),
                     ShadButton.secondary(
-                      width: double.infinity,
                       size: ShadButtonSize.lg,
                       onPressed: isLoading
                           ? null
                           : () {
                               final email = _emailController.text.trim();
                               final password = _passwordController.text;
-                              String? errorMessage;
 
-                              if (email.isEmpty) {
-                                errorMessage = 'กรุณากรอกอีเมล';
-                              } else if (!email.contains('@')) {
-                                errorMessage = 'รูปแบบอีเมลไม่ถูกต้อง';
-                              } else if (password.isEmpty) {
-                                errorMessage = 'กรุณากรอกรหัสผ่าน';
-                              } else if (password.length < 6) {
-                                errorMessage =
-                                    'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
-                              }
-
-                              if (errorMessage != null) {
-                                ShadToaster.of(context).show(
-                                  ShadToast.destructive(
-                                    title: const Text('ข้อมูลไม่ถูกต้อง'),
-                                    description: Text(errorMessage),
-                                    alignment: Alignment.topCenter,
-                                  ),
-                                );
-                              } else {
+                              if (_formKey.currentState != null &&
+                                  _formKey.currentState!.validate()) {
                                 ref
                                     .read(loginControllerProvider.notifier)
                                     .login(email, password);
@@ -187,10 +193,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            // TODO: Navigate to Sign Up
-                            Navigator.pushReplacement(context, MaterialPageRoute(
-                              builder: (context) => const AppLayoutScreen(role: Role.admin),
-                            ));
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SignUpScreen(),
+                              ),
+                            );
                           },
                           child: Text(
                             'เริ่มสร้างบัญชี',
