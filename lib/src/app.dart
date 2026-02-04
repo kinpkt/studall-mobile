@@ -24,7 +24,7 @@ class MyApp extends ConsumerWidget {
       darkTheme: appThemeDark,
       materialThemeBuilder: (context, theme) =>
           materialThemeBuilder(context, theme),
-      home: const AppLayoutScreen(role: Role.partner),
+      home: const LoginScreen(),
     );
   }
 }

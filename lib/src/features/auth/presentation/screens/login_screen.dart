@@ -27,6 +27,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  String? _validateEmail(String value) {
+    if (value.isEmpty) {
+      return 'กรุณากรอกอีเมล';
+    } else if (!value.contains('@') || !value.contains('.')) {
+      return 'รูปแบบอีเมลไม่ถูกต้อง';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String value) {
+    if (value.isEmpty) {
+      return 'กรุณากรอกรหัสผ่าน';
+    } else if (value.length < 6) {
+      return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
@@ -55,6 +73,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               constraints: const BoxConstraints(maxWidth: 380),
               child: Form(
                 key: _formKey,
+                // autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -81,13 +100,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 24),
-
                     ShadInputFormField(
                       controller: _emailController,
                       label: const Text('อีเมล'),
                       placeholder: const Text('m@example.com'),
                       keyboardType: TextInputType.emailAddress,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: _validateEmail,
                     ),
                     const SizedBox(height: 16),
                     ShadInputFormField(
@@ -110,6 +129,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ],
                       ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: _validatePassword,
                       obscureText: _obscurePassword,
                       placeholder: const Text('••••••••'),
                       trailing: ShadIconButton.ghost(
@@ -140,28 +161,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           : () {
                               final email = _emailController.text.trim();
                               final password = _passwordController.text;
-                              String? errorMessage;
 
-                              if (email.isEmpty) {
-                                errorMessage = 'กรุณากรอกอีเมล';
-                              } else if (!email.contains('@')) {
-                                errorMessage = 'รูปแบบอีเมลไม่ถูกต้อง';
-                              } else if (password.isEmpty) {
-                                errorMessage = 'กรุณากรอกรหัสผ่าน';
-                              } else if (password.length < 6) {
-                                errorMessage =
-                                    'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
-                              }
-
-                              if (errorMessage != null) {
-                                ShadToaster.of(context).show(
-                                  ShadToast.destructive(
-                                    title: const Text('ข้อมูลไม่ถูกต้อง'),
-                                    description: Text(errorMessage),
-                                    alignment: Alignment.topCenter,
-                                  ),
-                                );
-                              } else {
+                              if (_formKey.currentState == null &&
+                                  _formKey.currentState!.validate()) {
                                 ref
                                     .read(loginControllerProvider.notifier)
                                     .login(email, password);
@@ -188,9 +190,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         GestureDetector(
                           onTap: () {
                             // TODO: Navigate to Sign Up
-                            Navigator.pushReplacement(context, MaterialPageRoute(
-                              builder: (context) => const AppLayoutScreen(role: Role.admin),
-                            ));
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const AppLayoutScreen(role: Role.admin),
+                              ),
+                            );
                           },
                           child: Text(
                             'เริ่มสร้างบัญชี',
