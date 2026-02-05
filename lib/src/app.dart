@@ -11,12 +11,16 @@ import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.da
 import 'package:studall/src/features/user/home/presentation/screens/admin_home_screen.dart';
 import 'package:studall/src/features/user/presentation/screens/app_layout_screen.dart';
 
+import 'package:studall/src/features/auth/presentation/providers/auth_state_provider.dart';
+
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+
+    final authState = ref.watch(authStateProvider);
 
     return ShadApp(
       debugShowCheckedModeBanner: false,
@@ -25,7 +29,20 @@ class MyApp extends ConsumerWidget {
       darkTheme: appThemeDark,
       materialThemeBuilder: (context, theme) =>
           materialThemeBuilder(context, theme),
-      home: const LoginScreen(),
+      home: authState.when(
+        data: (user) {
+          if (user == null)
+            return const LoginScreen();
+
+          return const AppLayoutScreen(role: Role.student);
+        },
+        loading: () => const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        error: (e, trace) => Scaffold(
+          body: Center(child: Text('Error: $e')),
+        ),
+      ),
 
     );
   }

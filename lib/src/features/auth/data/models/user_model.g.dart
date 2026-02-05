@@ -10,7 +10,6 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   id: json['id'] as String,
   email: json['email'] as String,
   username: json['username'] as String,
-  fullName: json['fullName'] as String,
   photoUrl: json['photoUrl'] as String?,
   isBanned: json['isBanned'] as bool? ?? false,
   roles:
@@ -24,7 +23,6 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'id': instance.id,
   'email': instance.email,
   'username': instance.username,
-  'fullName': instance.fullName,
   'photoUrl': instance.photoUrl,
   'isBanned': instance.isBanned,
   'roles': instance.roles.map((e) => _$RoleEnumMap[e]!).toList(),

@@ -1,3 +1,13 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/repositories/firebase_auth_repository.dart';
+import '../../data/models/user_model.dart';
+
+final authStateProvider = StreamProvider<UserModel?>((ref) {
+  final authRepository = ref.watch(authRepositoryProvider);
+
+  return authRepository.authStateChanges();
+});
+
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import '../../data/models/user_model.dart';
 // import '../../data/repositories/auth_repository.dart';

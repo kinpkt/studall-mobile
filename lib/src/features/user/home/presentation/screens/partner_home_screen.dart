@@ -20,9 +20,9 @@ class PartnerHomeScreen extends StatelessWidget {
     ];
 
     final List<UserModel> staffs = [
-      UserModel(id: 'somchai_t', email: 'somchai_t@gmail.com', username: 'somchai_t', fullName: 'สมชาย ตายทั้งเป็น'),
-      UserModel(id: 'ehen123', email: 'ehen@gmail.com', username: 'ehen123', fullName: 'อีเห็น เป็นนางรำ'),
-      UserModel(id: 'klangtam222', email: 'klangtam222@gmail.com', username: 'klangtam222', fullName: 'กลางธรรม ทำทำไม'),
+      UserModel(id: 'somchai_t', email: 'somchai_t@gmail.com', username: 'somchai_t'),
+      UserModel(id: 'ehen123', email: 'ehen@gmail.com', username: 'ehen123'),
+      UserModel(id: 'klangtam222', email: 'klangtam222@gmail.com', username: 'klangtam222'),
     ];
 
     return Column(
@@ -69,7 +69,7 @@ class PartnerHomeScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             return ListTile(
               leading: Icon(PhosphorIconsRegular.userCircle),
-              title: Text(staffs[index].fullName, style: theme.textTheme.large),
+              title: Text(staffs[index].username, style: theme.textTheme.large),
               subtitle: Text('@${staffs[index].username}', style: theme.textTheme.p),
             );
           },

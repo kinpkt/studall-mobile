@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:studall/src/features/auth/data/repositories/firebase_auth_repository.dart';
 
 final signUpControllerProvider = AsyncNotifierProvider<SignUpController, void>(
   () {
@@ -13,11 +14,17 @@ class SignUpController extends AsyncNotifier<void> {
   Future<void> signUp(String email, String password, String username) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await Future.delayed(const Duration(seconds: 2));
+      final authRepository = ref.read(authRepositoryProvider);
 
-      throw Exception("สร้างบัญชีไม่สำเร็จ");
+      await authRepository.signUpWithEmail(
+          email: email,
+          password: password
+      );
 
-      // TODO: เรียก Repository ตรงนี้
+      // await Future.delayed(const Duration(seconds: 2));
+
+      // throw Exception("สร้างบัญชีไม่สำเร็จ");
+
       // await ref.read(authRepositoryProvider).signUpWithEmail(
       //   email: email,
       //   password: password,
@@ -29,9 +36,13 @@ class SignUpController extends AsyncNotifier<void> {
   Future<void> googleSignUp() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await Future.delayed(const Duration(seconds: 2));
+      final authRepository = ref.read(authRepositoryProvider);
+
+      await authRepository.signInWithGoogle();
+
+      // await Future.delayed(const Duration(seconds: 2));
       // TODO: เรียก Repository Google Sign Up
-      throw Exception("สร้างบัญชีไม่สำเร็จด้วย Google");
+      // throw Exception("สร้างบัญชีไม่สำเร็จด้วย Google");
     });
   }
 }
