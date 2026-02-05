@@ -15,7 +15,6 @@ StudentModel _$StudentModelFromJson(Map<String, dynamic> json) => StudentModel(
   id: json['id'] as String,
   email: json['email'] as String,
   username: json['username'] as String,
-  fullName: json['fullName'] as String,
   photoUrl: json['photoUrl'] as String?,
   isBanned: json['isBanned'] as bool? ?? false,
   roles:
@@ -30,7 +29,6 @@ Map<String, dynamic> _$StudentModelToJson(StudentModel instance) =>
       'id': instance.id,
       'email': instance.email,
       'username': instance.username,
-      'fullName': instance.fullName,
       'photoUrl': instance.photoUrl,
       'isBanned': instance.isBanned,
       'roles': instance.roles.map((e) => _$RoleEnumMap[e]!).toList(),

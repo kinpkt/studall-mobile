@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "282022508089",
+    "project_id": "studall-mobile",
+    "storage_bucket": "studall-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:282022508089:android:c8c5294b79b4860d3b7fe8",
+        "android_client_info": {
+          "package_name": "com.example.studall"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD69AHfBSMU-AMa-FKT-_OU3c7_rgv03vc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
