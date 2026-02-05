@@ -116,13 +116,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Text('รหัสผ่าน'),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const AppLayoutScreen(role: Role.admin),
-                                ),
-                              );
+                              // TODO: Implement forgot password functionality
                             },
                             child: Text(
                               'ลืมรหัสผ่าน',

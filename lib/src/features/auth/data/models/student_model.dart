@@ -16,24 +16,14 @@ class StudentModel extends UserModel {
     required this.institute,
     required this.schedule,
     List<TaskModel>? tasks,
-    required String id,
-    required String email,
-    required String username,
-    // required String fullName,
-    String? photoUrl,
-    bool isBanned = false,
-    List<Role> roles = const [],
-  })  :
-        this.tasks = tasks ?? [],
-        super(
-        id: id,
-        email: email,
-        username: username,
-        // fullName: fullName,
-        photoUrl: photoUrl,
-        isBanned: isBanned,
-        roles: roles,
-      );
+    required super.id,
+    required super.email,
+    required super.username,
+    super.fullName,
+    super.photoUrl,
+    super.isBanned = false,
+    super.roles = const [],
+  }) : tasks = tasks ?? [];
 
   factory StudentModel.fromJson(Map<String, dynamic> json) =>
       _$StudentModelFromJson(json);
@@ -53,9 +43,10 @@ class StudentModel extends UserModel {
     String? id,
     String? email,
     String? username,
-    // String? fullName,
+    String? fullName,
     String? photoUrl,
     bool? isBanned,
+    Role? lastActiveRole,
     List<Role>? roles,
   }) {
     return StudentModel(
@@ -65,7 +56,7 @@ class StudentModel extends UserModel {
       id: id ?? this.id,
       email: email ?? this.email,
       username: username ?? this.username,
-      // fullName: fullName ?? this.fullName,
+      fullName: fullName ?? this.fullName,
       photoUrl: photoUrl ?? this.photoUrl,
       isBanned: isBanned ?? this.isBanned,
       roles: roles ?? this.roles,

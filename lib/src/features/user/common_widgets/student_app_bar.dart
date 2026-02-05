@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
+import 'package:studall/src/features/auth/data/repositories/firebase_auth_repository.dart';
+import 'package:studall/src/features/auth/presentation/providers/auth_state_provider.dart';
 
 class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
   final String? pageTitle;
@@ -68,7 +71,7 @@ class _StudentAppbarState extends State<StudentAppbar>
   }
 
   void _toggleAnimation() {
-    if (!widget.showNextEvent){
+    if (!widget.showNextEvent) {
       _controller.forward();
     } else {
       _controller.reverse();
@@ -106,11 +109,9 @@ class _StudentAppbarState extends State<StudentAppbar>
 
     if (hour < 12) {
       return 'ถัดไปอีก 1 ชมครึ่ง';
-    }
-    else if (hour < 18) {
+    } else if (hour < 18) {
       return 'ถัดไปอีก 30 นาที';
-    }
-    else {
+    } else {
       return 'ไม่มีวิชาวันนี้แล้ว';
     }
   }
@@ -166,63 +167,86 @@ class _StudentAppbarState extends State<StudentAppbar>
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: widget.onProfileTap,
-                    child: ShadAvatar(
-                      'https://app.requestly.io/delay/2000/avatars.githubusercontent.com/u/124599?v=4',
-                      size: const Size.square(40),
-                      backgroundColor: colorScheme.muted,
-                      placeholder: Text(
-                        widget.userInitials ?? 'SA',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: colorScheme.foreground,
-                          height: 20 / 12,
-                        ),
-                      ),
+                    child: Consumer(
+                      builder: (context, ref, _) {
+                        final authState = ref.watch(authStateProvider);
+                        final authRepository = ref.read(authRepositoryProvider);
+                        return authState.when(
+                          data: (user) {
+                            print(user!.photoUrl);
+                            return GestureDetector(
+                              onDoubleTap: () => authRepository.signOut(),
+                              child: ShadAvatar(
+                                user!.photoUrl,
+                                size: const Size.square(40),
+                                backgroundColor: colorScheme.muted,
+                                placeholder: Text(
+                                  widget.userInitials ?? 'SA',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                    color: colorScheme.foreground,
+                                    height: 20 / 12,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          loading: () => const Scaffold(
+                            body: Center(child: CircularProgressIndicator()),
+                          ),
+                          error: (e, trace) =>
+                              Scaffold(body: Center(child: Text('Error: $e'))),
+                        );
+                      },
                     ),
                   ),
                 ],
               ),
             ],
           ),
-          widget.showSubtitle ? 
-          SizedBox(
-            height: 28,
-            width: double.infinity,
-            child: ClipRect(
-              child: Stack(
-                children: [
-                  SlideTransition(
-                    position: _dateSlideAnimation,
-                    child: Text(
-                      widget.dateText ?? _formatThaiDate(DateTime.now()),
-                      style: textTheme.h4.copyWith(color: colorScheme.daily),
-                    ),
-                  ),
-                  SlideTransition(
-                    position: _classSlideAnimation,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+          widget.showSubtitle
+              ? SizedBox(
+                  height: 28,
+                  width: double.infinity,
+                  child: ClipRect(
+                    child: Stack(
                       children: [
-                        Text(
-                          'ถัดไป: ',
-                          style: textTheme.custom['medium']!.copyWith(
-                            color: colorScheme.daily,
+                        SlideTransition(
+                          position: _dateSlideAnimation,
+                          child: Text(
+                            widget.dateText ?? _formatThaiDate(DateTime.now()),
+                            style: textTheme.h4.copyWith(
+                              color: colorScheme.daily,
+                            ),
                           ),
                         ),
-                        Text(
-                          widget.nextClassName ?? 'Mobile Application Design',
-                          style: textTheme.h4.copyWith(
-                            color: colorScheme.daily,
+                        SlideTransition(
+                          position: _classSlideAnimation,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                'ถัดไป: ',
+                                style: textTheme.custom['medium']!.copyWith(
+                                  color: colorScheme.daily,
+                                ),
+                              ),
+                              Text(
+                                widget.nextClassName ??
+                                    'Mobile Application Design',
+                                style: textTheme.h4.copyWith(
+                                  color: colorScheme.daily,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ) : const SizedBox.shrink(),
+                )
+              : const SizedBox.shrink(),
         ],
       ),
     );

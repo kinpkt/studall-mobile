@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/features/auth/data/models/role.dart';
+import 'package:studall/src/features/auth/data/models/user_model.dart';
 import 'package:studall/src/features/user/common_widgets/plain_text_app_bar.dart';
 import 'package:studall/src/features/user/common_widgets/student_app_bar.dart';
 import 'package:studall/src/features/user/home/presentation/screens/admin_home_screen.dart';
@@ -25,7 +26,9 @@ class AppLayoutScreen extends ConsumerWidget {
         ];
       case Role.student:
         return [
-          Center(child: Text('หน้าหลัก')), // TODO: ใส่ Widget จริง เช่น HomeScreen()
+          Center(
+            child: Text('หน้าหลัก'),
+          ), // TODO: ใส่ Widget จริง เช่น HomeScreen()
           Center(child: Text('วิชา')), // TODO: ใส่ SubjectScreen()
           Center(child: TasksScreen()), // TODO: ใส่ TodoScreen()
           Center(child: Text('สำรวจ')), // TODO: ใส่ ExploreScreen()
@@ -39,7 +42,6 @@ class AppLayoutScreen extends ConsumerWidget {
           Center(child: Text('สำรวจ')), // TODO: ใส่ ExploreScreen()
           Center(child: Text('เครื่องมือ')), // TODO: ใส่ ToolsScreen()
         ];
-
     }
   }
 

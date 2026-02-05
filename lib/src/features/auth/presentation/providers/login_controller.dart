@@ -15,11 +15,7 @@ class LoginController extends AsyncNotifier<void> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final authRepository = ref.read(authRepositoryProvider);
-
-      await authRepository.signInWithEmail(
-          email: email,
-          password: password
-      );
+      await authRepository.signInWithEmail(email: email, password: password);
 
       // await Future.delayed(const Duration(seconds: 2));
 
@@ -33,12 +29,7 @@ class LoginController extends AsyncNotifier<void> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final authRepository = ref.read(authRepositoryProvider);
-
       await authRepository.signInWithGoogle();
-
-      // await Future.delayed(const Duration(seconds: 2));
-      // TODO: เรียก Repository Google Sign In
-      // throw Exception("เข้าสู่ระบบไม่สำเร็จด้วย Google");
     });
   }
 }
