@@ -1,5 +1,8 @@
-# Created by https://www.toptal.com/developers/gitignore/api/vim,linux,macos,flutter,windows,androidstudio,visualstudiocode,jetbrains+all
-# Edit at https://www.toptal.com/developers/gitignore?templates=vim,linux,macos,flutter,windows,androidstudio,visualstudiocode,jetbrains+all
+# Created by https://www.toptal.com/developers/gitignore/api/vim,linux,macos,flutter,windows,androidstudio,jetbrains+all,visualstudiocode,dotenv
+# Edit at https://www.toptal.com/developers/gitignore?templates=vim,linux,macos,flutter,windows,androidstudio,jetbrains+all,visualstudiocode,dotenv
+
+### dotenv ###
+.env
 
 ### Flutter ###
 # Flutter/Dart/Pub related
@@ -388,4 +391,4 @@ hs_err_pid*
 
 !/gradle/wrapper/gradle-wrapper.jar
 
-# End of https://www.toptal.com/developers/gitignore/api/vim,linux,macos,flutter,windows,androidstudio,visualstudiocode,jetbrains+all
+# End of https://www.toptal.com/developers/gitignore/api/vim,linux,macos,flutter,windows,androidstudio,jetbrains+all,visualstudiocode,dotenv

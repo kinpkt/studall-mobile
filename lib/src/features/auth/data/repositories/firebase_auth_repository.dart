@@ -1,68 +1,93 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/user_model.dart';
-import 'auth_repository.dart';
+  import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+  import 'package:flutter_riverpod/flutter_riverpod.dart';
+  import '../models/user_model.dart';
+  import 'auth_repository.dart';
+  import 'package:google_sign_in/google_sign_in.dart';
 
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return FirebaseAuthRepository(FirebaseAuth.instance);
-});
+  final authRepositoryProvider = Provider<AuthRepository>((ref) {
+    return FirebaseAuthRepository(FirebaseAuth.instance);
+  });
 
-class FirebaseAuthRepository implements AuthRepository {
-  final FirebaseAuth _firebaseAuth;
+  class FirebaseAuthRepository implements AuthRepository {
+    final FirebaseAuth _firebaseAuth;
 
-  FirebaseAuthRepository(this._firebaseAuth);
+    FirebaseAuthRepository(this._firebaseAuth);
 
-  UserModel? _userFromFirebase(User? user) {
-    if (user == null)
-      return null;
-    
-    return UserModel(
-        id: user.uid,
-        email: user.email ?? '',
-        username: user.displayName ?? '',
-        // fullName: fullName
-    );
-  }
+    UserModel? _userFromFirebase(User? user) {
+      if (user == null)
+        return null;
 
-  @override
-  Stream<UserModel?> authStateChanges() {
-    return _firebaseAuth.authStateChanges().map(_userFromFirebase);
-  }
-
-  @override
-  Future<UserModel?> getCurrentUser() async {
-    return _userFromFirebase(_firebaseAuth.currentUser);
-  }
-
-  @override
-  Future<UserModel> signInWithEmail({required String email, required String password}) async {
-    final credential = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
-
-    if (credential.user == null)
-      throw Exception('Sign in failed');
-
-    return _userFromFirebase(credential.user!)!;
-  }
-
-  @override
-  Future<UserModel> signUpWithEmail({required String email, required String password, String? displayName}) async {
-    final credential = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-
-    if (credential.user != null && displayName != null) {
-      await credential.user!.updateDisplayName(displayName);
-      await credential.user!.reload();
+      return UserModel(
+          id: user.uid,
+          email: user.email ?? '',
+          username: user.displayName ?? '',
+          // fullName: fullName
+      );
     }
-    
-    return _userFromFirebase(_firebaseAuth.currentUser)!;
-  }
 
-  @override
-  Future<void> signOut() {
-    return _firebaseAuth.signOut();
-  }
+    @override
+    Stream<UserModel?> authStateChanges() {
+      return _firebaseAuth.authStateChanges().map(_userFromFirebase);
+    }
 
-  @override
-  Future<UserModel> signInWithGoogle() {
-    throw UnimplementedError();
+    @override
+    Future<UserModel?> getCurrentUser() async {
+      return _userFromFirebase(_firebaseAuth.currentUser);
+    }
+
+    @override
+    Future<UserModel> signInWithEmail({required String email, required String password}) async {
+      final credential = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+
+      if (credential.user == null)
+        throw Exception('Sign in failed');
+
+      return _userFromFirebase(credential.user!)!;
+    }
+
+    @override
+    Future<UserModel> signUpWithEmail({required String email, required String password, String? displayName}) async {
+      final credential = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+
+      if (credential.user != null && displayName != null) {
+        await credential.user!.updateDisplayName(displayName);
+        await credential.user!.reload();
+      }
+
+      return _userFromFirebase(_firebaseAuth.currentUser)!;
+    }
+
+    @override
+    Future<void> signOut() {
+      return _firebaseAuth.signOut();
+    }
+
+    @override
+    Future<UserModel> signInWithGoogle() async {
+      await GoogleSignIn.instance.initialize(
+        serverClientId: dotenv.env['GOOGLE_SERVER_CLIENT_ID'],
+      );
+
+      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance.authenticate();
+
+      if (googleUser == null)
+        throw Exception('Google Sign In cancelled by user');
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
+
+      if (userCredential.user == null)
+        throw Exception('Google Sign In failed to retrieve user');
+
+      // Optional: Save to Firestore if it's a new user (same logic as email signup)
+      // _saveUserToFirestore(userCredential.user!);
+
+      return _userFromFirebase(userCredential.user)!;
+    }
   }
-}
