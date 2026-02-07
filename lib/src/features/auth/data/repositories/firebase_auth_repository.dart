@@ -98,15 +98,6 @@ class FirebaseAuthRepository implements AuthRepository {
     }
   }
 
-  Future<void> _initGoogleSignIn() async {
-    final clientId = dotenv.env['GOOGLE_SERVER_CLIENT_ID'];
-    if (clientId == null) {
-      print("Error: GOOGLE_SERVER_CLIENT_ID not found in .env");
-      return;
-    }
-    await _googleSignIn.initialize(serverClientId: clientId);
-  }
-
   @override
   Future<UserModel> signInWithGoogle() async {
     final clientId = dotenv.env['GOOGLE_SERVER_CLIENT_ID'];
@@ -141,7 +132,7 @@ class FirebaseAuthRepository implements AuthRepository {
         throw Exception('Firebase Sign In failed');
       }
 
-      // await _syncUserDocIfNeeded(user);
+      // await _syncUserDocIfNeeded(user);3lp
 
       return _userFromFirebase(user)!;
     } on GoogleSignInException catch (e) {

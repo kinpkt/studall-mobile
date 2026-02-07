@@ -8,6 +8,7 @@ import 'package:studall/src/core/theme/material_theme_builder.dart';
 import 'package:studall/src/features/auth/presentation/screens/login_screen.dart';
 import 'package:studall/src/features/user/presentation/screens/app_layout_screen.dart';
 import 'package:studall/src/features/auth/presentation/providers/auth_state_provider.dart';
+import 'package:studall/src/features/auth/presentation/screens/select_role_screen.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -18,7 +19,7 @@ class MyApp extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
 
     return ShadApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
       themeMode: themeMode,
       theme: appThemeLight,
       darkTheme: appThemeDark,
@@ -26,8 +27,16 @@ class MyApp extends ConsumerWidget {
           materialThemeBuilder(context, theme),
       home: authState.when(
         data: (user) {
-          if (user != null) return AppLayoutScreen(role: user.lastActiveRole ?? Role.student,);
+          if (user != null) {
+            if (user.roles.isEmpty) {
+              return const SelectRoleScreen();
+            } else if (user.lastActiveRole != null) {
+              return AppLayoutScreen(role: user.lastActiveRole!);
+            }
+          }
+
           return const LoginScreen();
+          // return const SelectRoleScreen();
         },
         loading: () =>
             const Scaffold(body: Center(child: CircularProgressIndicator())),

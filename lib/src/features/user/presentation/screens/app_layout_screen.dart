@@ -9,6 +9,7 @@ import 'package:studall/src/features/user/home/presentation/screens/admin_home_s
 import 'package:studall/src/features/user/home/presentation/screens/partner_home_screen.dart';
 import 'package:studall/src/features/user/tasks/presentation/tasks_screen.dart';
 import '../providers/app_layout_controller.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class AppLayoutScreen extends ConsumerWidget {
   const AppLayoutScreen({super.key, required this.role});
@@ -154,11 +155,28 @@ class AppLayoutScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(appLayoutControllerProvider);
-
+    const studentPageTitles = [null, 'รายวิชา', 'ที่ต้องทำ', 'บันทึก', 'สำรวจ'];
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
     return SafeArea(
       bottom: false,
       child: Scaffold(
-        appBar: _buildAppBar(currentIndex),
+        appBar: StudentAppbar(
+          showNextEvent: currentIndex == 0,
+          showSubtitle: currentIndex != 4,
+          pageTitle: studentPageTitles[currentIndex],
+          actions: [
+            ShadIconButton.outline(
+              decoration: ShadDecoration(shape: BoxShape.circle),
+              onPressed: () {},
+              icon: Icon(
+                PhosphorIconsRegular.bell,
+                size: 24,
+                color: colorScheme.foreground,
+              ),
+            ),
+          ],
+        ),
         body: IndexedStack(index: currentIndex, children: _pages),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},

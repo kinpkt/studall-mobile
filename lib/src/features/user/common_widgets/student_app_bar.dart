@@ -17,6 +17,7 @@ class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onNotificationTap;
   final VoidCallback? onProfileTap;
   final VoidCallback? onAnimationTap;
+  final List<Widget>? actions;
 
   const StudentAppbar({
     super.key,
@@ -30,6 +31,7 @@ class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
     this.onNotificationTap,
     this.onProfileTap,
     this.onAnimationTap,
+    this.actions,
   });
 
   @override
@@ -137,117 +139,110 @@ class _StudentAppbarState extends State<StudentAppbar>
     return Container(
       color: colorScheme.background,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  _getDisplayTitle(),
-                  style: textTheme.h2,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 24),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ShadIconButton.outline(
-                    decoration: ShadDecoration(shape: BoxShape.circle),
-                    onPressed: widget.onNotificationTap ?? () {},
-                    icon: Icon(
-                      PhosphorIconsRegular.bell,
-                      size: 24,
-                      color: colorScheme.foreground,
-                    ),
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _getDisplayTitle(),
+                    style: textTheme.h2,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: widget.onProfileTap,
-                    child: Consumer(
-                      builder: (context, ref, _) {
-                        final authState = ref.watch(authStateProvider);
-                        final authRepository = ref.read(authRepositoryProvider);
-                        return authState.when(
-                          data: (user) {
-                            print(user!.photoUrl);
-                            return GestureDetector(
-                              onDoubleTap: () => authRepository.signOut(),
-                              child: ShadAvatar(
-                                user!.photoUrl,
-                                size: const Size.square(40),
-                                backgroundColor: colorScheme.muted,
-                                placeholder: Text(
-                                  widget.userInitials ?? 'SA',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                    color: colorScheme.foreground,
-                                    height: 20 / 12,
+                ),
+                const SizedBox(width: 24),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 8,
+                  children: [
+                    if (widget.actions != null) ...widget.actions!,
+                    GestureDetector(
+                      onTap: widget.onProfileTap,
+                      child: Consumer(
+                        builder: (context, ref, _) {
+                          final authState = ref.watch(authStateProvider);
+                          final authRepository = ref.read(authRepositoryProvider);
+                          return authState.when(
+                            data: (user) {
+                              return GestureDetector(
+                                onDoubleTap: () => authRepository.signOut(),
+                                child: ShadAvatar(
+                                  user!.photoUrl,
+                                  size: const Size.square(40),
+                                  backgroundColor: colorScheme.muted,
+                                  placeholder: Text(
+                                    widget.userInitials ?? 'SA',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: colorScheme.foreground,
+                                      height: 20 / 12,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                          loading: () => const Scaffold(
-                            body: Center(child: CircularProgressIndicator()),
-                          ),
-                          error: (e, trace) =>
-                              Scaffold(body: Center(child: Text('Error: $e'))),
-                        );
-                      },
+                              );
+                            },
+                            loading: () => const Scaffold(
+                              body: Center(child: CircularProgressIndicator()),
+                            ),
+                            error: (e, trace) =>
+                                Scaffold(body: Center(child: Text('Error: $e'))),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          widget.showSubtitle
-              ? SizedBox(
-                  height: 28,
-                  width: double.infinity,
-                  child: ClipRect(
-                    child: Stack(
-                      children: [
-                        SlideTransition(
-                          position: _dateSlideAnimation,
-                          child: Text(
-                            widget.dateText ?? _formatThaiDate(DateTime.now()),
-                            style: textTheme.h4.copyWith(
-                              color: colorScheme.daily,
+                  ],
+                ),
+              ],
+            ),
+            widget.showSubtitle
+                ? SizedBox(
+                    height: 28,
+                    width: double.infinity,
+                    child: ClipRect(
+                      child: Stack(
+                        children: [
+                          SlideTransition(
+                            position: _dateSlideAnimation,
+                            child: Text(
+                              widget.dateText ?? _formatThaiDate(DateTime.now()),
+                              style: textTheme.h4.copyWith(
+                                color: colorScheme.daily,
+                              ),
                             ),
                           ),
-                        ),
-                        SlideTransition(
-                          position: _classSlideAnimation,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'ถัดไป: ',
-                                style: textTheme.custom['medium']!.copyWith(
-                                  color: colorScheme.daily,
+                          SlideTransition(
+                            position: _classSlideAnimation,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'ถัดไป: ',
+                                  style: textTheme.custom['medium']!.copyWith(
+                                    color: colorScheme.daily,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                widget.nextClassName ??
-                                    'Mobile Application Design',
-                                style: textTheme.h4.copyWith(
-                                  color: colorScheme.daily,
+                                Text(
+                                  widget.nextClassName ??
+                                      'Mobile Application Design',
+                                  style: textTheme.h4.copyWith(
+                                    color: colorScheme.daily,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                )
-              : const SizedBox.shrink(),
-        ],
+                  )
+                : const SizedBox.shrink(),
+          ],
+        ),
       ),
     );
   }
