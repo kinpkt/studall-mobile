@@ -73,9 +73,9 @@ class RadioCard<T> extends StatelessWidget {
         GestureDetector(
           onTap: enabled && onChanged != null ? () => onChanged!(value) : null,
           child: AnimatedContainer(
-            constraints: const BoxConstraints(minWidth: 394, minHeight: 124),
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
+            constraints: const BoxConstraints(minWidth: 394, minHeight: 124),
             decoration: BoxDecoration(
               color: colorScheme.card,
               border: Border.all(color: colorScheme.border, width: 1),

@@ -167,13 +167,11 @@ class AppLayoutScreen extends ConsumerWidget {
           pageTitle: studentPageTitles[currentIndex],
           actions: [
             ShadIconButton.outline(
+              iconSize: 24,
+              foregroundColor: colorScheme.foreground,
               decoration: ShadDecoration(shape: BoxShape.circle),
               onPressed: () {},
-              icon: Icon(
-                PhosphorIconsRegular.bell,
-                size: 24,
-                color: colorScheme.foreground,
-              ),
+              icon: Icon(PhosphorIconsRegular.bell),
             ),
           ],
         ),

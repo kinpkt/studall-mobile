@@ -63,6 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '282022508089',
     projectId: 'studall-mobile',
     storageBucket: 'studall-mobile.firebasestorage.app',
+    iosClientId: '282022508089-h04526iss3i1hfel3prhdmosh4s6tihf.apps.googleusercontent.com',
     iosBundleId: 'com.example.studall',
   );
 }

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
-import '../../data/models/role.dart';
+// import '../../data/models/role.dart';
 import '../providers/login_controller.dart';
 import '../widgets/google_sign_in_button.dart';
-import '../../../user/presentation/screens/app_layout_screen.dart';
+// import '../../../user/presentation/screens/app_layout_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});

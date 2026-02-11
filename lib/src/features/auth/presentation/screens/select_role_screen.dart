@@ -1,9 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/common_widgets/radio_card.dart';
 import 'package:studall/src/features/auth/data/models/role.dart';
-import '../../../user/common_widgets/student_app_bar.dart';
+import 'package:studall/src/common_widgets/common_appbar.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:studall/src/features/auth/data/repositories/auth_repository.dart';
+import 'package:studall/src/features/auth/presentation/providers/auth_state_provider.dart';
+import 'package:studall/src/features/auth/data/repositories/firebase_auth_repository.dart';
+import 'package:flutter_initicon/flutter_initicon.dart';
+import 'package:studall/src/features/user/presentation/screens/app_layout_screen.dart';
+import 'package:studall/src/features/classroom_sync/presentation/screens/sync_classroom_screen.dart';
 
 /// Screen for selecting user role during registration.
 /// Uses Role enum (student, partner)
@@ -17,7 +24,12 @@ class SelectRoleScreen extends StatefulWidget {
 class _SelectRoleScreenState extends State<SelectRoleScreen> {
   Role? _selectedRole = Role.student;
 
-  void _handleRegister() {
+  void _handleRegister(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SyncClassroomScreen()),
+    );
+
     if (_selectedRole == null) {
       return;
     }
@@ -32,22 +44,21 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: StudentAppbar(
-        pageTitle: '',
-        showNextEvent: false,
-        showSubtitle: false,
-      ),
+      appBar: _buildAppBar(context),
       backgroundColor: colorScheme.background,
       body: SafeArea(
+        bottom: true,
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 394),
+              constraints: const BoxConstraints(maxWidth: 392),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const SizedBox(height: 16.0),
+
                   Column(
                     children: [
                       Text(
@@ -107,17 +118,79 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
 
                   // Register Button
                   ShadButton(
-                    onPressed: _selectedRole != null ? _handleRegister : null,
+                    onPressed: _selectedRole != null
+                        ? () => _handleRegister(context)
+                        : null,
                     size: ShadButtonSize.lg,
                     width: double.infinity,
                     child: const Text('ลงทะเบียน'),
                   ),
+                  const SizedBox(height: 56),
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  CommonAppbar _buildAppBar(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return CommonAppbar(
+      leading: [
+        Consumer(
+          builder: (context, ref, _) {
+            final authRepository = ref.watch(authRepositoryProvider);
+            return GestureDetector(
+              child: Row(
+                children: [
+                  Icon(
+                    size: 24.0,
+                    PhosphorIconsRegular.signOut,
+                    color: colorScheme.foreground,
+                  ),
+                  const SizedBox(width: 8),
+                  Text('ออกจากระบบ', style: theme.textTheme.p),
+                ],
+              ),
+              onTap: () => authRepository.signOut(),
+            );
+          },
+        ),
+      ],
+      actions: [
+        Consumer(
+          builder: (context, ref, _) {
+            final authState = ref.watch(authStateProvider);
+            return authState.when(
+              data: (user) {
+                return ShadAvatar(
+                  user?.photoUrl,
+                  size: const Size.square(40),
+                  backgroundColor: colorScheme.muted,
+                  placeholder: Initicon(
+                    text: user?.username ?? "SA",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: colorScheme.foreground,
+                      height: 20 / 12,
+                    ),
+                  ),
+                );
+              },
+              loading: () => const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              ),
+              error: (e, trace) =>
+                  Scaffold(body: Center(child: Text('Error: $e'))),
+            );
+          },
+        ),
+      ],
     );
   }
 }

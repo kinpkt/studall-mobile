@@ -8,6 +8,9 @@ final appThemeLight = ShadThemeData(
   colorScheme: AppColorScheme.lightScheme,
   textTheme: appTextStyle,
   inputTheme: appInputTheme,
+  buttonSizesTheme: ShadButtonSizesTheme(
+    icon: ShadButtonSizeTheme(height: 40, padding: EdgeInsets.all(8)),
+  ),
 );
 
 final appThemeDark = ShadThemeData(

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
 import 'package:studall/src/features/auth/data/repositories/firebase_auth_repository.dart';
 import 'package:studall/src/features/auth/presentation/providers/auth_state_provider.dart';
+import 'package:studall/src/features/auth/presentation/screens/login_screen.dart';
 
 class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
   final String? pageTitle;
@@ -38,7 +38,7 @@ class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
   State<StudentAppbar> createState() => _StudentAppbarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(136);
+  Size get preferredSize => const Size.fromHeight(86);
 }
 
 class _StudentAppbarState extends State<StudentAppbar>
@@ -145,6 +145,7 @@ class _StudentAppbarState extends State<StudentAppbar>
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: Text(
@@ -165,7 +166,9 @@ class _StudentAppbarState extends State<StudentAppbar>
                       child: Consumer(
                         builder: (context, ref, _) {
                           final authState = ref.watch(authStateProvider);
-                          final authRepository = ref.read(authRepositoryProvider);
+                          final authRepository = ref.read(
+                            authRepositoryProvider,
+                          );
                           return authState.when(
                             data: (user) {
                               return GestureDetector(
@@ -189,8 +192,9 @@ class _StudentAppbarState extends State<StudentAppbar>
                             loading: () => const Scaffold(
                               body: Center(child: CircularProgressIndicator()),
                             ),
-                            error: (e, trace) =>
-                                Scaffold(body: Center(child: Text('Error: $e'))),
+                            error: (e, trace) => Scaffold(
+                              body: Center(child: Text('Error: $e')),
+                            ),
                           );
                         },
                       ),
@@ -209,7 +213,8 @@ class _StudentAppbarState extends State<StudentAppbar>
                           SlideTransition(
                             position: _dateSlideAnimation,
                             child: Text(
-                              widget.dateText ?? _formatThaiDate(DateTime.now()),
+                              widget.dateText ??
+                                  _formatThaiDate(DateTime.now()),
                               style: textTheme.h4.copyWith(
                                 color: colorScheme.daily,
                               ),

@@ -13,6 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_dotenv: ^6.0.0
+  flutter_initicon: ^3.0.1
   flutter_riverpod: ^3.2.0
   flutter_svg: ^2.2.3
   google_fonts: ^6.3.3
