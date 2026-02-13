@@ -5,11 +5,9 @@ import 'package:studall/src/features/auth/data/models/role.dart';
 import 'package:studall/src/common_widgets/common_appbar.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:studall/src/features/auth/data/repositories/auth_repository.dart';
 import 'package:studall/src/features/auth/presentation/providers/auth_state_provider.dart';
 import 'package:studall/src/features/auth/data/repositories/firebase_auth_repository.dart';
 import 'package:flutter_initicon/flutter_initicon.dart';
-import 'package:studall/src/features/user/presentation/screens/app_layout_screen.dart';
 import 'package:studall/src/features/classroom_sync/presentation/screens/sync_classroom_screen.dart';
 
 /// Screen for selecting user role during registration.

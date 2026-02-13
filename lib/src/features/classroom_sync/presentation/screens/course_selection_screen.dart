@@ -3,8 +3,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/common_widgets/common_appbar.dart';
 import 'package:studall/src/common_widgets/checkbox_card.dart';
-import 'package:studall/src/features/user/presentation/screens/app_layout_screen.dart';
-import 'package:studall/src/features/auth/data/models/role.dart';
+import 'package:studall/src/features/student/presentation/screens/student_layout_screen.dart';
 
 class CourseSelectionScreen extends StatefulWidget {
   const CourseSelectionScreen({super.key});
@@ -170,9 +169,9 @@ class _CourseSelectionScreenState extends State<CourseSelectionScreen> {
               ),
             ],
           ),
-          onTap: () => Navigator.of(context).push( 
+          onTap: () => Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => const AppLayoutScreen(role: Role.student,),
+              builder: (context) => const StudentLayoutScreen(),
             ),
           ),
         ),
