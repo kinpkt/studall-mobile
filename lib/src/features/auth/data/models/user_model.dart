@@ -6,7 +6,7 @@ part 'user_model.g.dart';
 
 @JsonSerializable()
 class UserModel {
-  final String id;
+  final String uid;
   final String email;
   final String username;
   final String? fullName;
@@ -16,7 +16,7 @@ class UserModel {
   final List<Role> roles;
 
   const UserModel({
-    required this.id,
+    required this.uid,
     required this.email,
     required this.username,
     this.fullName,
@@ -33,7 +33,7 @@ class UserModel {
 
   factory UserModel.fromFirebase(User firebaseUser) {
     return UserModel(
-      id: firebaseUser.uid,
+      uid: firebaseUser.uid,
       email: firebaseUser.email ?? '',
       username: '',
       fullName: firebaseUser.displayName ?? '',
@@ -43,7 +43,7 @@ class UserModel {
   }
 
   UserModel copyWith({
-    String? id,
+    String? uid,
     String? email,
     String? username,
     String? fullName,
@@ -53,7 +53,7 @@ class UserModel {
     List<Role>? roles,
   }) {
     return UserModel(
-      id: id ?? this.id,
+      uid: uid ?? this.uid,
       email: email ?? this.email,
       username: username ?? this.username,
       fullName: fullName ?? this.fullName,

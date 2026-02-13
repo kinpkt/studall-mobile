@@ -26,7 +26,7 @@ class FirebaseAuthRepository implements AuthRepository {
   UserModel? _userFromFirebase(User? user) {
     if (user == null) return null;
     return UserModel(
-      id: user.uid,
+      uid: user.uid,
       email: user.email ?? '',
       photoUrl: user.photoURL ?? '',
       username: user.displayName ?? '',
@@ -132,7 +132,7 @@ class FirebaseAuthRepository implements AuthRepository {
         throw Exception('Firebase Sign In failed');
       }
 
-      // await _syncUserDocIfNeeded(user);3lp
+      await _syncUserDocIfNeeded(user);
 
       return _userFromFirebase(user)!;
     } on GoogleSignInException catch (e) {
