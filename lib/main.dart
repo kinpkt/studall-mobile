@@ -16,7 +16,6 @@ void main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-
 // // Test Home Page to showcase Shadcn UI theme colors and text styles
 // class MyHomePage extends StatefulWidget {
 //   const MyHomePage({super.key});

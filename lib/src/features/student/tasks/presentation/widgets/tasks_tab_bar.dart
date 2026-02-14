@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class TasksAppBar extends StatelessWidget {
-  const TasksAppBar({super.key});
+class TasksTabBar extends StatelessWidget {
+  const TasksTabBar({super.key});
 
   @override
   Widget build(BuildContext context) {

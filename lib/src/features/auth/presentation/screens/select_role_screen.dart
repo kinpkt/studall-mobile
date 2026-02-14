@@ -83,7 +83,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
                     children: [
                       // Student Role Card
                       RadioCard<Role>(
-                        title: 'สำหรับผู้นักเรียน',
+                        title: 'สำหรับนักเรียน / นักศึกษา',
                         description:
                             'จัดการตารางเรียน ติดตามการบ้าน \nรับการแจ้งเตือนเพื่อไม่พลาดทุกคลาสสำคัญ',
                         value: Role.student,

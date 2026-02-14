@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/features/student/common_widgets/student_app_bar.dart';
-import 'package:studall/src/features/student/tasks/presentation/tasks_screen.dart';
+import 'package:studall/src/features/student/home/presentation/screens/student_home_screen.dart';
+import 'package:studall/src/features/student/tasks/presentation/screens/tasks_screen.dart';
+import '../../notes/presentation/screens/notes_screen.dart';
 import '../providers/student_layout_controller.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -11,13 +13,11 @@ class StudentLayoutScreen extends ConsumerWidget {
 
   List<Widget> get _pages {
     return [
-      Center(
-        child: Text('หน้าหลัก'),
-      ), // TODO: ใส่ Widget จริง เช่น HomeScreen()
+      Center(child: StudentHomeScreen()),
       Center(child: Text('วิชา')), // TODO: ใส่ SubjectScreen()
-      Center(child: TasksScreen()), // TODO: ใส่ TodoScreen()
+      Center(child: TasksScreen()),
+      Center(child: NotesScreen()),
       Center(child: Text('สำรวจ')), // TODO: ใส่ ExploreScreen()
-      Center(child: Text('เครื่องมือ')), // TODO: ใส่ ToolsScreen()
     ];
   }
 

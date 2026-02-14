@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/common_widgets/plain_text_app_bar.dart';
-import 'package:studall/src/features/partner/home/presentation/screens/partner_home_screen.dart';
+import 'package:studall/src/features/admin/home/presentation/screens/admin_home_screen.dart';
 import '../providers/admin_layout_controller.dart';
 
 class AdminLayoutScreen extends ConsumerWidget {
   const AdminLayoutScreen({super.key});
 
   List<Widget> get _pages {
-    return [Center(child: PartnerHomeScreen())];
+    return [Center(child: AdminHomeScreen())];
   }
 
   List<NavigationDestination> get _destinations {

@@ -12,6 +12,7 @@ import 'package:studall/src/features/auth/presentation/providers/auth_state_prov
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/select_role_screen.dart';
+import 'package:studall/src/features/student/tasks/presentation/screens/tasks_screen.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -32,8 +33,9 @@ class MyApp extends ConsumerWidget {
         data: (user) {
           if (user != null) {
             if (user.roles.isEmpty) {
-              return const SelectRoleScreen();
-            } else if (user.lastActiveRole != null) {
+              return const StudentLayoutScreen();
+            }
+            else if (user.lastActiveRole != null) {
               switch (user.lastActiveRole!) {
                 case Role.student:
                   return StudentLayoutScreen();
@@ -47,7 +49,7 @@ class MyApp extends ConsumerWidget {
           return const LogInScreen();
         },
         loading: () =>
-            const Scaffold(body: Center(child: CircularProgressIndicator())),
+        const Scaffold(body: Center(child: CircularProgressIndicator())),
         error: (e, trace) => Scaffold(body: Center(child: Text('Error: $e'))),
       ),
       initialRoute: '/',
@@ -55,7 +57,6 @@ class MyApp extends ConsumerWidget {
         '/login': (context) => const LogInScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/select-role': (context) => const SelectRoleScreen(),
-
         '/student-layout': (context) => const StudentLayoutScreen(),
         '/partner-layout': (context) => const PartnerLayoutScreen(),
         '/admin-layout': (context) => const AdminLayoutScreen(),
