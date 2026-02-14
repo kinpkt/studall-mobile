@@ -15,7 +15,7 @@ class RecentItemCard extends StatelessWidget {
 
     return ShadCard(
       width: 240,
-      padding: const EdgeInsets.only(top: 24, left: 24, right: 24, bottom: 8),
+      padding: const EdgeInsets.only(top: 24, left: 24, right: 24, bottom: 16),
       title: Text(item.name, style: theme.textTheme.h4,),
       description: Text(item.courseId),
       footer: Row(

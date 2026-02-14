@@ -13,7 +13,7 @@ class TasksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Sandbox area for defining hardcoded datasources
     CourseModel demoCourse = CourseModel(courseId: '01418342-65', name: 'Mobile Application Design and Development', credit: 3);
-    TaskModel demoTask = TaskModel(title: 'Ass09: Asynchronous Programming', dueDate: DateTime.now(), type: TaskType.assignment, course: demoCourse);
+    TaskModel demoTask = TaskModel(title: 'Ass09: Asynchronous Programming', dueDate: DateTime(2026, 2, 26, 23, 59), type: TaskType.assignment, course: demoCourse);
 
     return DefaultTabController(
       length: 3,

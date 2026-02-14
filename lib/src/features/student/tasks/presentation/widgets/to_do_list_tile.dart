@@ -28,6 +28,11 @@ class ToDoListTile extends StatelessWidget {
         ),
         title: Text(task.title, style: theme.textTheme.list,),
         subtitle: Text(task.course?.name ?? '', style: theme.textTheme.muted),
+        trailing: Text(task.formattedDueDate,
+          style: theme.textTheme.p.copyWith(
+            color: theme.colorScheme.custom['success'],
+          ),
+        ),
       ),
     );
   }
