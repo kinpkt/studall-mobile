@@ -109,7 +109,7 @@ class _StudentAppbarState extends State<StudentAppbar>
     final hour = now.hour;
 
     if (hour < 12) {
-      return 'ถัดไปอีก 1 ชมครึ่ง';
+      return 'ถัดไปอีก 1 ชม. ครึ่ง';
     } else if (hour < 18) {
       return 'ถัดไปอีก 30 นาที';
     } else {
