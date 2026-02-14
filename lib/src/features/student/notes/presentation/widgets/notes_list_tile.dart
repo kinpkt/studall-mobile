@@ -6,7 +6,9 @@ import '../../data/models/note_model.dart';
 
 class NotesListTile extends StatelessWidget {
   final NoteModel note;
-  const NotesListTile({super.key, required this.note});
+  final bool isPinned;
+
+  const NotesListTile({super.key, required this.note, this.isPinned = false});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,14 @@ class NotesListTile extends StatelessWidget {
           ),
         ),
         title: Text(note.name, style: theme.textTheme.list,),
-        subtitle: Text(note.course.name ?? '', style: theme.textTheme.muted),
+        subtitle: Text(
+          note.course.name != null ? '${note.course.name} (${note.timeDifferenceString})' :
+          '(${note.timeDifferenceString})', style: theme.textTheme.muted),
+        trailing: isPinned ? Icon(
+          PhosphorIconsFill.pushPin,
+          color: Colors.grey[300],
+          size: 18,
+        ) : null,
       ),
     );
   }
