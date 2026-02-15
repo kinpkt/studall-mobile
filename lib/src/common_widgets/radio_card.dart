@@ -38,7 +38,7 @@ class RadioCard<T> extends StatelessWidget {
   /// Whether the radio card is enabled. Defaults to true.
   final bool enabled;
 
-  RadioCard({
+  const RadioCard({
     super.key,
     required this.title,
     required this.description,

@@ -26,6 +26,7 @@ ThemeData materialThemeBuilder(BuildContext context, ThemeData theme) {
       onError: shadColorScheme.destructiveForeground,
       errorContainer: shadColorScheme.destructive.withValues(alpha: .1),
       onErrorContainer: shadColorScheme.destructive,
+      // ignore: deprecated_member_use
       surfaceVariant: shadColorScheme.muted,
       onSurfaceVariant: shadColorScheme.mutedForeground,
       outline: shadColorScheme.border,
