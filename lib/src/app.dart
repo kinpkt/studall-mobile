@@ -12,7 +12,6 @@ import 'package:studall/src/features/auth/presentation/providers/auth_state_prov
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/select_role_screen.dart';
-import 'package:studall/src/features/student/tasks/presentation/screens/tasks_screen.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -33,20 +32,21 @@ class MyApp extends ConsumerWidget {
         data: (user) {
           if (user != null) {
             if (user.roles.isEmpty) {
-              return const StudentLayoutScreen();
+              return const SelectRoleScreen();
             }
             else if (user.lastActiveRole != null) {
               switch (user.lastActiveRole!) {
                 case Role.student:
-                  return StudentLayoutScreen();
+                  return const StudentLayoutScreen();
                 case Role.partner:
-                  return PartnerLayoutScreen();
+                  return const PartnerLayoutScreen();
                 case Role.admin:
-                  return AdminLayoutScreen();
+                  return const AdminLayoutScreen();
               }
             }
           }
-          return const LogInScreen();
+          return const AdminLayoutScreen();
+          // return const LogInScreen();
         },
         loading: () =>
         const Scaffold(body: Center(child: CircularProgressIndicator())),
