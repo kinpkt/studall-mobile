@@ -49,7 +49,7 @@ class AdminLayoutScreen extends ConsumerWidget {
     return SafeArea(
       child: Scaffold(
         appBar: _buildAppBar(currentIndex),
-        body: IndexedStack(index: currentIndex, children: _pages),
+        body: SingleChildScrollView(child: IndexedStack(index: currentIndex, children: _pages)),
         bottomNavigationBar: NavigationBar(
           selectedIndex: currentIndex,
           onDestinationSelected: (index) {

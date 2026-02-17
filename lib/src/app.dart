@@ -5,6 +5,8 @@ import 'package:studall/src/features/auth/data/models/role.dart';
 import 'package:studall/src/core/theme/app_theme.dart';
 import 'package:studall/src/core/theme/theme_provider.dart';
 import 'package:studall/src/core/theme/material_theme_builder.dart';
+import 'package:studall/src/features/partner/advertisements/presentation/screens/partner_add_advertisement_screen.dart';
+import 'package:studall/src/features/partner/branches/presentation/screens/partner_add_branch_screen.dart';
 import 'package:studall/src/features/student/presentation/screens/student_layout_screen.dart';
 import 'package:studall/src/features/partner/presentation/screens/partner_layout_screen.dart';
 import 'package:studall/src/features/admin/presentation/screens/admin_layout_screen.dart';
@@ -45,7 +47,7 @@ class MyApp extends ConsumerWidget {
               }
             }
           }
-          return const AdminLayoutScreen();
+          return const PartnerLayoutScreen();
           // return const LogInScreen();
         },
         loading: () =>
@@ -59,6 +61,8 @@ class MyApp extends ConsumerWidget {
         '/select-role': (context) => const SelectRoleScreen(),
         '/student-layout': (context) => const StudentLayoutScreen(),
         '/partner-layout': (context) => const PartnerLayoutScreen(),
+        '/partner-add-branch': (context) => const PartnerAddBranchScreen(),
+        '/partner-add-advertisement': (context) => const PartnerAddAdvertisementScreen(),
         '/admin-layout': (context) => const AdminLayoutScreen(),
       },
     );
