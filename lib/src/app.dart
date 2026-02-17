@@ -31,21 +31,21 @@ class MyApp extends ConsumerWidget {
           materialThemeBuilder(context, theme),
       home: authState.when(
         data: (user) {
-          if (user != null) {
-            if (user.roles.isEmpty) {
-              return const StudentLayoutScreen();
-            }
-            else if (user.lastActiveRole != null) {
-              switch (user.lastActiveRole!) {
-                case Role.student:
-                  return StudentLayoutScreen();
-                case Role.partner:
-                  return PartnerLayoutScreen();
-                case Role.admin:
-                  return AdminLayoutScreen();
-              }
-            }
-          }
+          // if (user != null) {
+          //   if (user.roles.isEmpty) {
+          //     return const StudentLayoutScreen();
+          //   }
+          //   else if (user.lastActiveRole != null) {
+          //     switch (user.lastActiveRole!) {
+          //       case Role.student:
+          //         return StudentLayoutScreen();
+          //       case Role.partner:
+          //         return PartnerLayoutScreen();
+          //       case Role.admin:
+          //         return AdminLayoutScreen();
+          //     }
+          //   }
+          // }
           return const LogInScreen();
         },
         loading: () =>

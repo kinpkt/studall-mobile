@@ -1,51 +1,52 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../models/user_model.dart';
 import 'auth_repository.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return FirebaseAuthRepository(
-    FirebaseAuth.instance,
-    FirebaseFirestore.instance,
-  );
+final authFirebaseRepositoryProvider = Provider<AuthFirebaseRepository>((ref) {
+  return FirebaseAuthRepository(FirebaseAuth.instance);
 });
 
-class FirebaseAuthRepository implements AuthRepository {
+class FirebaseAuthRepository implements AuthFirebaseRepository {
   final FirebaseAuth _firebaseAuth;
-  final FirebaseFirestore _firestore;
 
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
-  FirebaseAuthRepository(this._firebaseAuth, this._firestore);
+  FirebaseAuthRepository(this._firebaseAuth);
 
-  UserModel? _userFromFirebase(User? user) {
-    if (user == null) return null;
-    return UserModel(
-      uid: user.uid,
-      email: user.email ?? '',
-      photoUrl: user.photoURL ?? '',
-      username: user.displayName ?? '',
-      fullName: user.displayName ?? '',
-    );
+  @override
+  Stream<User?> get authStateChanges {
+    return _firebaseAuth.authStateChanges().map((user) => user);
   }
 
   @override
-  Stream<UserModel?> authStateChanges() {
-    return _firebaseAuth.authStateChanges().map(_userFromFirebase);
+  String? get currentUid => _firebaseAuth.currentUser?.uid;
+
+  @override
+  Future<User> signUpWithEmail({
+    required String email,
+    required String password,
+    required String username,
+  }) async {
+    try {
+      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      await credential.user!.updateDisplayName(username);
+      return credential.user!;
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    }
   }
 
   @override
-  Future<UserModel?> getCurrentUser() async {
-    return _userFromFirebase(_firebaseAuth.currentUser);
-  }
-
-  @override
-  Future<UserModel> signInWithEmail({
+  Future<User> signInWithEmail({
     required String email,
     required String password,
   }) async {
@@ -54,60 +55,19 @@ class FirebaseAuthRepository implements AuthRepository {
         email: email,
         password: password,
       );
-      return _userFromFirebase(credential.user!)!;
+      return credential.user!;
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
     }
   }
 
   @override
-  Future<UserModel> signUpWithEmail({
-    required String email,
-    required String password,
-    String? displayName,
-  }) async {
-    try {
-      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      final user = credential.user;
-      if (user != null) {
-        if (displayName != null) {
-          await user.updateDisplayName(displayName);
-          await user.reload();
-        }
-        // สร้าง User Doc แบบ Hub & Spoke
-        await _syncUserDocIfNeeded(user, displayName: displayName);
-      }
-
-      return _userFromFirebase(_firebaseAuth.currentUser)!;
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
-    }
-  }
-
-  @override
-  Future<void> signOut() async {
-    try {
-      await _firebaseAuth.signOut();
-      await _googleSignIn.signOut();
-    } catch (e) {
-      throw Exception('Logout failed: $e');
-    }
-  }
-
-  @override
-  Future<UserModel> signInWithGoogle() async {
+  Future<User> signInWithGoogle() async {
     final clientId = dotenv.env['GOOGLE_SERVER_CLIENT_ID'];
-    if (clientId == null) {
-      // ignore: avoid_print
-      print("Error: GOOGLE_SERVER_CLIENT_ID not found in .env");
-      return Future.error('การตั้งค่า Google Sign-In ไม่ถูกต้อง');
-    }
+    if (clientId == null) throw Exception('GOOGLE_SERVER_CLIENT_ID missing');
 
     final List<String> scopes = ['email', 'profile'];
+
     try {
       await _googleSignIn.initialize(serverClientId: clientId);
 
@@ -122,25 +82,39 @@ class FirebaseAuthRepository implements AuthRepository {
         idToken: googleAuth.idToken,
       );
 
-      // Sign in to Firebase
       final UserCredential userCredential = await _firebaseAuth
           .signInWithCredential(credential);
 
-      final user = userCredential.user;
-
-      if (user == null) {
-        throw Exception('Firebase Sign In failed');
+      if (userCredential.user == null) {
+        throw Exception('ไม่พบข้อมูลผู้ใช้');
       }
 
-      await _syncUserDocIfNeeded(user);
-
-      return _userFromFirebase(user)!;
+      return userCredential.user!;
     } on GoogleSignInException catch (e) {
       throw _handleGoogleSignInException(e);
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
     } catch (e) {
       throw Exception('เกิดข้อผิดพลาดในการเข้าสู่ระบบ Google: $e');
+    }
+  }
+
+  @override
+  Future<void> signOut() async {
+    try {
+      await _firebaseAuth.signOut();
+      await _googleSignIn.signOut();
+    } catch (e) {
+      throw Exception('Logout failed: $e');
+    }
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
     }
   }
 
@@ -171,13 +145,14 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   Exception _handleGoogleSignInException(GoogleSignInException e) {
+    print('Google Sign-In error: ${e.code}, description: ${e.description}');
     switch (e.code) {
       case GoogleSignInExceptionCode.canceled:
-        return Exception('ยกเลิกการเข้าสู่ระบบ');
+      // return Exception('ยกเลิกการเข้าสู่ระบบ');
       case GoogleSignInExceptionCode.interrupted:
-        return Exception('การเข้าสู่ระบบถูกขัดจังหวะ กรุณาลองใหม่อีกครั้ง');
+      // return Exception('การเข้าสู่ระบบถูกขัดจังหวะ กรุณาลองใหม่อีกครั้ง');
       case GoogleSignInExceptionCode.clientConfigurationError:
-        return Exception('ตั้งค่า Google Sign-In ไม่ถูกต้อง: ${e.description}');
+      // return Exception('ตั้งค่า Google Sign-In ไม่ถูกต้อง: ${e.description}');
       case GoogleSignInExceptionCode.providerConfigurationError:
         return Exception('ระบบ Auth ไม่พร้อมใช้งาน กรุณาลองใหม่ภายหลัง');
       case GoogleSignInExceptionCode.uiUnavailable:
@@ -186,28 +161,6 @@ class FirebaseAuthRepository implements AuthRepository {
         return Exception('ผู้ใช้งานไม่ตรงกัน กรุณาลองใหม่อีกครั้ง');
       case GoogleSignInExceptionCode.unknownError:
         return Exception('เกิดข้อผิดพลาดไม่ทราบสาเหตุในการเข้าสู่ระบบ');
-    }
-  }
-
-  // ------------------------------------------------------------------
-  // 💾 Internal Helpers
-  // ------------------------------------------------------------------
-
-  Future<void> _syncUserDocIfNeeded(User user, {String? displayName}) async {
-    final userDoc = _firestore.collection('users').doc(user.uid);
-    final docSnapshot = await userDoc.get();
-
-    // ถ้ายังไม่มี Doc ให้สร้างใหม่แบบ "ตัวเปล่า" (Blank User)
-    if (!docSnapshot.exists) {
-      await userDoc.set({
-        'uid': user.uid,
-        'email': user.email,
-        'displayName': displayName ?? user.displayName,
-        'photoUrl': user.photoURL,
-        'createdAt': FieldValue.serverTimestamp(),
-        'roles': [],
-        'lastActiveRole': null,
-      });
     }
   }
 

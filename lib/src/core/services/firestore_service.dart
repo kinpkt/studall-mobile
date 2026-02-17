@@ -80,4 +80,21 @@ class FirestoreService {
   Future<void> delete({required String path}) async {
     await _db.doc(path).delete();
   }
+
+  /// เช็คว่า Document ตาม Path ที่ระบุมีอยู่หรือไม่
+  Future<bool> exists({required String path}) async {
+    final snap = await _db.doc(path).get();
+    return snap.exists;
+  }
+
+  /// 2. เช็คว่ามีข้อมูลใน Collection ที่ตรงตามเงื่อนไข (Query) หรือไม่
+  Future<bool> existsQuery({
+    required String collectionPath,
+    required Query Function(Query query) queryBuilder,
+  }) async {
+    Query query = _db.collection(collectionPath);
+    query = queryBuilder(query).limit(1); // ใช้ limit(1) เพื่อประหยัดค่า Read
+    final snap = await query.get();
+    return snap.docs.isNotEmpty;
+  }
 }

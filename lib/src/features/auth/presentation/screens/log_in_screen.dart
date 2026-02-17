@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
-import '../providers/login_controller.dart';
+import '../providers/log_in_provider.dart';
 import '../widgets/google_sign_in_button.dart';
 
 class LogInScreen extends ConsumerStatefulWidget {

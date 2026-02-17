@@ -162,41 +162,41 @@ class _StudentAppbarState extends State<StudentAppbar>
                     if (widget.actions != null) ...widget.actions!,
                     GestureDetector(
                       onTap: widget.onProfileTap,
-                      child: Consumer(
-                        builder: (context, ref, _) {
-                          final authState = ref.watch(authStateProvider);
-                          final authRepository = ref.read(
-                            authRepositoryProvider,
-                          );
-                          return authState.when(
-                            data: (user) {
-                              return GestureDetector(
-                                onDoubleTap: () => authRepository.signOut(),
-                                child: ShadAvatar(
-                                  user!.photoUrl,
-                                  size: const Size.square(40),
-                                  backgroundColor: colorScheme.muted,
-                                  placeholder: Text(
-                                    widget.userInitials ?? 'SA',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: colorScheme.foreground,
-                                      height: 20 / 12,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            loading: () => const Scaffold(
-                              body: Center(child: CircularProgressIndicator()),
-                            ),
-                            error: (e, trace) => Scaffold(
-                              body: Center(child: Text('Error: $e')),
-                            ),
-                          );
-                        },
-                      ),
+                      // child: Consumer(
+                      //   builder: (context, ref, _) {
+                      //     final authState = ref.watch(authStateProvider);
+                      //     final authRepository = ref.read(
+                      //       authRepositoryProvider,
+                      //     );
+                      //     return authState.when(
+                      //       data: (user) {
+                      //         return GestureDetector(
+                      //           onDoubleTap: () => authRepository.signOut(),
+                      //           child: ShadAvatar(
+                      //             user!.photoUrl,
+                      //             size: const Size.square(40),
+                      //             backgroundColor: colorScheme.muted,
+                      //             placeholder: Text(
+                      //               widget.userInitials ?? 'SA',
+                      //               style: TextStyle(
+                      //                 fontSize: 12,
+                      //                 fontWeight: FontWeight.w400,
+                      //                 color: colorScheme.foreground,
+                      //                 height: 20 / 12,
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         );
+                      //       },
+                      //       loading: () => const Scaffold(
+                      //         body: Center(child: CircularProgressIndicator()),
+                      //       ),
+                      //       error: (e, trace) => Scaffold(
+                      //         body: Center(child: Text('Error: $e')),
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
                     ),
                   ],
                 ),
