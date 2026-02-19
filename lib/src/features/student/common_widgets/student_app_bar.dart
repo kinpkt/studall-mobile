@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
-import 'package:studall/src/features/auth/data/repositories/firebase_auth_repository.dart';
-import 'package:studall/src/features/auth/presentation/providers/auth_state_provider.dart';
+import 'package:studall/src/features/auth/data/repositories/auth_firebase_repository.dart';
+import 'package:studall/src/features/auth/presentation/controllers/auth_state_provider.dart';
 
 class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
   final String? pageTitle;

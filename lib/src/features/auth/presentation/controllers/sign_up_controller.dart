@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:studall/src/features/auth/data/repositories/firebase_auth_repository.dart';
-import 'package:studall/src/features/auth/data/repositories/firestore_auth_repository.dart';
+import 'package:studall/src/features/auth/data/repositories/auth_firebase_repository.dart';
+import 'package:studall/src/features/auth/data/repositories/user_firestore_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:studall/src/features/auth/data/models/user_model.dart';
 
 final signUpControllerProvider = AsyncNotifierProvider<SignUpController, void>(
   () {
@@ -16,16 +17,16 @@ class SignUpController extends AsyncNotifier<void> {
   Future<void> signUp(String email, String password, String username) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-     final authRepository = ref.read(authFirebaseRepositoryProvider);
+      final authRepository = ref.read(authFirebaseRepositoryProvider);
 
       User user = await authRepository.signUpWithEmail(
-          email: email,
-          password: password,
-          username: username
+        email: email,
+        password: password,
+        username: username,
       );
 
-      final firestoreRepository = ref.read(authFirestoreRepositoryProvider);
-      await firestoreRepository.createUserProfile(user);
+      final firestoreRepository = ref.read(userFirestoreRepositoryProvider);
+      await firestoreRepository.createUserProfile(UserModel.fromFirebase(user));
     });
   }
 }

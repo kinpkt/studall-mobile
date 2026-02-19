@@ -1,8 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:studall/src/features/auth/data/repositories/firebase_auth_repository.dart';
-import 'package:studall/src/features/auth/data/repositories/firestore_auth_repository.dart';
-
+import 'package:studall/src/features/auth/data/repositories/auth_firebase_repository.dart';
+import 'package:studall/src/features/auth/data/repositories/user_firestore_repository.dart';
+import 'package:studall/src/features/auth/data/models/user_model.dart';
 
 final loginControllerProvider = AsyncNotifierProvider<LoginController, void>(
   () {
@@ -26,10 +25,12 @@ class LoginController extends AsyncNotifier<void> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final authRepository = ref.read(authFirebaseRepositoryProvider);
-      User user = await authRepository.signInWithGoogle();
-      
-      final authFirestoreRepository = ref.read(authFirestoreRepositoryProvider);
-      await authFirestoreRepository.createUserProfile(user);
+
+      final user = await authRepository.signInWithGoogle();
+
+      final userRepository = ref.read(userFirestoreRepositoryProvider);
+
+      await userRepository.createUserProfile(UserModel.fromFirebase(user));
     });
   }
 }

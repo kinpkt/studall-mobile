@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final firestoreServiceProvider = Provider((ref) => FirestoreService());
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -47,6 +50,21 @@ class FirestoreService {
     return snapshots.docs
         .map((doc) => builder(doc.data() as Map<String, dynamic>, doc.id))
         .toList();
+  }
+
+  /// ดึงข้อมูล 1 เอกสารแบบ Real-time Stream (เหมาะกับแอปที่ต้องการอัปเดตทันที)
+  Stream<T?> streamDocument<T>({
+    required String path,
+    required T Function(Map<String, dynamic> data, String id) builder,
+  }) {
+    return _db
+        .doc(path)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.exists
+              ? builder(snapshot.data() as Map<String, dynamic>, snapshot.id)
+              : null,
+        );
   }
 
   /// ดึงข้อมูลแบบ Real-time Stream (เหมาะกับแอปที่ต้องการอัปเดตทันที)
