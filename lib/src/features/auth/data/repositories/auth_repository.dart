@@ -1,30 +1,32 @@
-import '../models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 /// Authentication Repository Interface
-/// Defines the contract for authentication operations
 abstract class AuthRepository {
-  /// Get current authenticated user
-  Future<UserModel?> getCurrentUser();
+  /// สตรีมสถานะการล็อกอิน
+  Stream<User?> get authStateChanges;
 
-  /// Sign in with email and password
-  Future<UserModel> signInWithEmail({
+  /// ดึง UID ของผู้ใช้ปัจจุบัน
+  String? get currentUid;
+
+  /// สมัครสมาชิก
+  Future<User> signUpWithEmail({
+    required String email,
+    required String password,
+    required String username,
+  });
+
+  /// ล็อกอินด้วย Email
+  Future<User> signInWithEmail({
     required String email,
     required String password,
   });
 
-  /// Sign up with email and password
-  Future<UserModel> signUpWithEmail({
-    required String email,
-    required String password,
-    String? displayName,
-  });
+  /// ล็อกอินด้วย Google
+  Future<User> signInWithGoogle();
 
-  /// Sign in with Google
-  Future<UserModel> signInWithGoogle();
-
-  /// Sign out
+  /// ออกจากระบบ
   Future<void> signOut();
 
-  /// Stream of authentication state changes
-  Stream<UserModel?> authStateChanges();
+  /// ส่งอีเมลรีเซ็ตรหัสผ่าน
+  Future<void> sendPasswordResetEmail(String email);
 }
