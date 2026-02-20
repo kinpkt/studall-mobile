@@ -4,12 +4,13 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/app_theme.dart';
 import 'package:studall/src/core/theme/theme_provider.dart';
 import 'package:studall/src/core/theme/material_theme_builder.dart';
+import 'package:studall/src/features/auth/presentation/controllers/user_profile_provider.dart';
+import 'package:studall/src/features/auth/data/models/role.dart';
 import 'package:studall/src/features/partner/advertisements/presentation/screens/partner_add_advertisement_screen.dart';
 import 'package:studall/src/features/partner/branches/presentation/screens/partner_add_branch_screen.dart';
 import 'package:studall/src/features/student/presentation/screens/student_layout_screen.dart';
 import 'package:studall/src/features/partner/presentation/screens/partner_layout_screen.dart';
 import 'package:studall/src/features/admin/presentation/screens/admin_layout_screen.dart';
-import 'package:studall/src/features/auth/presentation/controllers/auth_state_provider.dart';
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/select_role_screen.dart';
@@ -20,7 +21,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
-    final authState = ref.watch(authStateProvider);
+    final user = ref.watch(userProfileProvider);
 
     return ShadApp(
       debugShowCheckedModeBanner: true,
@@ -29,22 +30,20 @@ class MyApp extends ConsumerWidget {
       darkTheme: appThemeDark,
       materialThemeBuilder: (context, theme) =>
           materialThemeBuilder(context, theme),
-      home: authState.when(
+      home: user.when(
         data: (user) {
-          //   if (user.roles.isEmpty) {
-          //     return const StudentLayoutScreen();
-          //   }
-          //   else if (user.lastActiveRole != null) {
-          //     switch (user.lastActiveRole!) {
-          //       case Role.student:
-          //         return StudentLayoutScreen();
-          //       case Role.partner:
-          //         return PartnerLayoutScreen();
-          //       case Role.admin:
-          //         return AdminLayoutScreen();
-          //     }
-          //   }
-          // }
+          if (user!.roles.isEmpty) {
+            return const SelectRoleScreen();
+          } else if (user.lastActiveRole != null) {
+            switch (user.lastActiveRole!) {
+              case Role.student:
+                return const StudentLayoutScreen();
+              case Role.partner:
+                return const PartnerLayoutScreen();
+              case Role.admin:
+                return const AdminLayoutScreen();
+            }
+          }
           return const LogInScreen();
           // return const PartnerLayoutScreen();
         },
@@ -60,7 +59,8 @@ class MyApp extends ConsumerWidget {
         '/student-layout': (context) => const StudentLayoutScreen(),
         '/partner-layout': (context) => const PartnerLayoutScreen(),
         '/partner-add-branch': (context) => const PartnerAddBranchScreen(),
-        '/partner-add-advertisement': (context) => const PartnerAddAdvertisementScreen(),
+        '/partner-add-advertisement': (context) =>
+            const PartnerAddAdvertisementScreen(),
         '/admin-layout': (context) => const AdminLayoutScreen(),
       },
     );

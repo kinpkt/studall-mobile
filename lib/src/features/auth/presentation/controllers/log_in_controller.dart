@@ -25,11 +25,9 @@ class LoginController extends AsyncNotifier<void> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final authRepository = ref.read(authFirebaseRepositoryProvider);
-
       final user = await authRepository.signInWithGoogle();
 
       final userRepository = ref.read(userFirestoreRepositoryProvider);
-
       await userRepository.createUserProfile(UserModel.fromFirebase(user));
     });
   }
