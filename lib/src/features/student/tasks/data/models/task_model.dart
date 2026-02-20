@@ -21,7 +21,7 @@ class TaskModel {
     required this.type,
     this.description,
     this.course,
-  }) : this.id = id ?? const Uuid().v4();
+  }) : id = id ?? const Uuid().v4();
 
   factory TaskModel.fromJson(Map<String, dynamic> json) => _$TaskModelFromJson(json);
 

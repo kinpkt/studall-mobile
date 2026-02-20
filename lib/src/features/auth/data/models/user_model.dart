@@ -6,7 +6,7 @@ part 'user_model.g.dart';
 
 @JsonSerializable()
 class UserModel {
-  final String id;
+  final String uid;
   final String email;
   final String username;
   final String? fullName;
@@ -16,7 +16,7 @@ class UserModel {
   final List<Role> roles;
 
   const UserModel({
-    required this.id,
+    required this.uid,
     required this.email,
     required this.username,
     this.fullName,
@@ -33,17 +33,52 @@ class UserModel {
 
   factory UserModel.fromFirebase(User firebaseUser) {
     return UserModel(
-      id: firebaseUser.uid,
+      uid: firebaseUser.uid,
       email: firebaseUser.email ?? '',
       username: '',
       fullName: firebaseUser.displayName ?? '',
       photoUrl: firebaseUser.photoURL,
       isBanned: false,
+      lastActiveRole: null,
+      roles: [],
     );
   }
 
+  factory UserModel.fromFirestore(Map<String, dynamic> data) {
+    return UserModel(
+      uid: data['uid'] as String,
+      email: data['email'] as String,
+      username: data['username'] as String,
+      fullName: data['fullName'] as String?,
+      photoUrl: data['photoUrl'] as String?,
+      isBanned: data['isBanned'] as bool? ?? false,
+      lastActiveRole: data['lastActiveRole'] != null
+          ? Role.values.firstWhere(
+              (role) => role.toString() == data['lastActiveRole'])
+          : null,
+      roles: (data['roles'] as List<dynamic>?)
+              ?.map((roleStr) => Role.values.firstWhere(
+                  (role) => role.toString() == roleStr))
+              .toList() ??
+          [],
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'uid': uid,
+      'email': email,
+      'username': username,
+      'fullName': fullName,
+      'photoUrl': photoUrl,
+      'isBanned': isBanned,
+      'lastActiveRole': lastActiveRole?.toString(),
+      'roles': roles.map((role) => role.toString()).toList(),
+    };
+  }
+
   UserModel copyWith({
-    String? id,
+    String? uid,
     String? email,
     String? username,
     String? fullName,
@@ -53,12 +88,13 @@ class UserModel {
     List<Role>? roles,
   }) {
     return UserModel(
-      id: id ?? this.id,
+      uid: uid ?? this.uid,
       email: email ?? this.email,
       username: username ?? this.username,
       fullName: fullName ?? this.fullName,
       photoUrl: photoUrl ?? this.photoUrl,
       isBanned: isBanned ?? this.isBanned,
+      lastActiveRole: lastActiveRole ?? this.lastActiveRole,
       roles: roles ?? this.roles,
     );
   }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
-import 'package:studall/src/features/auth/data/repositories/firebase_auth_repository.dart';
-import 'package:studall/src/features/auth/presentation/providers/auth_state_provider.dart';
+import 'package:studall/src/features/auth/data/repositories/auth_firebase_repository.dart';
+import 'package:studall/src/features/auth/presentation/controllers/auth_state_provider.dart';
 
 class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
   final String? pageTitle;
@@ -162,41 +162,41 @@ class _StudentAppbarState extends State<StudentAppbar>
                     if (widget.actions != null) ...widget.actions!,
                     GestureDetector(
                       onTap: widget.onProfileTap,
-                      child: Consumer(
-                        builder: (context, ref, _) {
-                          final authState = ref.watch(authStateProvider);
-                          final authRepository = ref.read(
-                            authRepositoryProvider,
-                          );
-                          return authState.when(
-                            data: (user) {
-                              return GestureDetector(
-                                onDoubleTap: () => authRepository.signOut(),
-                                child: ShadAvatar(
-                                  user!.photoUrl,
-                                  size: const Size.square(40),
-                                  backgroundColor: colorScheme.muted,
-                                  placeholder: Text(
-                                    widget.userInitials ?? 'SA',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: colorScheme.foreground,
-                                      height: 20 / 12,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            loading: () => const Scaffold(
-                              body: Center(child: CircularProgressIndicator()),
-                            ),
-                            error: (e, trace) => Scaffold(
-                              body: Center(child: Text('Error: $e')),
-                            ),
-                          );
-                        },
-                      ),
+                      // child: Consumer(
+                      //   builder: (context, ref, _) {
+                      //     final authState = ref.watch(authStateProvider);
+                      //     final authRepository = ref.read(
+                      //       authRepositoryProvider,
+                      //     );
+                      //     return authState.when(
+                      //       data: (user) {
+                      //         return GestureDetector(
+                      //           onDoubleTap: () => authRepository.signOut(),
+                      //           child: ShadAvatar(
+                      //             user!.photoUrl,
+                      //             size: const Size.square(40),
+                      //             backgroundColor: colorScheme.muted,
+                      //             placeholder: Text(
+                      //               widget.userInitials ?? 'SA',
+                      //               style: TextStyle(
+                      //                 fontSize: 12,
+                      //                 fontWeight: FontWeight.w400,
+                      //                 color: colorScheme.foreground,
+                      //                 height: 20 / 12,
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         );
+                      //       },
+                      //       loading: () => const Scaffold(
+                      //         body: Center(child: CircularProgressIndicator()),
+                      //       ),
+                      //       error: (e, trace) => Scaffold(
+                      //         body: Center(child: Text('Error: $e')),
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
                     ),
                   ],
                 ),

@@ -5,8 +5,8 @@ import 'package:studall/src/features/auth/data/models/role.dart';
 import 'package:studall/src/common_widgets/common_appbar.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:studall/src/features/auth/presentation/providers/auth_state_provider.dart';
-import 'package:studall/src/features/auth/data/repositories/firebase_auth_repository.dart';
+import 'package:studall/src/features/auth/presentation/controllers/auth_state_provider.dart';
+import 'package:studall/src/features/auth/data/repositories/auth_firebase_repository.dart';
 import 'package:flutter_initicon/flutter_initicon.dart';
 import 'package:studall/src/features/classroom_sync/presentation/screens/sync_classroom_screen.dart';
 
@@ -141,7 +141,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
       leading: [
         Consumer(
           builder: (context, ref, _) {
-            final authRepository = ref.watch(authRepositoryProvider);
+            final authRepository = ref.watch(authFirebaseRepositoryProvider);
             return GestureDetector(
               child: Row(
                 children: [
@@ -160,34 +160,34 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
         ),
       ],
       actions: [
-        Consumer(
-          builder: (context, ref, _) {
-            final authState = ref.watch(authStateProvider);
-            return authState.when(
-              data: (user) {
-                return ShadAvatar(
-                  user?.photoUrl,
-                  size: const Size.square(40),
-                  backgroundColor: colorScheme.muted,
-                  placeholder: Initicon(
-                    text: user?.username ?? "SA",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: colorScheme.foreground,
-                      height: 20 / 12,
-                    ),
-                  ),
-                );
-              },
-              loading: () => const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              ),
-              error: (e, trace) =>
-                  Scaffold(body: Center(child: Text('Error: $e'))),
-            );
-          },
-        ),
+        // Consumer(
+        //   builder: (context, ref, _) {
+        //     final authState = ref.watch(authStateProvider);
+        //     return authState.when(
+        //       data: (user) {
+        //         return ShadAvatar(
+        //           user,
+        //           size: const Size.square(40),
+        //           backgroundColor: colorScheme.muted,
+        //           placeholder: Initicon(
+        //             text: user?.username ?? "SA",
+        //             style: TextStyle(
+        //               fontSize: 12,
+        //               fontWeight: FontWeight.w400,
+        //               color: colorScheme.foreground,
+        //               height: 20 / 12,
+        //             ),
+        //           ),
+        //         );
+        //       },
+        //       loading: () => const Scaffold(
+        //         body: Center(child: CircularProgressIndicator()),
+        //       ),
+        //       error: (e, trace) =>
+        //           Scaffold(body: Center(child: Text('Error: $e'))),
+        //     );
+        //   },
+        // ),
       ],
     );
   }

@@ -20,7 +20,7 @@ class ActivityModel {
     required this.endDateTime,
     this.course,
     this.location,
-  }) : this.id = id ?? const Uuid().v4();
+  }) : id = id ?? const Uuid().v4();
 
   factory ActivityModel.fromJson(Map<String, dynamic> json) => _$ActivityModelFromJson(json);
 

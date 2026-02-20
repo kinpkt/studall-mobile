@@ -21,7 +21,7 @@ class CourseModel {
     this.grade,
     this.description,
     this.academicYear,
-  }) : this.id = id ?? const Uuid().v4();
+  }) : id = id ?? const Uuid().v4();
 
   factory CourseModel.fromLetterGrade({
     String? id,

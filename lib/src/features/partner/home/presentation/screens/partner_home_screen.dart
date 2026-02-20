@@ -19,9 +19,9 @@ class PartnerHomeScreen extends StatelessWidget {
     ];
 
     final List<UserModel> staffs = [
-      UserModel(id: 'somchai_t', email: 'somchai_t@gmail.com', username: 'somchai_t'),
-      UserModel(id: 'ehen123', email: 'ehen@gmail.com', username: 'ehen123'),
-      UserModel(id: 'klangtam222', email: 'klangtam222@gmail.com', username: 'klangtam222'),
+      UserModel(uid: 'somchai_t', email: 'somchai_t@gmail.com', username: 'somchai_t'),
+      UserModel(uid: 'ehen123', email: 'ehen@gmail.com', username: 'ehen123'),
+      UserModel(uid: 'klangtam222', email: 'klangtam222@gmail.com', username: 'klangtam222'),
     ];
 
     return Container(
