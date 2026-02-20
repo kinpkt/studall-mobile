@@ -7,6 +7,7 @@ environment:
   sdk: ^3.10.4
 
 dependencies:
+  camera: ^0.11.4
   cloud_firestore: ^6.1.2
   firebase_auth: ^6.1.4
   firebase_core: ^4.4.0
@@ -14,12 +15,17 @@ dependencies:
     sdk: flutter
   flutter_dotenv: ^6.0.0
   flutter_initicon: ^3.0.1
+  flutter_map: ^8.2.2
   flutter_riverpod: ^3.2.0
   flutter_svg: ^2.2.3
+  geolocator: ^14.0.2
   google_fonts: ^6.3.3
-  google_maps_flutter: ^2.14.2
   google_sign_in: ^7.2.0
+  image_picker: ^1.2.1
   json_annotation: ^4.9.0
+  latlong2: ^0.9.1
+  path: ^1.9.1
+  path_provider: ^2.1.5
   phosphor_flutter: ^2.1.0
   shadcn_ui: ^0.45.1
   step_progress_indicator: ^1.0.2

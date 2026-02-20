@@ -15,11 +15,11 @@ class StudentLayoutScreen extends ConsumerWidget {
 
   List<Widget> get _pages {
     return [
-      Center(child: StudentHomeScreen()),
-      Center(child: CoursesScreen()),
-      Center(child: TasksScreen()),
-      Center(child: NotesScreen()),
-      Center(child: ExploreScreen()),
+      StudentHomeScreen(),
+      CoursesScreen(),
+      TasksScreen(),
+      NotesScreen(),
+      ExploreScreen(),
     ];
   }
 
@@ -85,7 +85,7 @@ class StudentLayoutScreen extends ConsumerWidget {
       bottom: false,
       child: Scaffold(
         appBar: _buildAppBar(context, currentIndex),
-        body: SingleChildScrollView(child: IndexedStack(index: currentIndex, children: _pages)),
+        body: IndexedStack(index: currentIndex, children: _pages),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
           child: const Icon(PhosphorIconsRegular.plus),

@@ -5,6 +5,8 @@ import 'package:studall/src/features/student/explore/presentation/widgets/advert
 import 'package:studall/src/features/student/explore/presentation/widgets/tools_item_card.dart';
 import 'package:studall/src/features/student/explore/presentation/widgets/working_space_item_card.dart';
 
+import '../../../maps/presentation/screens/student_maps_screen.dart';
+
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});
 
@@ -97,6 +99,9 @@ class ExploreScreen extends StatelessWidget {
             width: 500,
             height: 64,
             child: Text('หรือค้นหาจากตำแหน่งของฉัน', style: theme.textTheme.h3,),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => StudentMapsScreen()));
+            },
           )
         ],
       )
