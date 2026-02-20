@@ -85,7 +85,7 @@ class StudentLayoutScreen extends ConsumerWidget {
       bottom: false,
       child: Scaffold(
         appBar: _buildAppBar(context, currentIndex),
-        body: IndexedStack(index: currentIndex, children: _pages),
+        body: SingleChildScrollView(child: IndexedStack(index: currentIndex, children: _pages)),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
           child: const Icon(PhosphorIconsRegular.plus),
