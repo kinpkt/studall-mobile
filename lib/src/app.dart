@@ -47,8 +47,8 @@ class MyApp extends ConsumerWidget {
               }
             }
           }
-          return const PartnerLayoutScreen();
-          // return const LogInScreen();
+          // return const StudentLayoutScreen();
+          return const LogInScreen();
         },
         loading: () =>
         const Scaffold(body: Center(child: CircularProgressIndicator())),
