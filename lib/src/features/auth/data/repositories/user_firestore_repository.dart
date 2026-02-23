@@ -15,18 +15,18 @@ class UserFirestoreRepository implements UserRepository {
 
   @override
   Future<void> createUserProfile(UserModel user) async {
-    await _service.exists(path: 'users/${user.uid}').then((exists) {
+    await _service.exists(path: 'users/${user.id}').then((exists) {
       if (!exists) {
-        _service.set(path: 'users/${user.uid}', data: user.toFirestore());
+        _service.set(path: 'users/${user.id}', data: user.toFirestore());
       }
     });
   }
 
   @override
-  Future<UserModel?> getUserProfile(String uid) async {
+  Future<UserModel?> getUserProfile(String id) async {
     final data = await _service.get(
-      path: 'users/$uid',
-      builder: (data, uid) => UserModel.fromFirestore(data),
+      path: 'users/$id',
+      builder: (data, id) => UserModel.fromFirestore(data),
     );
     if (data != null) return data;
     return null;
@@ -34,20 +34,24 @@ class UserFirestoreRepository implements UserRepository {
 
   @override
   Future<void> updateUserProfile(UserModel user) async {
-    await _service.update(path: 'users/${user.uid}', data: user.toFirestore());
+    await _service.update(path: 'users/${user.id}', data: user.toFirestore());
   }
 
   @override
-  Stream<UserModel?> streamUserProfile(String uid) {
+  Stream<UserModel?> streamUserProfile(String id) {
     return _service.streamDocument(
-      path: 'users/$uid',
-      builder: (data, uid) => UserModel.fromFirestore(data),
+      path: 'users/$id',
+      builder: (data, id) {
+        final user = UserModel.fromFirestore(data);
+        user.debugPrint();
+        return user;
+      },
     );
   }
 
   @override
-  Future<bool> checkUserExists(String uid) async {
-    final bool isExists = await _service.exists(path: 'users/$uid');
+  Future<bool> checkUserExists(String id) async {
+    final bool isExists = await _service.exists(path: 'users/$id');
     return isExists;
   }
 }

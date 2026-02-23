@@ -81,6 +81,7 @@ class StudentLayoutScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(studentLayoutControllerProvider);
+    print(currentIndex);
     return SafeArea(
       bottom: false,
       child: Scaffold(

@@ -12,7 +12,7 @@ StudentModel _$StudentModelFromJson(Map<String, dynamic> json) => StudentModel(
   tasks: (json['tasks'] as List<dynamic>?)
       ?.map((e) => TaskModel.fromJson(e as Map<String, dynamic>))
       .toList(),
-  uid: json['uid'] as String,
+  id: json['id'] as String,
   email: json['email'] as String,
   username: json['username'] as String,
   photoUrl: json['photoUrl'] as String?,
@@ -26,7 +26,7 @@ StudentModel _$StudentModelFromJson(Map<String, dynamic> json) => StudentModel(
 
 Map<String, dynamic> _$StudentModelToJson(StudentModel instance) =>
     <String, dynamic>{
-      'id': instance.uid,
+      'id': instance.id,
       'email': instance.email,
       'username': instance.username,
       'photoUrl': instance.photoUrl,

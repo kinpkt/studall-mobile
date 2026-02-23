@@ -32,7 +32,13 @@ class MyApp extends ConsumerWidget {
           materialThemeBuilder(context, theme),
       home: user.when(
         data: (user) {
-          if (user!.roles.isEmpty) {
+          if (user == null) {
+            return const LogInScreen();
+          } else if (user.isBanned) {
+            return Scaffold();
+          }
+
+          if (user.roles.isEmpty) {
             return const SelectRoleScreen();
           } else if (user.lastActiveRole != null) {
             switch (user.lastActiveRole!) {
@@ -40,7 +46,7 @@ class MyApp extends ConsumerWidget {
                 return const StudentLayoutScreen();
               case Role.partner:
                 return const PartnerLayoutScreen();
-              case Role.admin:
+              case Role.admin :
                 return const AdminLayoutScreen();
             }
           }

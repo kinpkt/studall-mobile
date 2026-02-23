@@ -4,6 +4,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
 import 'package:studall/src/features/auth/data/repositories/auth_firebase_repository.dart';
 import 'package:studall/src/features/auth/presentation/controllers/auth_state_provider.dart';
+import 'package:studall/src/features/auth/presentation/controllers/user_profile_provider.dart';
 
 class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
   final String? pageTitle;
@@ -37,7 +38,9 @@ class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
   State<StudentAppbar> createState() => _StudentAppbarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(86);
+  Size get preferredSize => const Size.fromHeight(92);
+
+  Size get minimumSize => const Size.fromHeight(92);
 }
 
 class _StudentAppbarState extends State<StudentAppbar>
@@ -137,116 +140,115 @@ class _StudentAppbarState extends State<StudentAppbar>
 
     return Container(
       color: colorScheme.background,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(
-                    _getDisplayTitle(),
-                    style: textTheme.h2,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+      constraints: const BoxConstraints(minHeight: 92),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  _getDisplayTitle(),
+                  style: textTheme.h2,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(width: 24),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 8,
-                  children: [
-                    if (widget.actions != null) ...widget.actions!,
-                    GestureDetector(
-                      onTap: widget.onProfileTap,
-                      // child: Consumer(
-                      //   builder: (context, ref, _) {
-                      //     final authState = ref.watch(authStateProvider);
-                      //     final authRepository = ref.read(
-                      //       authRepositoryProvider,
-                      //     );
-                      //     return authState.when(
-                      //       data: (user) {
-                      //         return GestureDetector(
-                      //           onDoubleTap: () => authRepository.signOut(),
-                      //           child: ShadAvatar(
-                      //             user!.photoUrl,
-                      //             size: const Size.square(40),
-                      //             backgroundColor: colorScheme.muted,
-                      //             placeholder: Text(
-                      //               widget.userInitials ?? 'SA',
-                      //               style: TextStyle(
-                      //                 fontSize: 12,
-                      //                 fontWeight: FontWeight.w400,
-                      //                 color: colorScheme.foreground,
-                      //                 height: 20 / 12,
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         );
-                      //       },
-                      //       loading: () => const Scaffold(
-                      //         body: Center(child: CircularProgressIndicator()),
-                      //       ),
-                      //       error: (e, trace) => Scaffold(
-                      //         body: Center(child: Text('Error: $e')),
-                      //       ),
-                      //     );
-                      //   },
-                      // ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            widget.showSubtitle
-                ? SizedBox(
-                    height: 28,
-                    width: double.infinity,
-                    child: ClipRect(
-                      child: Stack(
-                        children: [
-                          SlideTransition(
-                            position: _dateSlideAnimation,
-                            child: Text(
-                              widget.dateText ??
-                                  _formatThaiDate(DateTime.now()),
-                              style: textTheme.h4.copyWith(
-                                color: colorScheme.daily,
+              ),
+              const SizedBox(width: 24),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 8,
+                children: [
+                  if (widget.actions != null) ...widget.actions!,
+                  GestureDetector(
+                    onTap: widget.onProfileTap,
+                    child: Consumer(
+                      builder: (context, ref, _) {
+                        final user = ref.watch(userProfileProvider);
+                        final authState = ref.watch(
+                          authFirebaseRepositoryProvider,
+                        );
+                        return user.when(
+                          data: (user) {
+                            return GestureDetector(
+                              onDoubleTap: () {
+                                authState.signOut();
+                              },
+                              child: ShadAvatar(
+                                user!.photoUrl,
+                                size: const Size.square(40),
+                                backgroundColor: colorScheme.muted,
+                                placeholder: Text(
+                                  widget.userInitials ?? 'SA',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                    color: colorScheme.foreground,
+                                    height: 20 / 12,
+                                  ),
+                                ),
                               ),
-                            ),
+                            );
+                          },
+                          loading: () => const Scaffold(
+                            body: Center(child: CircularProgressIndicator()),
                           ),
-                          SlideTransition(
-                            position: _classSlideAnimation,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  'ถัดไป: ',
-                                  style: textTheme.custom['medium']!.copyWith(
-                                    color: colorScheme.daily,
-                                  ),
-                                ),
-                                Text(
-                                  widget.nextClassName ??
-                                      'Mobile Application Design',
-                                  style: textTheme.h4.copyWith(
-                                    color: colorScheme.daily,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                          error: (e, trace) =>
+                              Scaffold(body: Center(child: Text('Error: $e'))),
+                        );
+                      },
                     ),
-                  )
-                : const SizedBox.shrink(),
-          ],
-        ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          widget.showSubtitle
+              ? SizedBox(
+                  height: 28,
+                  width: double.infinity,
+                  child: ClipRect(
+                    child: Stack(
+                      children: [
+                        SlideTransition(
+                          position: _dateSlideAnimation,
+                          child: Text(
+                            widget.dateText ?? _formatThaiDate(DateTime.now()),
+                            style: textTheme.h4.copyWith(
+                              color: colorScheme.daily,
+                            ),
+                          ),
+                        ),
+                        SlideTransition(
+                          position: _classSlideAnimation,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                'ถัดไป: ',
+                                style: textTheme.custom['medium']!.copyWith(
+                                  color: colorScheme.daily,
+                                ),
+                              ),
+                              Text(
+                                widget.nextClassName ??
+                                    'Mobile Application Design',
+                                style: textTheme.h4.copyWith(
+                                  color: colorScheme.daily,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ],
       ),
     );
   }

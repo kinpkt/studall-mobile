@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import '../controllers/log_in_controller.dart';
+import '../controllers/auth_controller.dart';
 
 class GoogleSignInButton extends ConsumerStatefulWidget {
   const GoogleSignInButton({super.key});
@@ -40,7 +40,7 @@ class _GoogleSignInButtonState extends ConsumerState<GoogleSignInButton>
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(loginControllerProvider).isLoading;
+    final isLoading = ref.watch(authControllerProvider).isLoading;
 
     return AnimatedBuilder(
       animation: _controller,
@@ -64,7 +64,7 @@ class _GoogleSignInButtonState extends ConsumerState<GoogleSignInButton>
         size: ShadButtonSize.lg,
         onPressed: isLoading
             ? null
-            : () => ref.read(loginControllerProvider.notifier).googleLogin(),
+            : () => ref.read(authControllerProvider.notifier).signInWithGoogle(),
         leading: SvgPicture.asset(
           'assets/logos/Google.svg',
           height: 20,

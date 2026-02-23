@@ -15,13 +15,21 @@ class PartnerHomeScreen extends StatelessWidget {
       'คณะบริหารธุรกิจ มก.',
       'เซนทรัลลาดพร้าว',
       'สามย่านมิตรทาวน์',
-      'MBK Center'
+      'MBK Center',
     ];
 
     final List<UserModel> staffs = [
-      UserModel(uid: 'somchai_t', email: 'somchai_t@gmail.com', username: 'somchai_t'),
-      UserModel(uid: 'ehen123', email: 'ehen@gmail.com', username: 'ehen123'),
-      UserModel(uid: 'klangtam222', email: 'klangtam222@gmail.com', username: 'klangtam222'),
+      UserModel(
+        id: 'somchai_t',
+        email: 'somchai_t@gmail.com',
+        username: 'somchai_t',
+      ),
+      UserModel(id: 'ehen123', email: 'ehen@gmail.com', username: 'ehen123'),
+      UserModel(
+        id: 'klangtam222',
+        email: 'klangtam222@gmail.com',
+        username: 'klangtam222',
+      ),
     ];
 
     return Container(
@@ -32,7 +40,7 @@ class PartnerHomeScreen extends StatelessWidget {
         children: [
           ShadCard(
             width: 480,
-            title: Text('Starbucks', style: theme.textTheme.h2,),
+            title: Text('Starbucks', style: theme.textTheme.h2),
             description: Text('Users From App: XX', style: theme.textTheme.h4),
             footer: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -42,10 +50,7 @@ class PartnerHomeScreen extends StatelessWidget {
               ],
             ),
           ),
-          Text(
-            'สาขาของร้าน',
-            style:theme.textTheme.h2,
-          ),
+          Text('สาขาของร้าน', style: theme.textTheme.h2),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -79,9 +84,9 @@ class PartnerHomeScreen extends StatelessWidget {
                 );
               },
             ),
-          )
-        ]
-      )
+          ),
+        ],
+      ),
     );
   }
 }

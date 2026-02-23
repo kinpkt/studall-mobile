@@ -6,7 +6,7 @@ part 'user_model.g.dart';
 
 @JsonSerializable()
 class UserModel {
-  final String uid;
+  final String id;
   final String email;
   final String username;
   final String? fullName;
@@ -16,7 +16,7 @@ class UserModel {
   final List<Role> roles;
 
   const UserModel({
-    required this.uid,
+    required this.id,
     required this.email,
     required this.username,
     this.fullName,
@@ -33,7 +33,7 @@ class UserModel {
 
   factory UserModel.fromFirebase(User firebaseUser) {
     return UserModel(
-      uid: firebaseUser.uid,
+      id: firebaseUser.uid,
       email: firebaseUser.email ?? '',
       username: '',
       fullName: firebaseUser.displayName ?? '',
@@ -46,7 +46,7 @@ class UserModel {
 
   factory UserModel.fromFirestore(Map<String, dynamic> data) {
     return UserModel(
-      uid: data['uid'] as String,
+      id: data['id'] as String,
       email: data['email'] as String,
       username: data['username'] as String,
       fullName: data['fullName'] as String?,
@@ -54,11 +54,16 @@ class UserModel {
       isBanned: data['isBanned'] as bool? ?? false,
       lastActiveRole: data['lastActiveRole'] != null
           ? Role.values.firstWhere(
-              (role) => role.toString() == data['lastActiveRole'])
+              (role) => role.toString() == data['lastActiveRole'],
+            )
           : null,
-      roles: (data['roles'] as List<dynamic>?)
-              ?.map((roleStr) => Role.values.firstWhere(
-                  (role) => role.toString() == roleStr))
+      roles:
+          (data['roles'] as List<dynamic>?)
+              ?.map(
+                (roleStr) => Role.values.firstWhere(
+                  (role) => role.toString() == roleStr,
+                ),
+              )
               .toList() ??
           [],
     );
@@ -66,7 +71,7 @@ class UserModel {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'uid': uid,
+      'id': id,
       'email': email,
       'username': username,
       'fullName': fullName,
@@ -77,8 +82,14 @@ class UserModel {
     };
   }
 
+  void debugPrint() {
+    print(
+      'UserModel: {id: $id, email: $email, username: $username, fullName: $fullName, photoUrl: $photoUrl, isBanned: $isBanned, lastActiveRole: $lastActiveRole, roles: $roles}',
+    );
+  }
+
   UserModel copyWith({
-    String? uid,
+    String? id,
     String? email,
     String? username,
     String? fullName,
@@ -88,7 +99,7 @@ class UserModel {
     List<Role>? roles,
   }) {
     return UserModel(
-      uid: uid ?? this.uid,
+      id: id ?? this.id,
       email: email ?? this.email,
       username: username ?? this.username,
       fullName: fullName ?? this.fullName,
