@@ -26,7 +26,7 @@ class UserFirestoreRepository implements UserRepository {
   Future<UserModel?> getUserProfile(String id) async {
     final data = await _service.get(
       path: 'users/$id',
-      builder: (data, id) => UserModel.fromFirestore(data),
+      builder: (data, id) => UserModel.fromFirestore(data, id),
     );
     if (data != null) return data;
     return null;
@@ -42,7 +42,7 @@ class UserFirestoreRepository implements UserRepository {
     return _service.streamDocument(
       path: 'users/$id',
       builder: (data, id) {
-        final user = UserModel.fromFirestore(data);
+        final user = UserModel.fromFirestore(data, id);
         user.debugPrint();
         return user;
       },
@@ -53,5 +53,25 @@ class UserFirestoreRepository implements UserRepository {
   Future<bool> checkUserExists(String id) async {
     final bool isExists = await _service.exists(path: 'users/$id');
     return isExists;
+  }
+
+  @override
+  Future<List<UserModel>> getAllUsers() async {
+    final data = await _service.getCollection<UserModel>(
+      path: 'users/',
+      builder: (data, docId) => UserModel.fromFirestore(data, docId),
+    );
+
+    return data;
+  }
+
+  @override
+  Future<void> updateUserBanStatus(String uid, bool isBanned) async {
+    await _service.update(
+      path: 'users/$uid',
+      data: {
+        'isBanned': isBanned,
+      }
+    );
   }
 }

@@ -1,10 +1,6 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import './role.dart';
 
-part 'user_model.g.dart';
-
-@JsonSerializable()
 class UserModel {
   final String id;
   final String email;
@@ -26,11 +22,6 @@ class UserModel {
     this.roles = const [],
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$UserModelToJson(this);
-
   factory UserModel.fromFirebase(User firebaseUser) {
     return UserModel(
       id: firebaseUser.uid,
@@ -44,9 +35,9 @@ class UserModel {
     );
   }
 
-  factory UserModel.fromFirestore(Map<String, dynamic> data) {
+  factory UserModel.fromFirestore(Map<String, dynamic> data, String docId) {
     return UserModel(
-      id: data['id'] as String,
+      id: docId,
       email: data['email'] as String,
       username: data['username'] as String,
       fullName: data['fullName'] as String?,
@@ -55,6 +46,7 @@ class UserModel {
       lastActiveRole: data['lastActiveRole'] != null
           ? Role.values.firstWhere(
               (role) => role.toString() == data['lastActiveRole'],
+              orElse: () => Role.values.first,
             )
           : null,
       roles:
@@ -62,6 +54,7 @@ class UserModel {
               ?.map(
                 (roleStr) => Role.values.firstWhere(
                   (role) => role.toString() == roleStr,
+                  orElse: () => Role.values.first,
                 ),
               )
               .toList() ??

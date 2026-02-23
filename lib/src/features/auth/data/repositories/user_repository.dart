@@ -14,4 +14,10 @@ abstract class UserRepository {
   Stream<UserModel?> streamUserProfile(String id);
 
   Future<bool> checkUserExists(String id);
+
+  /// ดึงข้อมูลผู้ใช้ทั้งหมด
+  Future<List<UserModel>> getAllUsers();
+
+  /// อัปเดทข้อมูลสถานะการแบนของผู้ใช้
+  Future<void> updateUserBanStatus(String uid, bool isBanned);
 }

@@ -46,12 +46,12 @@ class MyApp extends ConsumerWidget {
                 return const StudentLayoutScreen();
               case Role.partner:
                 return const PartnerLayoutScreen();
-              case Role.admin :
+              case Role.admin:
                 return const AdminLayoutScreen();
             }
           }
+
           return const LogInScreen();
-          // return const PartnerLayoutScreen();
         },
         loading: () =>
             const Scaffold(body: Center(child: CircularProgressIndicator())),

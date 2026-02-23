@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:uuid/uuid.dart';
 
 enum BranchStatus {
@@ -21,4 +22,6 @@ class BranchModel {
     this.status = BranchStatus.available,
     required this.location,
   }) : id = id ?? _uuid.v7();
+
+  LatLng get leafletCoordinate => LatLng(location.latitude, location.longitude);
 }
