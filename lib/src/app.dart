@@ -32,8 +32,12 @@ class MyApp extends ConsumerWidget {
           materialThemeBuilder(context, theme),
       home: user.when(
         data: (user) {
-          if (user!.roles.isEmpty) {
-            return const SelectRoleScreen();
+          if (user == null)
+            return const LogInScreen();
+
+          if (user.roles.isEmpty) {
+            return const AdminLayoutScreen();
+            // return const SelectRoleScreen();
           } else if (user.lastActiveRole != null) {
             switch (user.lastActiveRole!) {
               case Role.student:
@@ -44,8 +48,8 @@ class MyApp extends ConsumerWidget {
                 return const AdminLayoutScreen();
             }
           }
+
           return const LogInScreen();
-          // return const PartnerLayoutScreen();
         },
         loading: () =>
             const Scaffold(body: Center(child: CircularProgressIndicator())),

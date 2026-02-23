@@ -4,9 +4,6 @@ import 'package:studall/src/features/student/tasks/data/models/task_model.dart';
 import './user_model.dart';
 import './role.dart';
 
-part 'student_model.g.dart';
-
-@JsonSerializable(explicitToJson: true)
 class StudentModel extends UserModel {
   final String institute;
   final ScheduleModel schedule;
@@ -24,16 +21,6 @@ class StudentModel extends UserModel {
     super.isBanned = false,
     super.roles = const [],
   }) : tasks = tasks ?? [];
-
-  factory StudentModel.fromJson(Map<String, dynamic> json) =>
-      _$StudentModelFromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = _$StudentModelToJson(this);
-    data.addAll(super.toJson());
-    return data;
-  }
 
   @override
   StudentModel copyWith({

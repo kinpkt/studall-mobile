@@ -1,10 +1,10 @@
 import 'package:studall/src/features/auth/data/models/user_model.dart';
 import 'package:uuid/uuid.dart';
-import 'package:uuid/v7.dart';
 
 enum RequestType {
   store, // ขอเพิ่มร้านใหม่เข้าสู่ระบบ
   advertise, // ขอเพิ่มโฆษณา (ให้แอดมินตรวจสอบเนื้อหาก่อน)
+  others, // อื่น ๆ (กรณีเป็นคำขอเรื่องอื่น)
 }
 
 enum RequestStatus {
@@ -15,9 +15,10 @@ enum RequestStatus {
 
 class RequestModel {
   final String id;
-  final UserModel requestedUser;
+  final String requestedUserId;
   final RequestType type;
   final RequestStatus status;
+  String? description;
   String? reason;
 
   static const _uuid = Uuid();
@@ -25,7 +26,7 @@ class RequestModel {
   RequestModel({
     String? id,
     required this.type,
-    required this.requestedUser,
+    required this.requestedUserId,
     this.status = RequestStatus.pending,
   }) : id = id ?? _uuid.v7();
 
@@ -38,5 +39,27 @@ class RequestModel {
       default:
         return '';
     }
+  }
+
+  factory RequestModel.fromFirestore(Map<String, dynamic> data, String docId) {
+    final String? requestTypeString = data['type'] as String?;
+    final String? requestStatusString = data['status'] as String?;
+
+    final RequestType parsedType = RequestType.values.firstWhere(
+      (e) => e.name == requestTypeString,
+      orElse: () => RequestType.others,
+    );
+
+    final RequestStatus parsedStatus = RequestStatus.values.firstWhere(
+      (e) => e.name == requestStatusString,
+      orElse: () => RequestStatus.pending,
+    );
+
+    return RequestModel(
+      id: docId,
+      type: parsedType,
+      status: parsedStatus,
+      requestedUserId: data['requestedUserId']
+    );
   }
 }

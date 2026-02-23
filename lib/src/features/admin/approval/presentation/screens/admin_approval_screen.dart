@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/features/admin/approval/data/repositories/request_firestore_repository.dart';
 import 'package:studall/src/features/auth/data/models/user_model.dart';
 
 import '../../data/models/request_model.dart';
 import '../widgets/request_list_tile.dart';
 
-class AdminApprovalScreen extends StatelessWidget {
+final requestsProvider = FutureProvider<List<RequestModel>>((ref) async {
+  final repository = ref.watch(requestFirestoreRepositoryProvider);
+  return repository.getAllRequests();
+});
+
+class AdminApprovalScreen extends ConsumerWidget {
   const AdminApprovalScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = ShadTheme.of(context);
 
-    // Hardcoded datasource (RequestModel)
-    final UserModel demoUser = UserModel(id: '1234', email: 'something', username: 'brain_cafe_sciku', fullName: 'Brain Cafe');
-    final List<RequestModel> requests = [
-      RequestModel(type: RequestType.store, requestedUser: demoUser),
-      RequestModel(type: RequestType.advertise, requestedUser: demoUser)
-    ];
+    final requestsAsyncValue = ref.watch(requestsProvider);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -27,9 +29,57 @@ class AdminApprovalScreen extends StatelessWidget {
           Text('คำขอจากผู้ใช้', style: theme.textTheme.h2,),
           const SizedBox(height: 16,),
           Text('คำขอที่รอดำเนินการ', style: theme.textTheme.h3,),
-          Column(
-            children:
-              (requests.length == 0 ? [Text('ขณะนี้ยังไม่มีคำขอที่รอดำเนินการ', style: theme.textTheme.h4,)] : requests.map((request) => RequestListTile(request: request)).toList())
+          const SizedBox(height: 16,),
+          requestsAsyncValue.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) => Text('เกิดข้อผิดพลาด: $error', style: theme.textTheme.p,),
+            data: (requests) {
+              final pendingRequests = requests.where((request) => request.status == RequestStatus.pending).toList();
+
+              if (pendingRequests.isEmpty) {
+                return Text('ไม่มีคำขอในขณะนี้', style: theme.textTheme.p,);
+              }
+
+              return Column(
+                children: pendingRequests.map((request) => RequestListTile(request: request)).toList(),
+              );
+            },
+          ),
+          const SizedBox(height: 16,),
+          Text('คำขอที่ถูกปฏิเสธ', style: theme.textTheme.h3,),
+          const SizedBox(height: 16,),
+          requestsAsyncValue.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) => Text('เกิดข้อผิดพลาด: $error', style: theme.textTheme.p,),
+            data: (requests) {
+              final declinedRequests = requests.where((request) => request.status == RequestStatus.declined).toList();
+
+              if (declinedRequests.isEmpty) {
+                return Text('ไม่มีคำขอในขณะนี้', style: theme.textTheme.p,);
+              }
+
+              return Column(
+                children: declinedRequests.map((request) => RequestListTile(request: request)).toList(),
+              );
+            },
+          ),
+          const SizedBox(height: 16,),
+          Text('คำขอที่ได้รับการอนุมัติ', style: theme.textTheme.h3,),
+          const SizedBox(height: 16,),
+          requestsAsyncValue.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) => Text('เกิดข้อผิดพลาด: $error', style: theme.textTheme.p,),
+            data: (requests) {
+              final approvedRequests = requests.where((request) => request.status == RequestStatus.approved).toList();
+
+              if (approvedRequests.isEmpty) {
+                return Text('ไม่มีคำขอในขณะนี้', style: theme.textTheme.p,);
+              }
+
+              return Column(
+                children: approvedRequests.map((request) => RequestListTile(request: request)).toList(),
+              );
+            },
           ),
         ],
       ),

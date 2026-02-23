@@ -2,9 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import './role.dart';
 
-part 'user_model.g.dart';
-
-@JsonSerializable()
 class UserModel {
   final String uid;
   final String email;
@@ -26,11 +23,6 @@ class UserModel {
     this.roles = const [],
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$UserModelToJson(this);
-
   factory UserModel.fromFirebase(User firebaseUser) {
     return UserModel(
       uid: firebaseUser.uid,
@@ -44,21 +36,22 @@ class UserModel {
     );
   }
 
-  factory UserModel.fromFirestore(Map<String, dynamic> data) {
+  factory UserModel.fromFirestore(Map<String, dynamic> data, String docId) {
     return UserModel(
-      uid: data['uid'] as String,
-      email: data['email'] as String,
-      username: data['username'] as String,
-      fullName: data['fullName'] as String?,
-      photoUrl: data['photoUrl'] as String?,
+      uid: data['uid'] as String? ?? '',
+      email: data['email'] as String? ?? '',
+      username: data['username'] as String? ?? '',
+      fullName: data['fullName'] as String? ?? '',
+      photoUrl: data['photoUrl'] as String? ?? '',
       isBanned: data['isBanned'] as bool? ?? false,
       lastActiveRole: data['lastActiveRole'] != null
           ? Role.values.firstWhere(
-              (role) => role.toString() == data['lastActiveRole'])
+              (role) => role.toString() == data['lastActiveRole'],
+              orElse: () => Role.values.first)
           : null,
       roles: (data['roles'] as List<dynamic>?)
               ?.map((roleStr) => Role.values.firstWhere(
-                  (role) => role.toString() == roleStr))
+                  (role) => role.name == roleStr))
               .toList() ??
           [],
     );
