@@ -8,7 +8,7 @@ class CommonAppbar extends StatelessWidget implements PreferredSizeWidget {
   const CommonAppbar({super.key, this.actions, this.leading});
 
   @override
-  Size get preferredSize => const Size.fromHeight(56);
+  Size get preferredSize => const Size.fromHeight(92);
 
   @override
   Widget build(BuildContext context) {
@@ -16,19 +16,16 @@ class CommonAppbar extends StatelessWidget implements PreferredSizeWidget {
     final colorScheme = theme.colorScheme;
     return Container(
       color: colorScheme.background,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: SafeArea(
-        child: SizedBox(
-          height: preferredSize.height - 16,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (leading != null) ...leading!,
-              const Spacer(),
-              if (actions != null) ...actions!,
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (leading != null) ...leading!,
+            const Spacer(),
+            if (actions != null) ...actions!,
+          ],
         ),
       ),
     );

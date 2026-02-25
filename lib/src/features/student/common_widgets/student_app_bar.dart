@@ -6,7 +6,8 @@ import 'package:studall/src/features/auth/data/repositories/auth_firebase_reposi
 import 'package:studall/src/features/auth/presentation/controllers/auth_state_provider.dart';
 import 'package:studall/src/features/auth/presentation/controllers/user_profile_provider.dart';
 
-class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
+class StudentAppbar extends ConsumerStatefulWidget
+    implements PreferredSizeWidget {
   final String? pageTitle;
   final bool showNextEvent;
   final bool showSubtitle;
@@ -35,15 +36,13 @@ class StudentAppbar extends StatefulWidget implements PreferredSizeWidget {
   });
 
   @override
-  State<StudentAppbar> createState() => _StudentAppbarState();
+  ConsumerState<StudentAppbar> createState() => _StudentAppbarState();
 
   @override
   Size get preferredSize => const Size.fromHeight(92);
-
-  Size get minimumSize => const Size.fromHeight(92);
 }
 
-class _StudentAppbarState extends State<StudentAppbar>
+class _StudentAppbarState extends ConsumerState<StudentAppbar>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _dateSlideAnimation;
@@ -138,6 +137,8 @@ class _StudentAppbarState extends State<StudentAppbar>
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
+    final authState = ref.watch(authFirebaseRepositoryProvider);
+    final user = ref.watch(userProfileProvider);
     return Container(
       color: colorScheme.background,
       constraints: const BoxConstraints(minHeight: 92),
@@ -165,41 +166,33 @@ class _StudentAppbarState extends State<StudentAppbar>
                   if (widget.actions != null) ...widget.actions!,
                   GestureDetector(
                     onTap: widget.onProfileTap,
-                    child: Consumer(
-                      builder: (context, ref, _) {
-                        final user = ref.watch(userProfileProvider);
-                        final authState = ref.watch(
-                          authFirebaseRepositoryProvider,
-                        );
-                        return user.when(
-                          data: (user) {
-                            return GestureDetector(
-                              onDoubleTap: () {
-                                authState.signOut();
-                              },
-                              child: ShadAvatar(
-                                user!.photoUrl,
-                                size: const Size.square(40),
-                                backgroundColor: colorScheme.muted,
-                                placeholder: Text(
-                                  widget.userInitials ?? 'SA',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                    color: colorScheme.foreground,
-                                    height: 20 / 12,
-                                  ),
-                                ),
-                              ),
-                            );
+                    child: user.when(
+                      data: (user) {
+                        return GestureDetector(
+                          onDoubleTap: () {
+                            authState.signOut();
                           },
-                          loading: () => const Scaffold(
-                            body: Center(child: CircularProgressIndicator()),
+                          child: ShadAvatar(
+                            user!.photoUrl,
+                            size: const Size.square(40),
+                            backgroundColor: colorScheme.muted,
+                            placeholder: Text(
+                              widget.userInitials ?? 'SA',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: colorScheme.foreground,
+                                height: 20 / 12,
+                              ),
+                            ),
                           ),
-                          error: (e, trace) =>
-                              Scaffold(body: Center(child: Text('Error: $e'))),
                         );
                       },
+                      loading: () => const Scaffold(
+                        body: Center(child: CircularProgressIndicator()),
+                      ),
+                      error: (e, trace) =>
+                          Scaffold(body: Center(child: Text('Error: $e'))),
                     ),
                   ),
                 ],

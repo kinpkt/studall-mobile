@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:studall/src/common_widgets/common_appbar.dart';
+import 'package:studall/src/common_widgets/common_app_bar.dart';
 import 'package:studall/src/features/classroom_sync/presentation/screens/course_selection_screen.dart';
 
 class SyncClassroomScreen extends StatelessWidget {

@@ -45,7 +45,7 @@ class UserModel {
       isBanned: data['isBanned'] as bool? ?? false,
       lastActiveRole: data['lastActiveRole'] != null
           ? Role.values.firstWhere(
-              (role) => role.toString() == data['lastActiveRole'],
+              (role) => role.name == data['lastActiveRole'],
               orElse: () => Role.values.first,
             )
           : null,
@@ -53,7 +53,7 @@ class UserModel {
           (data['roles'] as List<dynamic>?)
               ?.map(
                 (roleStr) => Role.values.firstWhere(
-                  (role) => role.toString() == roleStr,
+                  (role) => role.name == roleStr,
                   orElse: () => Role.values.first,
                 ),
               )
@@ -70,8 +70,8 @@ class UserModel {
       'fullName': fullName,
       'photoUrl': photoUrl,
       'isBanned': isBanned,
-      'lastActiveRole': lastActiveRole?.toString(),
-      'roles': roles.map((role) => role.toString()).toList(),
+      'lastActiveRole': lastActiveRole?.name,
+      'roles': roles.map((role) => role.name).toList(),
     };
   }
 
