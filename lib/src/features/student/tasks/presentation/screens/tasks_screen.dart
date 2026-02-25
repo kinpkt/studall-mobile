@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
-import 'package:studall/src/features/student/tasks/presentation/widgets/to_do_list_tile.dart';
-import '../../../courses/data/models/course_model.dart';
 import '../../data/models/task_model.dart';
-import '../../data/models/task_type.dart';
 import '../widgets/tasks_tab_bar.dart';
 import '../widgets/task_tile.dart';
 

@@ -2,7 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
 import 'package:uuid/uuid.dart';
 import 'package:studall/src/features/student/courses/data/models/course_model.dart';
-import 'task_type.dart';
 
 @JsonSerializable(explicitToJson: true)
 class TaskModel {
