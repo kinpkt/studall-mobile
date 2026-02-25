@@ -22,10 +22,6 @@ class StudentHomeScreen extends StatelessWidget {
       ItemModel(Uuid().v7.toString(), 'Security and Protection', '01418236-65', ItemType.resource, DateTime.now()),
     ];
 
-    // Sandbox area for defining hardcoded datasources
-    CourseModel demoCourse = CourseModel(courseId: '01418342-65', name: 'Mobile Application Design and Development', credit: 3);
-    TaskModel demoTask = TaskModel(title: 'Ass09: Asynchronous Programming', dueDate: DateTime(2026, 2, 26, 23, 59), type: TaskType.assignment, course: demoCourse);
-
     return DefaultTabController(
       length: 3,
       child: Container(
@@ -69,7 +65,7 @@ class StudentHomeScreen extends StatelessWidget {
                 children: [
                   Column(
                     children: [
-                      ToDoListTile(task: demoTask)
+                      // ToDoListTile(task: demoTask)
                     ],
                   ),
                   // Center(child: Text("หน้ามอบหมายแล้ว")),

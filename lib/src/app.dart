@@ -32,12 +32,13 @@ class MyApp extends ConsumerWidget {
           materialThemeBuilder(context, theme),
       home: user.when(
         data: (user) {
+          print('User lastActiveRole: ${user?.lastActiveRole}');
+          print('User Email: ${user?.email ?? ''}');
           if (user == null)
             return const LogInScreen();
 
           if (user.roles.isEmpty) {
-            return const AdminLayoutScreen();
-            // return const SelectRoleScreen();
+            return const SelectRoleScreen();
           } else if (user.lastActiveRole != null) {
             switch (user.lastActiveRole!) {
               case Role.student:

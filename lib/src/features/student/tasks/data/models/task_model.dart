@@ -3,9 +3,6 @@ import 'package:uuid/uuid.dart';
 import 'package:studall/src/features/student/courses/data/models/course_model.dart';
 import 'task_type.dart';
 
-part 'task_model.g.dart';
-
-@JsonSerializable(explicitToJson: true)
 class TaskModel {
   final String id;
   final String title;
@@ -22,10 +19,6 @@ class TaskModel {
     this.description,
     this.course,
   }) : id = id ?? const Uuid().v4();
-
-  factory TaskModel.fromJson(Map<String, dynamic> json) => _$TaskModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$TaskModelToJson(this);
 
   TaskModel copyWith({
     String? id,

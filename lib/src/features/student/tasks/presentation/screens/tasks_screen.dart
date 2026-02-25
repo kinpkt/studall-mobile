@@ -11,10 +11,6 @@ class TasksScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Sandbox area for defining hardcoded datasources
-    CourseModel demoCourse = CourseModel(courseId: '01418342-65', name: 'Mobile Application Design and Development', credit: 3);
-    TaskModel demoTask = TaskModel(title: 'Ass09: Asynchronous Programming', dueDate: DateTime(2026, 2, 26, 23, 59), type: TaskType.assignment, course: demoCourse);
-
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -29,7 +25,7 @@ class TasksScreen extends StatelessWidget {
                   children: [
                     Column(
                       children: [
-                        ToDoListTile(task: demoTask)
+                        // ToDoListTile(task: demoTask)
                       ],
                     ),
                     // Center(child: Text("หน้ามอบหมายแล้ว")),
