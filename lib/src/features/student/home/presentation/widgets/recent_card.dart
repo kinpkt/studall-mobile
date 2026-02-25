@@ -5,7 +5,7 @@ import 'package:studall/src/core/theme/theme_extension.dart';
 import 'package:studall/src/core/utils/datetime_to_thai_string.dart';
 import 'package:studall/src/features/student/common_widgets/resource_icon.dart';
 
-import '../data/models/utility_model.dart';
+import '../../../data/models/utility_model.dart';
 
 class RecentItemCard extends StatelessWidget {
   final UtilityModel item;

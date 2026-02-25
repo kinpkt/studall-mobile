@@ -62,7 +62,7 @@ class TaskTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                dateTimeToThaiString(task.dueDateTime!),
+                _formatDueDate(task.dueDateTime!),
                 style: TextStyle(
                   fontFamily: 'Google Sans',
                   fontSize: 14,
