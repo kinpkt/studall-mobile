@@ -5,10 +5,7 @@ import 'package:studall/src/features/student/common_widgets/recent_card.dart';
 import 'package:studall/src/features/student/tasks/presentation/widgets/task_tile.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../courses/data/models/course_model.dart';
 import '../../../tasks/data/models/task_model.dart';
-import '../../../tasks/data/models/task_type.dart';
-
 class StudentHomeScreen extends StatelessWidget {
   const StudentHomeScreen({super.key});
 
@@ -47,19 +44,6 @@ class StudentHomeScreen extends StatelessWidget {
       ),
     ];
 
-    // Sandbox area for defining hardcoded datasources
-    CourseModel demoCourse1 = CourseModel(
-      courseId: '01418496',
-      name: 'โครงงานวิทยาศาสตร์คอมพิวเตอร์',
-      credit: 3,
-    );
-
-    CourseModel demoCourse2 = CourseModel(
-      courseId: '01418342-65',
-      name: 'Mobile Application Design and Development',
-      credit: 3,
-    );
-
     List<TaskModel> demoTasks = [
       TaskModel(
         title: 'การบ้านที่ 4 การประเมิอราคา future แปลกๆ',
@@ -74,7 +58,6 @@ class StudentHomeScreen extends StatelessWidget {
         type: WorkUtilityType(WorkType.assignment),
       ),
     ];
-
     return DefaultTabController(
       length: 3,
       child: Container(

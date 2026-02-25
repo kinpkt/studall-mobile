@@ -78,6 +78,45 @@ class StudentLayoutScreen extends ConsumerWidget {
     );
   }
 
+  void _showAddOptions(BuildContext context) {
+    final theme = ShadTheme.of(context);
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(PhosphorIconsRegular.listChecks),
+                  title: Text('เพิ่มสิ่งที่ต้องทำ', style: theme.textTheme.p),
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to To-do creation screen or open dialog
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(PhosphorIconsRegular.notebook),
+                  title: Text('เพิ่มรูปจดบันทึก', style: theme.textTheme.p),
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to Note creation screen or open dialog
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(studentLayoutControllerProvider);
@@ -87,7 +126,7 @@ class StudentLayoutScreen extends ConsumerWidget {
         appBar: _buildAppBar(context, currentIndex),
         body: IndexedStack(index: currentIndex, children: _pages),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () => _showAddOptions(context),
           child: const Icon(PhosphorIconsRegular.plus),
         ),
         bottomNavigationBar: NavigationBar(

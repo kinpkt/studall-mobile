@@ -28,6 +28,7 @@ class TasksScreen extends StatelessWidget {
         type: WorkUtilityType(WorkType.assignment),
       ),
     ];
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(

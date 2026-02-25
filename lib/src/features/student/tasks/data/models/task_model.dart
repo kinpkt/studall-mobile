@@ -4,8 +4,6 @@ import 'package:uuid/uuid.dart';
 import 'package:studall/src/features/student/courses/data/models/course_model.dart';
 import 'task_type.dart';
 
-// part 'task_model.g.dart';
-
 @JsonSerializable(explicitToJson: true)
 class TaskModel {
   final String id;

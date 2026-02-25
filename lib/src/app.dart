@@ -32,7 +32,9 @@ class MyApp extends ConsumerWidget {
           materialThemeBuilder(context, theme),
       home: user.when(
         data: (user) {
-          if (user == null) {
+          print('User lastActiveRole: ${user?.lastActiveRole}');
+          print('User Email: ${user?.email ?? ''}');
+          if (user == null){
             return const LogInScreen();
           } else if (user.isBanned) {
             return Scaffold();
