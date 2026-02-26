@@ -102,8 +102,16 @@ class _AddEditCourseModalState extends ConsumerState<AddEditCourseModal> {
                 schedule: _schedules,
               );
 
-              await ref.read(courseFirestoreRepositoryProvider).addCourse(newCourse);
-              ref.invalidate(courseFirestoreRepositoryProvider);
+              if (widget.course == null) {
+                await ref.read(courseFirestoreRepositoryProvider).addCourse(
+                    newCourse);
+                ref.invalidate(courseFirestoreRepositoryProvider);
+              }
+              else {
+                await ref.read(courseFirestoreRepositoryProvider).updateCourse(
+                    newCourse);
+                ref.invalidate(courseFirestoreRepositoryProvider);
+              }
 
               if (mounted)
                 Navigator.pop(context);
