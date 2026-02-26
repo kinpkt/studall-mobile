@@ -3,11 +3,10 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
 import 'package:studall/src/core/utils/datetime_to_thai_string.dart';
 import 'package:studall/src/features/student/common_widgets/resource_icon.dart';
-
-import '../../data/models/task_model.dart';
+import 'package:studall/src/features/student/data/models/utility_model.dart';
 
 class TaskTile extends StatelessWidget {
-  final TaskModel task;
+  final UtilityModel task;
 
   const TaskTile({super.key, required this.task});
 
@@ -40,7 +39,7 @@ class TaskTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  task.label,
+                  task.courseId ?? '',
                   style: TextStyle(
                     fontFamily: 'Google Sans',
                     fontSize: 14,
@@ -62,7 +61,7 @@ class TaskTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                _formatDueDate(task.dueDateTime!),
+                _formatDueDate(task.dueDate!),
                 style: TextStyle(
                   fontFamily: 'Google Sans',
                   fontSize: 14,
@@ -72,7 +71,7 @@ class TaskTile extends StatelessWidget {
                 ),
               ),
               Text(
-                '${task.dueDateTime!.hour.toString().padLeft(2, '0')}:${task.dueDateTime!.minute.toString().padLeft(2, '0')}',
+                '${task.dueDate!.hour.toString().padLeft(2, '0')}:${task.dueDate!.minute.toString().padLeft(2, '0')}',
                 style: TextStyle(
                   fontFamily: 'Google Sans',
                   fontSize: 14,

@@ -12,6 +12,13 @@ class RequestFirestoreRepository {
 
   RequestFirestoreRepository(this._service);
 
+  Future<void> addRequest(RequestModel request) async {
+    await _service.add(
+      collectionPath: 'requests',
+      data: request.toFirestore()
+    );
+  }
+
   Future<List<RequestModel>> getAllRequests() async {
     final data = await _service.getCollection<RequestModel>(
       path: 'requests/',

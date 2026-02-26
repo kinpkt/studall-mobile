@@ -1,15 +1,15 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:studall/src/features/student/tasks/data/models/task_model.dart';
+import 'package:studall/src/features/student/data/models/utility_model.dart';
 import './user_model.dart';
 import './role.dart';
 
 class StudentModel extends UserModel {
   final String institute;
-  final List<TaskModel> tasks;
+  final List<UtilityModel> tasks;
 
   StudentModel({
     required this.institute,
-    List<TaskModel>? tasks,
+    List<UtilityModel>? tasks,
     required super.id,
     required super.email,
     required super.username,
@@ -22,7 +22,7 @@ class StudentModel extends UserModel {
   @override
   StudentModel copyWith({
     String? institute,
-    List<TaskModel>? tasks,
+    List<UtilityModel>? tasks,
     String? id,
     String? email,
     String? username,

@@ -62,4 +62,17 @@ class RequestModel {
       requestedUserId: data['requestedUserId']
     );
   }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'id': id,
+      'requestedUserId': requestedUserId,
+      'type': type.name,
+      'status': status.name,
+      if (description != null)
+        'description': description,
+      if (reason != null)
+        'reason': reason,
+    };
+  }
 }

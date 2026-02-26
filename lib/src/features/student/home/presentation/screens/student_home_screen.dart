@@ -1,66 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
 import 'package:studall/src/features/student/home/presentation/widgets/recent_card.dart';
 import 'package:studall/src/features/student/tasks/presentation/widgets/task_tile.dart';
 import 'package:uuid/uuid.dart';
 import 'package:studall/src/features/student/home/data/models/schedule_model.dart';
 import 'package:studall/src/features/student/home/presentation/widgets/schedule.dart';
-import '../../../tasks/data/models/task_model.dart';
 
 class StudentHomeScreen extends StatelessWidget {
   const StudentHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Hardcoded datasource for items:
-    List<UtilityModel> items = [
-      WorkUtilityModel(
-        id: Uuid().v7.toString(),
-        courseId: '01418236-682',
-        creatorUserId: Uuid().v7.toString(),
-        title: 'Deadlock',
-        workType: WorkType.assignment,
-        creationTime: DateTime(2026, 1, 20),
-        updateTime: DateTime(2026, 1, 22),
-        dueDateTime: DateTime(2026, 2, 9, 23, 59),
-      ),
-      MaterialUtilityModel(
-        id: Uuid().v7.toString(),
-        courseId: '01418236-682',
-        creatorUserId: Uuid().v7.toString(),
-        title: 'Deadlock',
-        materialType: MaterialTypes.material,
-        creationTime: DateTime(2026, 1, 20),
-        updateTime: DateTime(2026, 1, 22),
-      ),
-      WorkUtilityModel(
-        id: Uuid().v7.toString(),
-        courseId: '01418236-682',
-        creatorUserId: Uuid().v7.toString(),
-        title: 'Deadlock',
-        workType: WorkType.shortAnswerQuestion,
-        creationTime: DateTime(2026, 1, 20),
-        updateTime: DateTime(2026, 1, 22),
-        dueDateTime: DateTime(2026, 2, 9, 23, 59),
-      ),
-    ];
-
-    List<TaskModel> demoTasks = [
-      TaskModel(
-        title: 'การบ้านที่ 4 การประเมิอราคา future แปลกๆ',
-        label: '01418342-65',
-        type: WorkUtilityType(WorkType.assignment),
-        dueDateTime: DateTime(2026, 2, 26, 23, 59), // Tomorrow
-      ),
-      TaskModel(
-        title: 'Ass09: Asynchronous Programming',
-        label: '01418342-65',
-        dueDateTime: DateTime(2026, 2, 27, 23, 59), // Day after tomorrow
-        type: WorkUtilityType(WorkType.assignment),
-      ),
-    ];
-
     List<ScheduleModel> sampleSchedule = [
       ScheduleModel(
         id: '1',
@@ -84,7 +36,7 @@ class StudentHomeScreen extends StatelessWidget {
       ),
       ScheduleModel(
         id: '3',
-        courseId: '01418321-65',
+        courseId: '01418221-65',
         title: 'Database Systems',
         location: 'Online',
         section: 'Sec 1',
@@ -94,7 +46,7 @@ class StudentHomeScreen extends StatelessWidget {
       ),
       ScheduleModel(
         id: '4',
-        courseId: '01418497-65',
+        courseId: '01418499-65',
         title: 'Senior Project',
         location: 'SC1-301',
         dayOfWeek: 5, // Friday
@@ -112,8 +64,8 @@ class StudentHomeScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Schedule(scheduleItems: sampleSchedule, height: 208),
             const SizedBox(height: 16),
-            _buildRecentContent(context, items),
-            _buildTaskList(context, demoTasks),
+            // _buildRecentContent(context, items),
+            // _buildTaskList(context, demoTasks),
           ],
         ),
       ),
@@ -180,7 +132,7 @@ class StudentHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTaskList(BuildContext context, List<TaskModel> tasks) {
+  Widget _buildTaskList(BuildContext context, List<UtilityModel> tasks) {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;

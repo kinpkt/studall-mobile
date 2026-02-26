@@ -33,67 +33,30 @@ class RecentItemCard extends StatelessWidget {
     String date = '';
     String time = '';
 
-    switch (item) {
-      case WorkUtilityModel work:
-        // final work = (item as WorkUtilityModel);
-        title = work.title ?? 'Untitled Work';
-        label = work.courseId;
+    switch (item.type) {
+      case UtilityType.work:
+        title = item.title ?? 'Untitled Work';
+        label = item.courseId ?? 'Generic';
         date = dateTimeToThaiString(
-          work.dueDateTime ?? work.creationTime,
+          item.dueDate ?? item.createdAt,
           withYear: false,
           acronymMonth: true,
           withTime: false,
         );
         time =
-            '${work.dueDateTime?.hour.toString().padLeft(2, '0')}:${work.dueDateTime?.minute.toString().padLeft(2, '0')}';
+            '${item.dueDate?.hour.toString().padLeft(2, '0')}:${item.dueDate?.minute.toString().padLeft(2, '0')}';
         break;
-      case MaterialUtilityModel material:
-        title = material.title ?? 'Untitled Material';
-        label = material.courseId;
+      case UtilityType.material:
+        title = item.title ?? 'Untitled Material';
+        label = item.courseId  ?? 'Generic';
         date = dateTimeToThaiString(
-          material.creationTime,
+          item.createdAt,
           withYear: false,
           acronymMonth: true,
           withTime: false,
         );
         time =
-            '${material.creationTime.hour.toString().padLeft(2, '0')}:${material.creationTime.minute.toString().padLeft(2, '0')}';
-        break;
-      case AnnouncementUtilityModel announcement:
-        title = announcement.title ?? 'Untitled Announcement';
-        label = announcement.courseId;
-        date = dateTimeToThaiString(
-          announcement.creationTime,
-          withYear: false,
-          acronymMonth: true,
-          withTime: false,
-        );
-        time =
-            '${announcement.creationTime.hour.toString().padLeft(2, '0')}:${announcement.creationTime.minute.toString().padLeft(2, '0')}';
-        break;
-      case EventUtilityModel event:
-        title = event.title ?? 'Untitled Event';
-        label = '';
-        date = dateTimeToThaiString(
-          event.creationTime,
-          withYear: false,
-          acronymMonth: true,
-          withTime: false,
-        );
-        time =
-            '${event.creationTime.hour.toString().padLeft(2, '0')}:${event.creationTime.minute.toString().padLeft(2, '0')}';
-        break;
-      case NoteUtilityModel note:
-        title = note.title ?? 'Untitled Note';
-        label = '';
-        date = dateTimeToThaiString(
-          note.creationTime,
-          withYear: false,
-          acronymMonth: true,
-          withTime: false,
-        );
-        time =
-            '${note.creationTime.hour.toString().padLeft(2, '0')}:${note.creationTime.minute.toString().padLeft(2, '0')}';
+            '${item.createdAt.hour.toString().padLeft(2, '0')}:${item.createdAt.minute.toString().padLeft(2, '0')}';
         break;
     }
 
@@ -143,7 +106,7 @@ class RecentItemCard extends StatelessWidget {
                               color: colorScheme.foreground,
                             ),
                           ),
-                          if (showTime && item is WorkUtilityModel) ...[
+                          if (showTime && item.type == UtilityType.work) ...[
                             const SizedBox(width: 2),
                             Text(
                               time,
@@ -158,43 +121,7 @@ class RecentItemCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                if (item is AnnouncementUtilityModel)
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: shadows.sm,
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: avatarUrl!.isNotEmpty
-                        ? Image.network(
-                            avatarUrl!,
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: colorScheme.muted,
-                                child: Icon(
-                                  PhosphorIconsRegular.user,
-                                  color: colorScheme.mutedForeground,
-                                  size: 20,
-                                ),
-                              );
-                            },
-                          )
-                        : Container(
-                            color: colorScheme.muted,
-                            child: Icon(
-                              PhosphorIconsRegular.user,
-                              color: colorScheme.mutedForeground,
-                              size: 20,
-                            ),
-                          ),
-                  )
-                else
-                  ResourceIcon(type: item.type),
+                ResourceIcon(type: item.type),
               ],
             ),
           ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
-import '../../data/models/task_model.dart';
 import '../widgets/tasks_tab_bar.dart';
 import '../widgets/task_tile.dart';
 
@@ -11,21 +10,6 @@ class TasksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
    
-    List<TaskModel> demoTasks = [
-      TaskModel(
-        title: 'การบ้านที่ 4 การประเมิอราคา future แปลกๆ',
-        label: '01418342-65',
-        type: WorkUtilityType(WorkType.assignment),
-        dueDateTime: DateTime(2026, 2, 26, 23, 59), // Tomorrow
-      ),
-      TaskModel(
-        title: 'Ass09: Asynchronous Programming',
-        label: '01418342-65',
-        dueDateTime: DateTime(2026, 2, 27, 23, 59), // Day after tomorrow
-        type: WorkUtilityType(WorkType.assignment),
-      ),
-    ];
-
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -40,7 +24,7 @@ class TasksScreen extends StatelessWidget {
                   children: [
                     Column(
                       children: [
-                        _buildTaskList(context, demoTasks),
+                        // _buildTaskList(context, demoTasks),
                       ],
                     ),
                     // Center(child: Text("หน้ามอบหมายแล้ว")),
@@ -56,7 +40,7 @@ class TasksScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTaskList(BuildContext context, List<TaskModel> tasks) {
+  Widget _buildTaskList(BuildContext context, List<UtilityModel> tasks) {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
