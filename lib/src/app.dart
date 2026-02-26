@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/app_theme.dart';
@@ -71,6 +72,13 @@ class MyApp extends ConsumerWidget {
             const PartnerAddAdvertisementScreen(),
         '/admin-layout': (context) => const AdminLayoutScreen(),
       },
+      localizationsDelegates: const [
+        FlutterQuillLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('th', 'TH'),
+      ],
     );
   }
 }

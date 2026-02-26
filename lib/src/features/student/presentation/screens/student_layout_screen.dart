@@ -6,6 +6,7 @@ import 'package:studall/src/features/student/courses/presentation/screens/course
 import 'package:studall/src/features/student/home/presentation/screens/student_home_screen.dart';
 import 'package:studall/src/features/student/tasks/presentation/screens/tasks_screen.dart';
 import '../../explore/presentation/screens/explore_screen.dart';
+import '../../notes/presentation/screens/note_quill_screen.dart';
 import '../../notes/presentation/screens/notes_screen.dart';
 import '../providers/student_layout_controller.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -105,8 +106,11 @@ class StudentLayoutScreen extends ConsumerWidget {
                   leading: const Icon(PhosphorIconsRegular.notebook),
                   title: Text('เพิ่มรูปจดบันทึก', style: theme.textTheme.p),
                   onTap: () {
-                    Navigator.pop(context);
-                    // TODO: Navigate to Note creation screen or open dialog
+                    // Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => NoteQuillScreen())
+                    );
                   },
                 ),
               ],
