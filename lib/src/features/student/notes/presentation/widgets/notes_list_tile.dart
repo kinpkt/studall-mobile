@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:studall/src/features/student/notes/presentation/screens/note_quill_screen.dart';
 
 import '../../data/models/note_model.dart';
 
 class NotesListTile extends StatelessWidget {
   final NoteModel note;
-  final bool isPinned;
 
-  const NotesListTile({super.key, required this.note, this.isPinned = false});
+  const NotesListTile({super.key, required this.note});
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +16,12 @@ class NotesListTile extends StatelessWidget {
 
     return Material(
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => NoteQuillScreen(note: note,))
+          );
+        },
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -28,11 +34,10 @@ class NotesListTile extends StatelessWidget {
             size: 24,
           ),
         ),
-        title: Text(note.name, style: theme.textTheme.list,),
+        title: Text(note.title, style: theme.textTheme.list,),
         subtitle: Text(
-          note.course.name != null ? '${note.course.name} (${note.timeDifferenceString})' :
           '(${note.timeDifferenceString})', style: theme.textTheme.muted),
-        trailing: isPinned ? Icon(
+        trailing: note.isPinned ? Icon(
           PhosphorIconsFill.pushPin,
           color: Colors.grey[300],
           size: 18,

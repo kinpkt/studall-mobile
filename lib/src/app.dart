@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/app_theme.dart';
@@ -15,6 +16,7 @@ import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dar
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/select_role_screen.dart';
 import 'package:studall/src/core/routes/app_router.dart';
+import 'package:studall/src/features/student/tools/presentation/gpa_calculator_screen.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -23,7 +25,6 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final user = ref.watch(userProfileProvider);
-    final router = ref.watch(goRouterProvider);
 
     return ShadApp(
       debugShowCheckedModeBanner: true,
@@ -34,12 +35,15 @@ class MyApp extends ConsumerWidget {
           materialThemeBuilder(context, theme),
       home: user.when(
         data: (user) {
-          print('User lastActiveRole: ${user?.lastActiveRole}');
-          print('User Email: ${user?.email ?? ''}');
-          if (user == null){
+          if (user == null) {
             return const LogInScreen();
-          } else if (user.isBanned) {
-            return Scaffold();
+          }
+          else if (user.isBanned) {
+            return Scaffold(
+              body: Center(
+                child: Text('บัญชีของท่านถูกระงับ กรุณาติดต่อผู้ดูแลระบบ'),
+              ),
+            );
           }
 
           if (user.roles.isEmpty) {
@@ -68,12 +72,20 @@ class MyApp extends ConsumerWidget {
         '/signup': (context) => const SignUpScreen(),
         '/select-role': (context) => const SelectRoleScreen(),
         '/student-layout': (context) => const StudentLayoutScreen(),
+        '/gpa-calculator': (context) => const GPACalculatorScreen(),
         '/partner-layout': (context) => const PartnerLayoutScreen(),
         '/partner-add-branch': (context) => const PartnerAddBranchScreen(),
         '/partner-add-advertisement': (context) =>
             const PartnerAddAdvertisementScreen(),
         '/admin-layout': (context) => const AdminLayoutScreen(),
       },
+      localizationsDelegates: const [
+        FlutterQuillLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('th', 'TH'),
+      ],
     );
   }
 }
