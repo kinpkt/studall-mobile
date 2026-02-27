@@ -14,6 +14,7 @@ import 'package:studall/src/features/admin/presentation/screens/admin_layout_scr
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/select_role_screen.dart';
+import 'package:studall/src/core/routes/app_router.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -22,6 +23,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final user = ref.watch(userProfileProvider);
+    final router = ref.watch(goRouterProvider);
 
     return ShadApp(
       debugShowCheckedModeBanner: true,
@@ -59,7 +61,8 @@ class MyApp extends ConsumerWidget {
             const Scaffold(body: Center(child: CircularProgressIndicator())),
         error: (e, trace) => Scaffold(body: Center(child: Text('Error: $e'))),
       ),
-      initialRoute: '/',
+      // routerConfig: router,
+
       routes: {
         '/login': (context) => const LogInScreen(),
         '/signup': (context) => const SignUpScreen(),

@@ -173,10 +173,11 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
                             authState.signOut();
                           },
                           child: ShadAvatar(
-                            user!.photoUrl,
+                            user?.photoUrl,
                             size: const Size.square(40),
                             backgroundColor: colorScheme.muted,
                             placeholder: Text(
+                              // TODO แก้ที่หลังเอามาจาก user profile provider
                               widget.userInitials ?? 'SA',
                               style: TextStyle(
                                 fontSize: 12,
