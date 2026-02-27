@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import '../controllers/sign_up_controller.dart';
+import 'package:studall/src/features/auth/presentation/controllers/auth_controller.dart';
+import '../controllers/auth_controller.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
@@ -109,10 +110,10 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
-    final signUpState = ref.watch(signUpControllerProvider);
+    final signUpState = ref.watch(authControllerProvider);
     final isLoading = signUpState.isLoading;
 
-    ref.listen(signUpControllerProvider, (_, next) {
+    ref.listen(authControllerProvider, (_, next) {
       if (next.hasError) {
         ShadToaster.of(context).show(
           ShadToast.destructive(
@@ -204,11 +205,11 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
                               if (_formKey.currentState != null &&
                                   _formKey.currentState!.validate()) {
                                 ref
-                                    .read(signUpControllerProvider.notifier)
+                                    .read(authControllerProvider.notifier)
                                     .signUp(
-                                      _emailController.text.trim(),
-                                      _passwordController.text,
-                                      _nameController.text.trim(),
+                                      email: _emailController.text.trim(),
+                                      password: _passwordController.text,
+                                      username: _nameController.text.trim(),
                                     );
                               }
                             },

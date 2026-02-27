@@ -1,83 +1,69 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
+import 'course_schedule_model.dart';
 
-part 'course_model.g.dart';
-
-@JsonSerializable()
 class CourseModel {
   final String id;
-  final String courseId;
   final String name;
-  final double credit;
-  final double? grade;
   final String? description;
-  final int? academicYear;
+  // final double? credit;
+  final String userId;
+  final String? teacherName;
+  final List<CourseScheduleModel> schedule;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool isActive;
+  DateTime? inactiveDateTime;
 
   CourseModel({
     String? id,
-    required this.courseId,
     required this.name,
-    required this.credit,
-    this.grade,
     this.description,
-    this.academicYear,
-  }) : id = id ?? const Uuid().v4();
+    required this.userId,
+    this.teacherName,
+    List<CourseScheduleModel>? schedule,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    required this.isActive,
+    DateTime? inactiveDateTime
+  })  : id = id ?? const Uuid().v7(),
+        schedule = schedule ?? [],
+        createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 
-  factory CourseModel.fromLetterGrade({
-    String? id,
-    required String courseId,
-    required String name,
-    required double credit,
-    required String letterGrade,
-    String? description,
-    int? academicYear,
-  }) {
+  factory CourseModel.fromFirestore(Map<String, dynamic> data, String docId) {
     return CourseModel(
-      id: id,
-      courseId: courseId,
-      name: name,
-      credit: credit,
-      description: description,
-      academicYear: academicYear,
-      grade: _letterGradeToNumeric(letterGrade),
+      id: docId,
+      name: data['name'] as String,
+      description: data['description'] as String?,
+      isActive: data['isActive'] as bool,
+      userId: data['userId'] as String,
+      teacherName: data['teacherName'] as String?,
+      schedule: (data['schedule'] as List<dynamic>?)?.map(
+        (scheduleData) => CourseScheduleModel.fromFirestore(
+          scheduleData as Map<String, dynamic>
+        )
+      ).toList(),
+      createdAt: data['createdAt'].toDate(),
+      updatedAt: data['updatedAt'].toDate(),
+      inactiveDateTime: data['inactiveDateTime'] != null ? data['inactiveDateTime'].toDate() : null,
     );
   }
 
-  factory CourseModel.fromJson(Map<String, dynamic> json) => _$CourseModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$CourseModelToJson(this);
-
-  static double _letterGradeToNumeric(String grade) {
-    switch (grade.toUpperCase()) {
-      case 'A': return 4.0;
-      case 'B+': return 3.5;
-      case 'B': return 3.0;
-      case 'C+': return 2.5;
-      case 'C': return 2.0;
-      case 'D+': return 1.5;
-      case 'D': return 1.0;
-      case 'F': return 0.0;
-      default: return 0.0;
-    }
-  }
-
-  CourseModel copyWith({
-    String? id,
-    String? courseId,
-    String? name,
-    double? credit,
-    double? grade,
-    String? description,
-    int? academicYear,
-  }) {
-    return CourseModel(
-      id: id ?? this.id,
-      courseId: courseId ?? this.courseId,
-      name: name ?? this.name,
-      credit: credit ?? this.credit,
-      grade: grade ?? this.grade,
-      description: description ?? this.description,
-      academicYear: academicYear ?? this.academicYear,
-    );
+  Map<String, dynamic> toFirestore() {
+    return {
+      'id': id,
+      'name': name,
+      if (description != null)
+        'description': description!,
+      'userId': userId,
+      if (teacherName != null)
+        'teacherName': teacherName!,
+      'schedule': schedule.map(
+        (sch) => sch.toFirestore()
+      ).toList(),
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'isActive': isActive
+    };
   }
 }

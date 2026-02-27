@@ -68,7 +68,7 @@ class UserListTile extends ConsumerWidget {
                                 await ref
                                     .read(userFirestoreRepositoryProvider)
                                     .updateUserBanStatus(
-                                  user.uid,
+                                  user.id,
                                   currentBanStatus,
                                 );
 

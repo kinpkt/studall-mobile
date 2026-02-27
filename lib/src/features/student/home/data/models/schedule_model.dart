@@ -1,26 +1,23 @@
-import 'package:json_annotation/json_annotation.dart';
-import 'activity_model.dart';
+import 'package:flutter/material.dart';
 
-part 'schedule_model.g.dart';
-
-@JsonSerializable(explicitToJson: true)
 class ScheduleModel {
-  // Public final field
-  final List<ActivityModel> activities;
+  String id;
+  String? courseId;
+  String title;
+  String? location;
+  String? section;
+  int dayOfWeek;
+  TimeOfDay startTime;
+  TimeOfDay endTime;
 
-  const ScheduleModel({
-    this.activities = const [],
+  ScheduleModel({
+    required this.id,
+    this.courseId,
+    required this.title,
+    this.location,
+    this.section,
+    required this.dayOfWeek,
+    required this.startTime,
+    required this.endTime,
   });
-
-  factory ScheduleModel.fromJson(Map<String, dynamic> json) => _$ScheduleModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ScheduleModelToJson(this);
-
-  ScheduleModel copyWith({
-    List<ActivityModel>? activities,
-  }) {
-    return ScheduleModel(
-      activities: activities ?? this.activities,
-    );
-  }
 }

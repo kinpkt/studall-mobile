@@ -1,47 +1,64 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:studall/src/features/student/data/models/utility_model.dart';
 import 'package:uuid/uuid.dart';
 import 'package:studall/src/features/student/courses/data/models/course_model.dart';
-import 'task_type.dart';
-
-part 'task_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class TaskModel {
   final String id;
   final String title;
-  final String? description;
-  final DateTime dueDate;
-  final TaskType type;
-  final CourseModel? course;
+  final String label;
+  final UtilityType type;
+  final DateTime? dueDateTime;
 
   TaskModel({
     String? id,
     required this.title,
-    required this.dueDate,
+    required this.label,
     required this.type,
-    this.description,
-    this.course,
+    this.dueDateTime,
   }) : id = id ?? const Uuid().v4();
 
-  factory TaskModel.fromJson(Map<String, dynamic> json) => _$TaskModelFromJson(json);
+  factory TaskModel.fromUtilityModel(UtilityModel? utility) {
+    if (utility == null) {
+      throw ArgumentError('UtilityModel cannot be null');
+    }
 
-  Map<String, dynamic> toJson() => _$TaskModelToJson(this);
+    if (utility.type is WorkUtilityType) {
+      return TaskModel(
+        title: utility.title ?? 'Untitled Task',
+        label: utility.courseId,
+        type: utility.type,
+        dueDateTime: (utility as WorkUtilityModel).dueDateTime,
+      );
+    }
+
+    return TaskModel(
+      title: utility.title ?? 'Untitled Task',
+      label: utility.courseId,
+      type: utility.type,
+    );
+  }
+
+  // factory TaskModel.fromJson(Map<String, dynamic> json) =>
+  //     _$TaskModelFromJson(json);
+
+  // Map<String, dynamic> toJson() => _$TaskModelToJson(this);
 
   TaskModel copyWith({
     String? id,
     String? title,
-    String? description,
-    DateTime? dueDate,
-    TaskType? type,
+    String? label,
+    DateTime? dueDateTime,
+    UtilityType? type,
     CourseModel? course,
   }) {
     return TaskModel(
       id: id ?? this.id,
       title: title ?? this.title,
-      description: description ?? this.description,
-      dueDate: dueDate ?? this.dueDate,
+      label: label ?? this.label,
       type: type ?? this.type,
-      course: course ?? this.course,
+      dueDateTime: dueDateTime ?? this.dueDateTime,
     );
   }
 
@@ -49,16 +66,39 @@ class TaskModel {
     DateTime now = DateTime.now();
 
     DateTime today = DateTime(now.year, now.month, now.day);
-    DateTime dueDay = DateTime(dueDate.year, dueDate.month, dueDate.day);
+    DateTime dueDay = DateTime(
+      dueDateTime!.year,
+      dueDateTime!.month,
+      dueDateTime!.day,
+    );
 
     int dayDifference = dueDay.difference(today).inDays;
 
-    String timeString = '${dueDate.hour.toString().padLeft(2, '0')}:${dueDate.minute.toString().padLeft(2, '0')}';
+    String timeString =
+        '${dueDateTime!.hour.toString().padLeft(2, '0')}:${dueDateTime!.minute.toString().padLeft(2, '0')}';
 
-    const thaiDays = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสฯ', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
+    const thaiDays = [
+      'จันทร์',
+      'อังคาร',
+      'พุธ',
+      'พฤหัสฯ',
+      'ศุกร์',
+      'เสาร์',
+      'อาทิตย์',
+    ];
     const thaiMonths = [
-      'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
-      'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
+      'ม.ค.',
+      'ก.พ.',
+      'มี.ค.',
+      'เม.ย.',
+      'พ.ค.',
+      'มิ.ย.',
+      'ก.ค.',
+      'ส.ค.',
+      'ก.ย.',
+      'ต.ค.',
+      'พ.ย.',
+      'ธ.ค.',
     ];
 
     if (dayDifference == 0)
@@ -68,17 +108,16 @@ class TaskModel {
     else if (dayDifference == -1)
       return 'เมื่อวาน $timeString';
     else if (dayDifference > 1 && dayDifference < 7) {
-      String weekday = thaiDays[dueDate.weekday - 1];
+      String weekday = thaiDays[dueDateTime!.weekday - 1];
       return 'วัน$weekday $timeString';
-    }
-    else {
-      String day = dueDate.day.toString();
-      String month = thaiMonths[dueDate.month - 1];
+    } else {
+      String day = dueDateTime!.day.toString();
+      String month = thaiMonths[dueDateTime!.month - 1];
 
-      if (now.year == dueDate.year)
+      if (now.year == dueDateTime!.year)
         return '$day $month $timeString';
       else {
-        int buddhistYear = dueDate.year + 543;
+        int buddhistYear = dueDateTime!.year + 543;
         return '$day $month $buddhistYear';
       }
     }

@@ -1,9 +1,8 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import './role.dart';
 
 class UserModel {
-  final String uid;
+  final String id;
   final String email;
   final String username;
   final String? fullName;
@@ -13,7 +12,7 @@ class UserModel {
   final List<Role> roles;
 
   const UserModel({
-    required this.uid,
+    required this.id,
     required this.email,
     required this.username,
     this.fullName,
@@ -25,7 +24,7 @@ class UserModel {
 
   factory UserModel.fromFirebase(User firebaseUser) {
     return UserModel(
-      uid: firebaseUser.uid,
+      id: firebaseUser.uid,
       email: firebaseUser.email ?? '',
       username: '',
       fullName: firebaseUser.displayName ?? '',
@@ -38,40 +37,52 @@ class UserModel {
 
   factory UserModel.fromFirestore(Map<String, dynamic> data, String docId) {
     return UserModel(
-      uid: data['uid'] as String? ?? '',
-      email: data['email'] as String? ?? '',
-      username: data['username'] as String? ?? '',
-      fullName: data['fullName'] as String? ?? '',
-      photoUrl: data['photoUrl'] as String? ?? '',
+      id: docId,
+      email: data['email'] as String,
+      username: data['username'] as String,
+      fullName: data['fullName'] as String?,
+      photoUrl: data['photoUrl'] as String?,
       isBanned: data['isBanned'] as bool? ?? false,
       lastActiveRole: data['lastActiveRole'] != null
-          ? Role.values.firstWhere(
-              (role) => role.toString() == data['lastActiveRole'],
-              orElse: () => Role.values.first)
-          : null,
-      roles: (data['roles'] as List<dynamic>?)
-              ?.map((roleStr) => Role.values.firstWhere(
-                  (role) => role.name == roleStr))
-              .toList() ??
-          [],
+        ? Role.values.firstWhere(
+            (role) => role.name == data['lastActiveRole'],
+            orElse: () => Role.values.first,
+          )
+        : null,
+      roles:
+        (data['roles'] as List<dynamic>?)
+            ?.map(
+              (roleStr) => Role.values.firstWhere(
+                (role) => role.name == roleStr,
+                orElse: () => Role.values.first,
+              ),
+            )
+            .toList() ??
+        [],
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'uid': uid,
+      'id': id,
       'email': email,
       'username': username,
       'fullName': fullName,
       'photoUrl': photoUrl,
       'isBanned': isBanned,
-      'lastActiveRole': lastActiveRole?.toString(),
-      'roles': roles.map((role) => role.toString()).toList(),
+      'lastActiveRole': lastActiveRole?.name,
+      'roles': roles.map((role) => role.name).toList(),
     };
   }
 
+  void debugPrint() {
+    print(
+      'UserModel: {id: $id, email: $email, username: $username, fullName: $fullName, photoUrl: $photoUrl, isBanned: $isBanned, lastActiveRole: $lastActiveRole, roles: $roles}',
+    );
+  }
+
   UserModel copyWith({
-    String? uid,
+    String? id,
     String? email,
     String? username,
     String? fullName,
@@ -81,7 +92,7 @@ class UserModel {
     List<Role>? roles,
   }) {
     return UserModel(
-      uid: uid ?? this.uid,
+      id: id ?? this.id,
       email: email ?? this.email,
       username: username ?? this.username,
       fullName: fullName ?? this.fullName,

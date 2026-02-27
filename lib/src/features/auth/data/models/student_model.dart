@@ -1,19 +1,16 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:studall/src/features/student/home/data/models/schedule_model.dart';
 import 'package:studall/src/features/student/tasks/data/models/task_model.dart';
 import './user_model.dart';
 import './role.dart';
 
 class StudentModel extends UserModel {
   final String institute;
-  final ScheduleModel schedule;
   final List<TaskModel> tasks;
 
   StudentModel({
     required this.institute,
-    required this.schedule,
     List<TaskModel>? tasks,
-    required super.uid,
+    required super.id,
     required super.email,
     required super.username,
     super.fullName,
@@ -25,9 +22,8 @@ class StudentModel extends UserModel {
   @override
   StudentModel copyWith({
     String? institute,
-    ScheduleModel? schedule,
     List<TaskModel>? tasks,
-    String? uid,
+    String? id,
     String? email,
     String? username,
     String? fullName,
@@ -38,9 +34,8 @@ class StudentModel extends UserModel {
   }) {
     return StudentModel(
       institute: institute ?? this.institute,
-      schedule: schedule ?? this.schedule,
       tasks: tasks ?? this.tasks,
-      uid: uid ?? this.uid,
+      id: id ?? this.id,
       email: email ?? this.email,
       username: username ?? this.username,
       fullName: fullName ?? this.fullName,

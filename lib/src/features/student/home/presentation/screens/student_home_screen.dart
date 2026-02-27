@@ -1,85 +1,247 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:studall/src/features/student/home/data/models/item_model.dart';
-import 'package:studall/src/features/student/home/presentation/widgets/recent_item_card.dart';
+import 'package:studall/src/features/student/data/models/utility_model.dart';
+import 'package:studall/src/features/student/home/presentation/widgets/recent_card.dart';
+import 'package:studall/src/features/student/tasks/presentation/widgets/task_tile.dart';
 import 'package:uuid/uuid.dart';
-
-import '../../../courses/data/models/course_model.dart';
+import 'package:studall/src/features/student/home/data/models/schedule_model.dart';
+import 'package:studall/src/features/student/home/presentation/widgets/schedule.dart';
 import '../../../tasks/data/models/task_model.dart';
-import '../../../tasks/data/models/task_type.dart';
-import '../../../tasks/presentation/widgets/to_do_list_tile.dart';
 
 class StudentHomeScreen extends StatelessWidget {
   const StudentHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = ShadTheme.of(context);
-
     // Hardcoded datasource for items:
-    List<ItemModel> items = [
-      ItemModel(Uuid().v7.toString(), 'Deadlock', '01418236-65', ItemType.assignment, DateTime(2026, 2, 9)),
-      ItemModel(Uuid().v7.toString(), 'Security and Protection', '01418236-65', ItemType.resource, DateTime.now()),
+    List<UtilityModel> items = [
+      WorkUtilityModel(
+        id: Uuid().v7.toString(),
+        courseId: '01418236-682',
+        creatorUserId: Uuid().v7.toString(),
+        title: 'Deadlock',
+        workType: WorkType.assignment,
+        creationTime: DateTime(2026, 1, 20),
+        updateTime: DateTime(2026, 1, 22),
+        dueDateTime: DateTime(2026, 2, 9, 23, 59),
+      ),
+      MaterialUtilityModel(
+        id: Uuid().v7.toString(),
+        courseId: '01418236-682',
+        creatorUserId: Uuid().v7.toString(),
+        title: 'Deadlock',
+        materialType: MaterialTypes.material,
+        creationTime: DateTime(2026, 1, 20),
+        updateTime: DateTime(2026, 1, 22),
+      ),
+      WorkUtilityModel(
+        id: Uuid().v7.toString(),
+        courseId: '01418236-682',
+        creatorUserId: Uuid().v7.toString(),
+        title: 'Deadlock',
+        workType: WorkType.shortAnswerQuestion,
+        creationTime: DateTime(2026, 1, 20),
+        updateTime: DateTime(2026, 1, 22),
+        dueDateTime: DateTime(2026, 2, 9, 23, 59),
+      ),
     ];
 
-    // Sandbox area for defining hardcoded datasources
-    CourseModel demoCourse = CourseModel(courseId: '01418342-65', name: 'Mobile Application Design and Development', credit: 3);
-    TaskModel demoTask = TaskModel(title: 'Ass09: Asynchronous Programming', dueDate: DateTime(2026, 2, 26, 23, 59), type: TaskType.assignment, course: demoCourse);
+    List<TaskModel> demoTasks = [
+      TaskModel(
+        title: 'การบ้านที่ 4 การประเมิอราคา future แปลกๆ',
+        label: '01418342-65',
+        type: WorkUtilityType(WorkType.assignment),
+        dueDateTime: DateTime(2026, 2, 26, 23, 59), // Tomorrow
+      ),
+      TaskModel(
+        title: 'Ass09: Asynchronous Programming',
+        label: '01418342-65',
+        dueDateTime: DateTime(2026, 2, 27, 23, 59), // Day after tomorrow
+        type: WorkUtilityType(WorkType.assignment),
+      ),
+    ];
+
+    List<ScheduleModel> sampleSchedule = [
+      ScheduleModel(
+        id: '1',
+        courseId: '01418342-65',
+        title: 'Mobile Application Design and Development',
+        location: 'SC1-202',
+        section: 'Sec 1',
+        dayOfWeek: 1, // Monday
+        startTime: const TimeOfDay(hour: 9, minute: 0),
+        endTime: const TimeOfDay(hour: 12, minute: 0),
+      ),
+      ScheduleModel(
+        id: '2',
+        courseId: '01418236-65',
+        title: 'Operating Systems',
+        location: 'SC1-104',
+        section: 'Sec 2',
+        dayOfWeek: 2, // Tuesday
+        startTime: const TimeOfDay(hour: 13, minute: 0),
+        endTime: const TimeOfDay(hour: 16, minute: 0),
+      ),
+      ScheduleModel(
+        id: '3',
+        courseId: '01418321-65',
+        title: 'Database Systems',
+        location: 'Online',
+        section: 'Sec 1',
+        dayOfWeek: 3, // Wednesday
+        startTime: const TimeOfDay(hour: 10, minute: 30),
+        endTime: const TimeOfDay(hour: 12, minute: 30),
+      ),
+      ScheduleModel(
+        id: '4',
+        courseId: '01418497-65',
+        title: 'Senior Project',
+        location: 'SC1-301',
+        dayOfWeek: 5, // Friday
+        startTime: const TimeOfDay(hour: 14, minute: 0),
+        endTime: const TimeOfDay(hour: 17, minute: 0),
+      ),
+    ];
 
     return DefaultTabController(
       length: 3,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 16.0,
           children: [
-            // const Placeholder(), // TO-DO: real-time time-table schedule
-            Column(
-              children: [
-                Row(
-                  spacing: 16.0,
-                  children: [
-                    Text('ล่าสุด', style: theme.textTheme.h3,),
-                    ShadBadge.destructive(child: Text('ใหม่'))
-                  ],
+            const SizedBox(height: 16),
+            Schedule(scheduleItems: sampleSchedule, height: 208),
+            const SizedBox(height: 16),
+            _buildRecentContent(context, items),
+            _buildTaskList(context, demoTasks),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecentContent(BuildContext context, List<UtilityModel> items) {
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'ล่าสุด',
+                    style: textTheme.custom['medium']?.copyWith(
+                      color: colorScheme.foreground,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  ShadBadge.destructive(
+                    child: Text('ใหม่', style: textTheme.custom['small']),
+                  ),
+                ],
+              ),
+
+              GestureDetector(
+                onTap: () {
+                  // TODO: Navigate to full recent items list
+                },
+                child: Text(
+                  'ทั้งหมด',
+                  style: textTheme.muted.copyWith(
+                    color: colorScheme.mutedForeground,
+                    decoration: TextDecoration.underline,
+                    decorationColor: colorScheme.mutedForeground,
+                  ),
                 ),
-                SizedBox(height: 16.0),
-                SizedBox(
-                  height: 220,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsetsGeometry.only(right: 8),
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: RecentItemCard(item: items[index]),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 104,
+            child: ListView.separated(
+              clipBehavior: Clip.none,
+              scrollDirection: Axis.horizontal,
+              itemCount: items.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 16),
+              itemBuilder: (context, index) {
+                return RecentItemCard(item: items[index]);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaskList(BuildContext context, List<TaskModel> tasks) {
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Row with title, count and "See All" link
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Left side: Title
+                Text(
+                  'ที่ต้องทำสัปดาห์นี้',
+                  style: textTheme.custom['medium']?.copyWith(
+                    color: colorScheme.foreground,
+                  ),
+                ),
+
+                Row(
+                  children: [
+                    Text(
+                      '${tasks.length}',
+                      style: textTheme.custom['medium']?.copyWith(
+                        color: colorScheme.mutedForeground,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    GestureDetector(
+                      onTap: () {
+                        // TODO: Navigate to full todo list
+                      },
+                      child: Text(
+                        'ทั้งหมด',
+                        style: textTheme.muted.copyWith(
+                          color: colorScheme.mutedForeground,
+                          decoration: TextDecoration.underline,
+                          decorationColor: colorScheme.mutedForeground,
                         ),
-                      );
-                    },
-                  )
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            Text('ที่ต้องทำสัปดาห์นี้', style: theme.textTheme.h3,),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  Column(
-                    children: [
-                      ToDoListTile(task: demoTask)
-                    ],
-                  ),
-                  // Center(child: Text("หน้ามอบหมายแล้ว")),
-                  Center(child: Text("หน้าเลยกำหนด")),
-                  Center(child: Text("หน้าเสร็จสิ้น")),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              final task = tasks[index];
+              return TaskTile(task: task);
+            },
+          ),
+        ],
       ),
     );
   }

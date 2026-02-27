@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
-import '../controllers/log_in_controller.dart';
+import '../controllers/auth_controller.dart';
 import '../widgets/google_sign_in_button.dart';
 
 class LogInScreen extends ConsumerStatefulWidget {
@@ -47,10 +47,10 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
-    final loginState = ref.watch(loginControllerProvider);
+    final loginState = ref.watch(authControllerProvider);
     final isLoading = loginState.isLoading;
 
-    ref.listen(loginControllerProvider, (_, next) {
+    ref.listen(authControllerProvider, (_, next) {
       if (next.hasError) {
         ShadToaster.of(context).show(
           ShadToast.destructive(
@@ -161,8 +161,8 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                               if (_formKey.currentState != null &&
                                   _formKey.currentState!.validate()) {
                                 ref
-                                    .read(loginControllerProvider.notifier)
-                                    .login(email, password);
+                                    .read(authControllerProvider.notifier)
+                                    .signInWithEmail(email: email, password: password);
                               }
                             },
                       child: isLoading
