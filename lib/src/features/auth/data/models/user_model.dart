@@ -44,21 +44,21 @@ class UserModel {
       photoUrl: data['photoUrl'] as String?,
       isBanned: data['isBanned'] as bool? ?? false,
       lastActiveRole: data['lastActiveRole'] != null
-          ? Role.values.firstWhere(
-              (role) => role.name == data['lastActiveRole'],
-              orElse: () => Role.values.first,
-            )
-          : null,
+        ? Role.values.firstWhere(
+            (role) => role.name == data['lastActiveRole'],
+            orElse: () => Role.values.first,
+          )
+        : null,
       roles:
-          (data['roles'] as List<dynamic>?)
-              ?.map(
-                (roleStr) => Role.values.firstWhere(
-                  (role) => role.name == roleStr,
-                  orElse: () => Role.values.first,
-                ),
-              )
-              .toList() ??
-          [],
+        (data['roles'] as List<dynamic>?)
+            ?.map(
+              (roleStr) => Role.values.firstWhere(
+                (role) => role.name == roleStr,
+                orElse: () => Role.values.first,
+              ),
+            )
+            .toList() ??
+        [],
     );
   }
 
