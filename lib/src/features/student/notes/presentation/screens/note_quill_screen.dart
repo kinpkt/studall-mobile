@@ -1,26 +1,69 @@
+import 'dart:convert';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
+import 'package:studall/src/features/student/courses/data/repositories/course_firestore_repository.dart';
+import 'package:studall/src/features/student/notes/data/models/note_model.dart';
 
-class NoteQuillScreen extends StatefulWidget {
-  const NoteQuillScreen({super.key});
+import '../../../courses/data/models/course_model.dart';
+import '../../data/repositories/note_firestore_repository.dart';
+
+final ownedCoursesProvider = FutureProvider.autoDispose.family<List<CourseModel>, String>((ref, userId) {
+  return ref.watch(courseFirestoreRepositoryProvider).getCoursesByUserId(userId);
+});
+
+class NoteQuillScreen extends ConsumerStatefulWidget {
+  final NoteModel? note;
+  const NoteQuillScreen({super.key, this.note});
 
   @override
-  State<NoteQuillScreen> createState() => _NoteQuillScreenState();
+  ConsumerState<NoteQuillScreen> createState() => _NoteQuillScreenState();
 }
 
-class _NoteQuillScreenState extends State<NoteQuillScreen> {
-  late final QuillController _controller;
+class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
+  late final QuillController _quillController;
+  late final TextEditingController _titleController;
+
+  String? _selectedCourseId;
+  final _currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
     super.initState();
-    _controller = QuillController.basic();
+
+    _titleController = TextEditingController(text: widget.note?.title ?? '');
+
+    _selectedCourseId = widget.note?.courseId;
+
+    if (widget.note != null && widget.note!.content.isNotEmpty) {
+      try {
+        final decodedJson = jsonDecode(widget.note!.content);
+
+        final document = Document.fromJson(decodedJson);
+
+        _quillController = QuillController(
+          document: document,
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      }
+      catch (e) {
+        debugPrint('Error loading note content: $e');
+        _quillController = QuillController.basic();
+      }
+    }
+    else {
+      _quillController = QuillController.basic();
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _quillController.dispose();
+    _titleController.dispose();
     super.dispose();
   }
 
@@ -28,6 +71,10 @@ class _NoteQuillScreenState extends State<NoteQuillScreen> {
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
 
+    if (_currentUser == null)
+      return LogInScreen();
+
+    final ownedCoursesAsyncValue = ref.watch(ownedCoursesProvider(_currentUser.uid));
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
@@ -37,9 +84,26 @@ class _NoteQuillScreenState extends State<NoteQuillScreen> {
         title: Text('จดโน้ต', style: theme.textTheme.h4),
         actions: [
           ShadButton.ghost(
-            onPressed: () {
-              final contentJson = _controller.document.toDelta().toJson();
-              print(contentJson);
+            onPressed: () async {
+              final deltaJson = _quillController.document.toDelta().toJson();
+
+              final contentString = jsonEncode(deltaJson);
+
+              final newNote = NoteModel(
+                id: widget.note?.id,
+                title: _titleController.text == '' ? 'Untitled' : _titleController.text,
+                content: contentString,
+                userId: _currentUser.uid,
+                courseId: _selectedCourseId,
+              );
+
+              if (widget.note != null)
+                await ref.read(noteFirestoreRepositoryProvider).updateNote(newNote);
+              else
+                await ref.read(noteFirestoreRepositoryProvider).addNote(newNote);
+
+              if (mounted)
+                Navigator.pop(context);
             },
             child: const Text('บันทึก'),
           ),
@@ -47,29 +111,70 @@ class _NoteQuillScreenState extends State<NoteQuillScreen> {
       ),
       body: Column(
         children: [
-          // 1. The Toolbar (Updated syntax)
+          ShadInput(
+            placeholder: Text('ชื่อหัวเรื่อง...'),
+            controller: _titleController,
+          ),
+          ownedCoursesAsyncValue.when(
+            data: (courses) {
+              return SizedBox(
+                width: double.infinity,
+                child: ShadSelect<String>(
+                  placeholder: Text('เลือกวิชา'),
+                  initialValue: _selectedCourseId,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedCourseId = value;
+                      });
+                    }
+                  },
+                  options: courses.map((course) {
+                    return ShadOption(
+                      value: course.id,
+                      child: Text(course.name),
+                    );
+                  }).toList(),
+                  selectedOptionBuilder: (context, value) {
+                    final selectedCourse = courses.firstWhere(
+                      (c) => c.id == value,
+                      orElse: () => courses.first,
+                    );
+                    return Text(selectedCourse.name);
+                  },
+                )
+              );
+            },
+            loading: () => const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('กำลังโหลดวิชา...'),
+            ),
+            error: (error, stackTrace) => Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text('เกิดข้อผิดพลาด: $error'),
+            ),
+          ),
           QuillSimpleToolbar(
-            controller: _controller,
+            controller: _quillController,
             config: const QuillSimpleToolbarConfig(
               showDividers: true,
               showFontFamily: false,
               showSearchButton: false,
             ),
           ),
-
           Divider(color: theme.colorScheme.border, height: 1),
-
-          // 2. The Editor (Updated syntax)
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: QuillEditor.basic(
-                controller: _controller,
+                controller: _quillController,
                 config: QuillEditorConfig(
                   placeholder: 'เริ่มพิมพ์ที่นี่...',
                   customStyles: DefaultStyles(
                     paragraph: DefaultTextBlockStyle(
-                      theme.textTheme.p,
+                      theme.textTheme.p.copyWith(
+                        color: theme.colorScheme.foreground,
+                      ),
                       const HorizontalSpacing(0, 0),
                       const VerticalSpacing(0, 0),
                       const VerticalSpacing(0, 0),

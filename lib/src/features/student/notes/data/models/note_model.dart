@@ -1,12 +1,59 @@
 import 'package:studall/src/features/student/courses/data/models/course_model.dart';
+import 'package:uuid/uuid.dart';
 
 class NoteModel {
-  final String uuid;
-  final String name;
-  final CourseModel course;
+  final String id;
+  final String title;
+  final String content; // Stringified JSON from flutter_quill
+  final String? courseId;
+  final String userId;
+  final bool isPinned;
   final DateTime createdAt;
+  final DateTime updatedAt;
 
-  NoteModel(this.uuid, this.name, this.course, this.createdAt);
+  static final _uuid = Uuid();
+
+  NoteModel(
+    {
+      id,
+      required this.title,
+      required this.content,
+      this.courseId,
+      required this.userId,
+      isPinned,
+      createdAt,
+      updatedAt
+    }) :  id = id ?? _uuid.v7().toString(),
+          isPinned = isPinned ?? false,
+          createdAt = createdAt ?? DateTime.now(),
+          updatedAt = updatedAt ?? DateTime.now();
+
+  factory NoteModel.fromFirestore(Map<String, dynamic> data, String docId) {
+    return NoteModel(
+      id: data['id'] as String,
+      title: data['title'] as String,
+      content: data['content'] as String,
+      courseId: data['courseId'] as String?,
+      userId: data['userId'] as String,
+      isPinned: data['isPinned'] as bool,
+      createdAt: data['createdAt'].toDate(),
+      updatedAt: data['updatedAt'].toDate(),
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'id': id,
+      'title': title,
+      'content': content,
+      if (courseId != null)
+        'courseId': courseId,
+      'userId': userId,
+      'isPinned': isPinned,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+    };
+  }
 
   String get timeDifferenceString {
     DateTime now = DateTime.now();

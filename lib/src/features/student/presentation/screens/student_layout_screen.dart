@@ -106,7 +106,6 @@ class StudentLayoutScreen extends ConsumerWidget {
                   leading: const Icon(PhosphorIconsRegular.notebook),
                   title: Text('เพิ่มรูปจดบันทึก', style: theme.textTheme.p),
                   onTap: () {
-                    // Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => NoteQuillScreen())
