@@ -18,6 +18,9 @@ class ToolsItemCard extends StatelessWidget {
       width: 240,
       height: 50,
       child: Text(name, style: theme.textTheme.h4,),
+      onPressed: () {
+        Navigator.pushNamed(context, path);
+      },
     );
   }
 }
