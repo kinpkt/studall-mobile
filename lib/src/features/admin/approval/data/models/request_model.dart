@@ -1,4 +1,3 @@
-import 'package:studall/src/features/auth/data/models/user_model.dart';
 import 'package:uuid/uuid.dart';
 
 enum RequestType {
@@ -56,7 +55,7 @@ class RequestModel {
     );
 
     return RequestModel(
-      id: docId,
+      id: data['id'],
       type: parsedType,
       status: parsedStatus,
       requestedUserId: data['requestedUserId']

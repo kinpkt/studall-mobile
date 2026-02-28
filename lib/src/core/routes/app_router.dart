@@ -7,10 +7,8 @@ import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dar
 import 'package:studall/src/features/student/presentation/screens/student_layout_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  // Create a ValueNotifier to listen to auth state changes
   final authStateNotifier = ValueNotifier<bool?>(null);
 
-  // Listen to authStateProvider and update the ValueNotifier
   ref.listen(authStateProvider, (previous, next) {
     next.when(
       data: (user) => authStateNotifier.value = user != null,
@@ -19,7 +17,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     );
   });
 
-  // Dispose the ValueNotifier when the provider is disposed
   ref.onDispose(() {
     authStateNotifier.dispose();
   });
@@ -34,22 +31,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           final isAuthenticated = user != null;
           final isOnLoginPage = state.fullPath == '/login';
 
-          // If NOT authenticated and not on login page, redirect to login
           if (!isAuthenticated && !isOnLoginPage) {
             return '/login';
           }
 
-          // If authenticated and on login page, redirect to home
           if (isAuthenticated && isOnLoginPage) {
             return '/';
           }
 
-          // Otherwise, stay on current page
           return null;
         },
-        loading: () => null, // Wait while loading
+        loading: () => null,
         error: (err, stack) {
-          // On error, redirect to login if not already there
           final isOnLoginPage = state.fullPath == '/login';
           return isOnLoginPage ? null : '/login';
         },

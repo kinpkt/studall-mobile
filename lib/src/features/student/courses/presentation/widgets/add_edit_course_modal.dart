@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
 import 'package:studall/src/features/student/courses/data/models/course_model.dart';
 import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
 import 'package:studall/src/features/student/courses/data/repositories/course_firestore_repository.dart';
@@ -97,19 +98,16 @@ class _AddEditCourseModalState extends ConsumerState<AddEditCourseModal> {
                 name: _nameController.text.trim(),
                 description: _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
                 teacherName: _teacherController.text.trim().isEmpty ? null : _teacherController.text.trim(),
-                userId: userId,
                 isActive: true,
                 schedule: _schedules,
               );
 
               if (widget.course == null) {
-                await ref.read(courseFirestoreRepositoryProvider).addCourse(
-                    newCourse);
+                await ref.read(courseFirestoreRepositoryProvider).addCourse(userId, newCourse);
                 ref.invalidate(courseFirestoreRepositoryProvider);
               }
               else {
-                await ref.read(courseFirestoreRepositoryProvider).updateCourse(
-                    newCourse);
+                await ref.read(courseFirestoreRepositoryProvider).updateCourse(userId, newCourse);
                 ref.invalidate(courseFirestoreRepositoryProvider);
               }
 

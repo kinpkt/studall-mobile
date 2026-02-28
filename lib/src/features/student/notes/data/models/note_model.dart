@@ -11,8 +11,6 @@ class NoteModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  static final _uuid = Uuid();
-
   NoteModel(
     {
       id,
@@ -23,7 +21,7 @@ class NoteModel {
       isPinned,
       createdAt,
       updatedAt
-    }) :  id = id ?? _uuid.v7().toString(),
+    }) :  id = id ?? const Uuid().v7(),
           isPinned = isPinned ?? false,
           createdAt = createdAt ?? DateTime.now(),
           updatedAt = updatedAt ?? DateTime.now();
