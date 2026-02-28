@@ -5,8 +5,6 @@ class CourseModel {
   final String id;
   final String name;
   final String? description;
-  // final double? credit;
-  final String userId;
   final String? teacherName;
   final List<CourseScheduleModel> schedule;
   final DateTime createdAt;
@@ -18,13 +16,12 @@ class CourseModel {
     String? id,
     required this.name,
     this.description,
-    required this.userId,
     this.teacherName,
     List<CourseScheduleModel>? schedule,
     DateTime? createdAt,
     DateTime? updatedAt,
     required this.isActive,
-    DateTime? inactiveDateTime
+    this.inactiveDateTime
   })  : id = id ?? const Uuid().v7(),
         schedule = schedule ?? [],
         createdAt = createdAt ?? DateTime.now(),
@@ -36,34 +33,30 @@ class CourseModel {
       name: data['name'] as String,
       description: data['description'] as String?,
       isActive: data['isActive'] as bool,
-      userId: data['userId'] as String,
       teacherName: data['teacherName'] as String?,
       schedule: (data['schedule'] as List<dynamic>?)?.map(
-        (scheduleData) => CourseScheduleModel.fromFirestore(
-          scheduleData as Map<String, dynamic>
-        )
+              (scheduleData) => CourseScheduleModel.fromFirestore(
+              scheduleData as Map<String, dynamic>
+          )
       ).toList(),
-      createdAt: data['createdAt'].toDate(),
-      updatedAt: data['updatedAt'].toDate(),
-      inactiveDateTime: data['inactiveDateTime'] != null ? data['inactiveDateTime'].toDate() : null,
+      createdAt: data['createdAt']?.toDate() ?? DateTime.now(),
+      updatedAt: data['updatedAt']?.toDate() ?? DateTime.now(),
+      inactiveDateTime: data['inactiveDateTime']?.toDate(),
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'id': id,
       'name': name,
-      if (description != null)
-        'description': description!,
-      'userId': userId,
-      if (teacherName != null)
-        'teacherName': teacherName!,
+      if (description != null) 'description': description!,
+      if (teacherName != null) 'teacherName': teacherName!,
       'schedule': schedule.map(
-        (sch) => sch.toFirestore()
+              (sch) => sch.toFirestore()
       ).toList(),
       'createdAt': createdAt,
       'updatedAt': updatedAt,
-      'isActive': isActive
+      'isActive': isActive,
+      if (inactiveDateTime != null) 'inactiveDateTime': inactiveDateTime,
     };
   }
 }

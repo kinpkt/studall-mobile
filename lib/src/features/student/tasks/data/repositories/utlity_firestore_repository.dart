@@ -20,7 +20,7 @@ class UtlityFirestoreRepository {
     );
   }
 
-  Future<List<UtilityModel>> getUtilitiesBy() async {
+  Future<List<UtilityModel>> getUtilitiesByUserId(String userId) async {
     final data = await _service.getCollection<UtilityModel>(
       path: 'utilities/',
       builder: (data, docId) => UtilityModel.fromFirestore(data, docId),

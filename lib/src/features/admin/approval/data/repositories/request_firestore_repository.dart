@@ -13,8 +13,8 @@ class RequestFirestoreRepository {
   RequestFirestoreRepository(this._service);
 
   Future<void> addRequest(RequestModel request) async {
-    await _service.add(
-      collectionPath: 'requests',
+    await _service.set(
+      path: 'requests/${request.id}',
       data: request.toFirestore()
     );
   }
@@ -22,6 +22,16 @@ class RequestFirestoreRepository {
   Future<List<RequestModel>> getAllRequests() async {
     final data = await _service.getCollection<RequestModel>(
       path: 'requests/',
+      builder: (data, docId) => RequestModel.fromFirestore(data, docId),
+    );
+
+    return data ?? [];
+  }
+
+  Future<List<RequestModel>> getRequestsByUserId(String userId) async {
+    final data = await _service.getCollection<RequestModel>(
+      path: 'requests/',
+      queryBuilder: (query) => query.where('requestedUserId', isEqualTo: userId),
       builder: (data, docId) => RequestModel.fromFirestore(data, docId),
     );
 

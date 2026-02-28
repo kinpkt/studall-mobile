@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studall/src/features/student/courses/data/models/course_model.dart';
 
@@ -16,22 +15,22 @@ class CourseFirestoreRepository implements CourseRepository {
   CourseFirestoreRepository(this._service);
 
   @override
-  Future<void> addCourse(CourseModel course) async {
-    await _service.add(
-      collectionPath: 'courses',
-      data: course.toFirestore()
+  Future<void> addCourse(String userId, CourseModel course) async {
+    await _service.set(
+        path: 'students/$userId/courses/${course.id}',
+        data: course.toFirestore()
     );
   }
 
   @override
-  Future<void> deleteCourse(String id) async {
-    await _service.delete(path: 'courses/$id');
+  Future<void> deleteCourse(String userId, String courseId) async {
+    await _service.delete(path: 'students/$userId/courses/$courseId');
   }
 
   @override
-  Future<CourseModel?> getCourseById(String id) async {
+  Future<CourseModel?> getCourseById(String userId, String courseId) async {
     final data = await _service.get<CourseModel>(
-      path: 'courses/$id',
+      path: 'students/$userId/courses/$courseId',
       builder: (data, docId) => CourseModel.fromFirestore(data, docId),
     );
 
@@ -39,20 +38,9 @@ class CourseFirestoreRepository implements CourseRepository {
   }
 
   @override
-  Future<List<CourseModel>> getCourses() async {
-    final data = await _service.getCollection<CourseModel>(
-      path: 'courses/',
-      builder: (data, docId) => CourseModel.fromFirestore(data, docId),
-    );
-
-    return data ?? [];
-  }
-
-  @override
   Future<List<CourseModel>> getCoursesByUserId(String userId) async {
     final data = await _service.getCollection<CourseModel>(
-      path: 'courses/',
-      queryBuilder: (query) => query.where('userId', isEqualTo: userId),
+      path: 'students/$userId/courses/',
       builder: (data, docId) => CourseModel.fromFirestore(data, docId),
     );
 
@@ -60,10 +48,15 @@ class CourseFirestoreRepository implements CourseRepository {
   }
 
   @override
-  Future<void> updateCourse(CourseModel course) async {
+  Future<void> updateCourse(String userId, CourseModel course) async {
     await _service.update(
-      path: 'courses/${course.id}',
+      path: 'students/$userId/courses/${course.id}',
       data: course.toFirestore()
     );
+  }
+
+  @override
+  Future<List<CourseModel>> getCourses() async {
+    throw UnimplementedError('Fetching all courses across all users requires a collectionGroup query.');
   }
 }
