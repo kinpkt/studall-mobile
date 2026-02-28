@@ -17,6 +17,7 @@ import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.da
 import 'package:studall/src/features/auth/presentation/screens/select_role_screen.dart';
 import 'package:studall/src/features/student/tools/presentation/gpa_calculator_screen.dart';
 import 'package:studall/src/core/routes/app_router.dart';
+import 'package:studall/src/features/student/tools/presentation/gpa_calculator_screen.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -25,7 +26,6 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final user = ref.watch(userProfileProvider);
-    final router = ref.watch(goRouterProvider);
 
     return ShadApp(
       debugShowCheckedModeBanner: true,
@@ -36,12 +36,15 @@ class MyApp extends ConsumerWidget {
           materialThemeBuilder(context, theme),
       home: user.when(
         data: (user) {
-          print('User lastActiveRole: ${user?.lastActiveRole}');
-          print('User Email: ${user?.email ?? ''}');
-          if (user == null){
+          if (user == null) {
             return const LogInScreen();
-          } else if (user.isBanned) {
-            return Scaffold();
+          }
+          else if (user.isBanned) {
+            return Scaffold(
+              body: Center(
+                child: Text('บัญชีของท่านถูกระงับ กรุณาติดต่อผู้ดูแลระบบ'),
+              ),
+            );
           }
 
           if (user.roles.isEmpty) {
