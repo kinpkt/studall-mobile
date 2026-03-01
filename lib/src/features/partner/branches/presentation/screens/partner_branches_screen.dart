@@ -1,37 +1,69 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
 import 'package:studall/src/features/partner/branches/data/models/branch_model.dart';
+import 'package:studall/src/features/partner/branches/data/repositories/branch_firestore_repository.dart';
 import 'package:studall/src/features/partner/branches/presentation/widgets/branch_details_card.dart';
 
-class PartnerBranchesScreen extends StatelessWidget {
+final partnerBranchesProvider = StreamProvider<List<BranchModel>>((ref) {
+  final currentUser = FirebaseAuth.instance.currentUser;
+
+  if (currentUser == null) {
+    return Stream.value([]);
+  }
+
+  final repository = ref.watch(branchFirestoreRepositoryProvider);
+  return repository.getBranchesByUserId(currentUser.uid);
+});
+
+class PartnerBranchesScreen extends ConsumerWidget {
   const PartnerBranchesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = ShadTheme.of(context);
-    
-    final List<BranchModel> branches = [
-      BranchModel(name: 'คณะวิทยาศาสตร์ มก.', location: GeoPoint(13.845972337420381, 100.57242158520883)),
-      BranchModel(name: 'คณะบริหารธุรกิจ มก.', location: GeoPoint(13.844453881287203, 100.56890334596429), status: BranchStatus.moderate),
-      BranchModel(name: 'เซนทรัลลาดพร้าว', location: GeoPoint(13.816635870512702, 100.56143745548962), status: BranchStatus.busy),
-      BranchModel(name: 'สามย่านมิตรทาวน์', location: GeoPoint(13.734207667051445, 100.5280987336719), status: BranchStatus.busy),
-      BranchModel(name: 'MBK Center', location: GeoPoint(13.745623748717762, 100.53053071550337)),
-    ];
-    
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('สาขาทั้งหมด', style: theme.textTheme.h2,),
-          SizedBox(height: 16,),
-          Column(
-            spacing: 12,
-            children: branches.map((branch) => BranchDetailsCard(branch: branch)).toList(),
-          )
-        ],
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      return const LogInScreen();
+    }
+
+    final branchesAsync = ref.watch(partnerBranchesProvider);
+
+    return SingleChildScrollView(
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('สาขาทั้งหมด', style: theme.textTheme.h2),
+            const SizedBox(height: 16),
+
+            branchesAsync.when(
+              loading: () => Text('Loading...', style: theme.textTheme.p),
+              error: (err, stack) => Text('ERROR: $err', style: theme.textTheme.p),
+              data: (branches) {
+                if (branches.isEmpty) {
+                  return Text('ไม่มีสาขาที่เพิ่มไว้', style: theme.textTheme.h1);
+                }
+
+                return Column(
+                  spacing: 12,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: branches.map((branch) {
+                    return BranchDetailsCard(
+                      branch: branch,
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

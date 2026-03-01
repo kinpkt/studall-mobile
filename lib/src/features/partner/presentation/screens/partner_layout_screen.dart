@@ -5,6 +5,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/common_widgets/plain_text_app_bar.dart';
 import 'package:studall/src/features/partner/branches/presentation/screens/partner_branches_screen.dart';
 import 'package:studall/src/features/partner/home/presentation/screens/partner_home_screen.dart';
+import 'package:studall/src/features/partner/requests/presentation/screens/partner_requests_screen.dart';
 import '../providers/partner_layout_controller.dart';
 
 class PartnerLayoutScreen extends ConsumerWidget {
@@ -14,6 +15,7 @@ class PartnerLayoutScreen extends ConsumerWidget {
     return [
       Center(child: PartnerHomeScreen()),
       Center(child: PartnerBranchesScreen()),
+      Center(child: PartnerRequestsScreen()),
     ];
   }
 
@@ -28,6 +30,11 @@ class PartnerLayoutScreen extends ConsumerWidget {
         icon: Icon(PhosphorIconsRegular.storefront),
         selectedIcon: Icon(PhosphorIconsFill.storefront),
         label: 'สาขา',
+      ),
+      NavigationDestination(
+        icon: Icon(PhosphorIconsRegular.article),
+        selectedIcon: Icon(PhosphorIconsFill.article),
+        label: 'คำขอของฉัน',
       ),
     ];
   }

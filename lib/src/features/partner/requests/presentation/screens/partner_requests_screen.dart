@@ -1,19 +1,25 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/admin/approval/data/repositories/request_firestore_repository.dart';
-import 'package:studall/src/features/auth/data/models/user_model.dart';
+import 'package:studall/src/features/partner/requests/presentation/widgets/partner_request_list_tile.dart';
 
-import '../../data/models/request_model.dart';
-import '../widgets/request_list_tile.dart';
+import '../../../../admin/approval/data/models/request_model.dart';
+import '../../../../admin/approval/presentation/widgets/request_list_tile.dart';
 
 final requestsProvider = StreamProvider<List<RequestModel>>((ref) {
+  final currentUser = FirebaseAuth.instance.currentUser;
+
+  if (currentUser == null)
+    return Stream.value([]);
+
   final repository = ref.watch(requestFirestoreRepositoryProvider);
-  return repository.getAllRequests();
+  return repository.getRequestsByUserId(currentUser.uid);
 });
 
-class AdminApprovalScreen extends ConsumerWidget {
-  const AdminApprovalScreen({super.key});
+class PartnerRequestsScreen extends ConsumerWidget {
+  const PartnerRequestsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,7 +32,7 @@ class AdminApprovalScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('คำขอจากผู้ใช้', style: theme.textTheme.h2,),
+          Text('คำขอของฉัน', style: theme.textTheme.h2,),
           const SizedBox(height: 16,),
           Text('คำขอที่รอดำเนินการ', style: theme.textTheme.h3,),
           const SizedBox(height: 16,),
@@ -41,7 +47,7 @@ class AdminApprovalScreen extends ConsumerWidget {
               }
 
               return Column(
-                children: pendingRequests.map((request) => RequestListTile(request: request)).toList(),
+                children: pendingRequests.map((request) => PartnerRequestListTile(request: request)).toList(),
               );
             },
           ),
@@ -59,7 +65,7 @@ class AdminApprovalScreen extends ConsumerWidget {
               }
 
               return Column(
-                children: declinedRequests.map((request) => RequestListTile(request: request)).toList(),
+                children: declinedRequests.map((request) => PartnerRequestListTile(request: request)).toList(),
               );
             },
           ),
@@ -72,12 +78,11 @@ class AdminApprovalScreen extends ConsumerWidget {
             data: (requests) {
               final approvedRequests = requests.where((request) => request.status == RequestStatus.approved).toList();
 
-              if (approvedRequests.isEmpty) {
+              if (approvedRequests.isEmpty)
                 return Text('ไม่มีคำขอในขณะนี้', style: theme.textTheme.p,);
-              }
 
               return Column(
-                children: approvedRequests.map((request) => RequestListTile(request: request)).toList(),
+                children: approvedRequests.map((request) => PartnerRequestListTile(request: request)).toList(),
               );
             },
           ),

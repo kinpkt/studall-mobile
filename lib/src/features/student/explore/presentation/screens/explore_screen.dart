@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:studall/src/features/student/explore/presentation/widgets/advertisement.dart';
+import 'package:studall/src/features/partner/advertisements/data/models/advertisement_model.dart';
+import 'package:studall/src/features/partner/advertisements/data/repositories/advertisement_firestore_repository.dart';
 import 'package:studall/src/features/student/explore/presentation/widgets/tools_item_card.dart';
 import 'package:studall/src/features/student/explore/presentation/widgets/working_space_item_card.dart';
 
+import '../../../../partner/home/presentation/widgets/advertisement_banner.dart';
 import '../../../maps/presentation/screens/student_maps_screen.dart';
 
-class ExploreScreen extends StatelessWidget {
+final advertisementsProvider = StreamProvider<List<AdvertisementModel>>((ref) {
+  final repository = ref.watch(advertisementFirestoreRepositoryProvider);
+  return repository.getAllPublishedAdvertisements();
+});
+
+class ExploreScreen extends ConsumerWidget {
   const ExploreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = ShadTheme.of(context);
 
-    // Hardcoded datasource for tools:
     List<Map<String, String>> tools = [
       {
         'name': 'ถ่ายรูปจดโน้ต',
@@ -49,13 +56,37 @@ class ExploreScreen extends StatelessWidget {
       },
     ];
 
+    final advertisementsAsync = ref.watch(advertisementsProvider);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 16.0,
         children: [
-          Advertisement(),
+          advertisementsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Center(child: Text('เกิดข้อผิดพลาด: $err')),
+            data: (ads) {
+              if (ads.isEmpty) {
+                return SizedBox();
+              }
+              return SizedBox(
+                height: 150,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: ads.length,
+                  itemBuilder: (context, index) {
+                    final ad = ads[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: AdvertisementBanner(ads: ad),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
           Row(
             spacing: 16.0,
             children: [

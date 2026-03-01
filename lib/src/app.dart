@@ -8,7 +8,7 @@ import 'package:studall/src/core/theme/material_theme_builder.dart';
 import 'package:studall/src/features/auth/presentation/controllers/user_profile_provider.dart';
 import 'package:studall/src/features/auth/data/models/role.dart';
 import 'package:studall/src/features/partner/advertisements/presentation/screens/partner_add_advertisement_screen.dart';
-import 'package:studall/src/features/partner/branches/presentation/screens/partner_add_branch_screen.dart';
+import 'package:studall/src/features/partner/branches/presentation/screens/partner_add_edit_branch_screen.dart';
 import 'package:studall/src/features/student/presentation/screens/student_layout_screen.dart';
 import 'package:studall/src/features/partner/presentation/screens/partner_layout_screen.dart';
 import 'package:studall/src/features/admin/presentation/screens/admin_layout_screen.dart';
@@ -75,7 +75,7 @@ class MyApp extends ConsumerWidget {
         '/student-layout': (context) => const StudentLayoutScreen(),
         '/gpa-calculator': (context) => const GPACalculatorScreen(),
         '/partner-layout': (context) => const PartnerLayoutScreen(),
-        '/partner-add-branch': (context) => const PartnerAddBranchScreen(),
+        '/partner-add-branch': (context) => const PartnerAddEditBranchScreen(),
         '/partner-add-advertisement': (context) =>
             const PartnerAddAdvertisementScreen(),
         '/admin-layout': (context) => const AdminLayoutScreen(),
