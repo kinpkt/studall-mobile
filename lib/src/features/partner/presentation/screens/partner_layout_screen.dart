@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/common_widgets/plain_text_app_bar.dart';
-import 'package:studall/src/features/partner/branches/presentation/screens/partner_branches_screen.dart';
-import 'package:studall/src/features/partner/home/presentation/screens/partner_home_screen.dart';
-import '../providers/partner_layout_controller.dart';
 
 class PartnerLayoutScreen extends ConsumerWidget {
-  const PartnerLayoutScreen({super.key});
+  final StatefulNavigationShell navigationShell;
 
-  List<Widget> get _pages {
-    return [
-      Center(child: PartnerHomeScreen()),
-      Center(child: PartnerBranchesScreen()),
-    ];
-  }
+  const PartnerLayoutScreen({super.key, required this.navigationShell});
 
   List<NavigationDestination> get _destinations {
     return [
@@ -29,6 +22,11 @@ class PartnerLayoutScreen extends ConsumerWidget {
         selectedIcon: Icon(PhosphorIconsFill.storefront),
         label: 'สาขา',
       ),
+      NavigationDestination(
+        icon: Icon(PhosphorIconsRegular.article),
+        selectedIcon: Icon(PhosphorIconsFill.article),
+        label: 'คำขอของฉัน',
+      ),
     ];
   }
 
@@ -39,24 +37,30 @@ class PartnerLayoutScreen extends ConsumerWidget {
   void _showAddOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext ctx) {
         return SafeArea(
           child: Wrap(
             children: [
               ListTile(
                 leading: Icon(PhosphorIconsRegular.storefront),
-                title: Text('เพิ่มสาขาใหม่', style: ShadTheme.of(context).textTheme.p),
+                title: Text(
+                  'เพิ่มสาขาใหม่',
+                  style: ShadTheme.of(context).textTheme.p,
+                ),
                 onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/partner-add-branch');
+                  Navigator.pop(ctx);
+                  context.push('/partner/add-branch');
                 },
               ),
               ListTile(
                 leading: Icon(PhosphorIconsRegular.newspaper),
-                title: Text('เพิ่มโฆษณาใหม่', style: ShadTheme.of(context).textTheme.p),
+                title: Text(
+                  'เพิ่มโฆษณาใหม่',
+                  style: ShadTheme.of(context).textTheme.p,
+                ),
                 onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/partner-add-advertisement');
+                  Navigator.pop(ctx);
+                  context.push('/partner/add-advertisement');
                 },
               ),
             ],
@@ -68,23 +72,24 @@ class PartnerLayoutScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = ref.watch(partnerLayoutControllerProvider);
+    final currentIndex = navigationShell.currentIndex;
 
     return SafeArea(
       child: Scaffold(
         appBar: _buildAppBar(currentIndex),
-        body: SingleChildScrollView(child: IndexedStack(index: currentIndex, children: _pages)),
+        body: navigationShell,
         bottomNavigationBar: NavigationBar(
           selectedIndex: currentIndex,
           onDestinationSelected: (index) {
-            ref.read(partnerLayoutControllerProvider.notifier).setIndex(index);
+            navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            );
           },
           destinations: _destinations,
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            _showAddOptions(context);
-          },
+          onPressed: () => _showAddOptions(context),
           child: Icon(PhosphorIconsRegular.plus),
         ),
       ),

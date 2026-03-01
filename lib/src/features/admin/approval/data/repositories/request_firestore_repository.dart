@@ -13,19 +13,25 @@ class RequestFirestoreRepository {
   RequestFirestoreRepository(this._service);
 
   Future<void> addRequest(RequestModel request) async {
-    await _service.add(
-      collectionPath: 'requests',
+    await _service.set(
+      path: 'requests/${request.id}',
       data: request.toFirestore()
     );
   }
 
-  Future<List<RequestModel>> getAllRequests() async {
-    final data = await _service.getCollection<RequestModel>(
+  Stream<List<RequestModel>> getAllRequests() {
+    return _service.streamCollection<RequestModel>(
       path: 'requests/',
       builder: (data, docId) => RequestModel.fromFirestore(data, docId),
     );
+  }
 
-    return data ?? [];
+  Stream<List<RequestModel>> getRequestsByUserId(String userId) {
+    return _service.streamCollection<RequestModel>(
+      path: 'requests/',
+      queryBuilder: (query) => query.where('requestedUserId', isEqualTo: userId),
+      builder: (data, docId) => RequestModel.fromFirestore(data, docId),
+    );
   }
 
   Future<void> updateRequest(String docId, RequestStatus newStatus) {
@@ -35,6 +41,10 @@ class RequestFirestoreRepository {
         'status': newStatus.name,
       }
     );
+  }
+
+  Future<void> deleteRequest(String docId) {
+    return _service.delete(path: 'requests/$docId');
   }
 }
 

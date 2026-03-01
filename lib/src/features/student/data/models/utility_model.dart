@@ -8,7 +8,6 @@ enum UtilityType {
 class UtilityModel {
   final String id;
   final String? courseId;
-  final String userId;
   final UtilityType type;
   final String title;
   final String? description;
@@ -19,7 +18,14 @@ class UtilityModel {
   static const _uuid = Uuid();
 
   UtilityModel({
-    String? id, this.courseId, required this.userId, required this.type, required this.title, this.description, DateTime? createdAt, DateTime? updatedAt, this.dueDate
+    String? id,
+    this.courseId,
+    required this.type,
+    required this.title,
+    this.description,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    this.dueDate
   }) :  id = id ?? _uuid.v7(),
         createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
@@ -28,7 +34,6 @@ class UtilityModel {
     return UtilityModel(
       id: data['id'] as String,
       courseId: data['courseId'] as String?,
-      userId: data['userId'],
       type: UtilityType.values.byName(data['type'] as String),
       title: data['title'] as String,
       description: data['description'] as String?,
@@ -43,7 +48,6 @@ class UtilityModel {
       'id': id,
       if (courseId != null)
         'courseId': courseId,
-      'userId': userId,
       'type': type.name,
       'title': title,
       if (description != null)

@@ -1,37 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
+import 'package:studall/src/features/student/courses/data/models/course_model.dart';
 
 class CourseCard extends StatelessWidget {
-  /// The course code/name displayed at the top.
-  final String courseName;
-
-  /// The section information (e.g., "หมู่ 1, 200").
-  final String section;
-
-  /// The teacher's name displayed at the bottom.
-  final String teacherName;
-
-  /// Optional background image path (asset or network).
+  final CourseModel course;
   final String? backgroundImage;
-
-  /// Optional avatar URL or asset path.
   final String? avatarUrl;
-
-  /// Whether to show the avatar. Defaults to true.
   final bool showAvatar;
-
-  /// Whether the course card is enabled. Defaults to true.
   final bool enabled;
-
-  /// Called when the user taps the card.
   final VoidCallback? onTap;
 
   const CourseCard({
     super.key,
-    required this.courseName,
-    required this.section,
-    required this.teacherName,
+    required this.course,
     this.backgroundImage,
     this.avatarUrl,
     this.showAvatar = true,
@@ -59,10 +41,7 @@ class CourseCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Stack(
             children: [
-              // Background Image
               if (backgroundImage != null) _buildBackgroundImage(),
-
-              // Gradient Overlays
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
@@ -85,14 +64,13 @@ class CourseCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Course Code/Name
                     SizedBox(
                       height: 28,
                       child: Row(
                         children: [
                           Expanded(
                             child: Text(
-                              courseName,
+                              course.name,
                               style: TextStyle(
                                 fontFamily: 'Google Sans',
                                 fontSize: 20,
@@ -108,8 +86,6 @@ class CourseCard extends StatelessWidget {
                         ],
                       ),
                     ),
-
-                    // Bottom Row (Section/Teacher and Avatar)
                     Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -120,9 +96,8 @@ class CourseCard extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Section
                                 Text(
-                                  section,
+                                  course.description ?? '',
                                   style: TextStyle(
                                     fontFamily: 'Google Sans',
                                     fontSize: 14,
@@ -131,10 +106,8 @@ class CourseCard extends StatelessWidget {
                                     color: colorScheme.mutedForeground,
                                   ),
                                 ),
-
-                                // Teacher Name
                                 Text(
-                                  teacherName,
+                                  course.teacherName ?? '',
                                   style: TextStyle(
                                     fontFamily: 'Google Sans',
                                     fontSize: 14,

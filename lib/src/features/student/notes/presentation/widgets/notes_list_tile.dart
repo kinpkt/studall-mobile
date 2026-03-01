@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:studall/src/features/student/notes/presentation/screens/note_quill_screen.dart';
+import 'package:studall/src/features/student/notes/presentation/screens/student_note_quill_screen.dart';
 
 import '../../data/models/note_model.dart';
 

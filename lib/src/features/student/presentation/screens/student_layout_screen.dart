@@ -1,28 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/features/student/common_widgets/student_app_bar.dart';
-import 'package:studall/src/features/student/courses/presentation/screens/courses_screen.dart';
-import 'package:studall/src/features/student/home/presentation/screens/student_home_screen.dart';
-import 'package:studall/src/features/student/tasks/presentation/screens/tasks_screen.dart';
-import '../../explore/presentation/screens/explore_screen.dart';
-import '../../notes/presentation/screens/note_quill_screen.dart';
-import '../../notes/presentation/screens/notes_screen.dart';
-import '../providers/student_layout_controller.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class StudentLayoutScreen extends ConsumerWidget {
-  const StudentLayoutScreen({super.key});
+  final StatefulNavigationShell navigationShell;
 
-  List<Widget> get _pages {
-    return [
-      StudentHomeScreen(),
-      CoursesScreen(),
-      TasksScreen(),
-      NotesScreen(),
-      ExploreScreen(),
-    ];
-  }
+  const StudentLayoutScreen({super.key, required this.navigationShell});
 
   List<NavigationDestination> get _destinations {
     return [
@@ -87,7 +73,7 @@ class StudentLayoutScreen extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) {
+      builder: (ctx) {
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -98,18 +84,14 @@ class StudentLayoutScreen extends ConsumerWidget {
                   leading: const Icon(PhosphorIconsRegular.listChecks),
                   title: Text('เพิ่มสิ่งที่ต้องทำ', style: theme.textTheme.p),
                   onTap: () {
-                    Navigator.pop(context);
-                    // TODO: Navigate to To-do creation screen or open dialog
+                    Navigator.pop(ctx);
                   },
                 ),
                 ListTile(
                   leading: const Icon(PhosphorIconsRegular.notebook),
                   title: Text('เพิ่มรูปจดบันทึก', style: theme.textTheme.p),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => NoteQuillScreen())
-                    );
+                    Navigator.pop(ctx);
                   },
                 ),
               ],
@@ -122,12 +104,12 @@ class StudentLayoutScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = ref.watch(studentLayoutControllerProvider);
+    final currentIndex = navigationShell.currentIndex;
     return SafeArea(
       bottom: false,
       child: Scaffold(
         appBar: _buildAppBar(context, currentIndex),
-        body: IndexedStack(index: currentIndex, children: _pages),
+        body: navigationShell,
         floatingActionButton: FloatingActionButton(
           onPressed: () => _showAddOptions(context),
           child: const Icon(PhosphorIconsRegular.plus),
@@ -135,7 +117,10 @@ class StudentLayoutScreen extends ConsumerWidget {
         bottomNavigationBar: NavigationBar(
           selectedIndex: currentIndex,
           onDestinationSelected: (index) {
-            ref.read(studentLayoutControllerProvider.notifier).setIndex(index);
+            navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            );
           },
           destinations: _destinations,
         ),

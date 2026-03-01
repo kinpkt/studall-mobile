@@ -55,19 +55,20 @@ class StudentHomeScreen extends StatelessWidget {
       ),
     ];
 
-    return DefaultTabController(
-      length: 3,
-      child: Container(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            Schedule(scheduleItems: sampleSchedule, height: 208),
-            const SizedBox(height: 16),
-            // _buildRecentContent(context, items),
-            // _buildTaskList(context, demoTasks),
-          ],
-        ),
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      color: colorScheme.background,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          Schedule(scheduleItems: sampleSchedule, height: 208),
+          const SizedBox(height: 16),
+          // _buildRecentContent(context, items),
+          // _buildTaskList(context, demoTasks),
+        ],
       ),
     );
   }

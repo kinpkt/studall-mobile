@@ -13,27 +13,32 @@ class NoteFirestoreRepository {
 
   NoteFirestoreRepository(this._service);
 
-  Future<void> addNote(NoteModel note) async {
-    await _service.add(
-      collectionPath: 'notes',
+  Future<void> addNote(String userId, NoteModel note) async {
+    await _service.set(
+      path: 'students/$userId/notes/${note.id}',
       data: note.toFirestore()
     );
   }
 
   Future<List<NoteModel>> getNotesByUserId(String userId) async {
-    final data = await _service.getCollection(
-      path: 'notes/',
-      queryBuilder: (query) => query.where('userId', isEqualTo: userId),
+    final data = await _service.getCollection<NoteModel>(
+      path: 'students/$userId/notes/',
       builder: (data, docId) => NoteModel.fromFirestore(data, docId),
     );
 
     return data ?? [];
   }
 
-  Future<void> updateNote(NoteModel note) async {
+  Future<void> updateNote(String userId, NoteModel note) async {
     await _service.update(
-      path: 'notes/${note.id}',
+      path: 'students/$userId/notes/${note.id}',
       data: note.toFirestore(),
+    );
+  }
+
+  Future<void> deleteNote(String userId, String noteId) async {
+    await _service.delete(
+      path: 'students/$userId/notes/$noteId',
     );
   }
 }

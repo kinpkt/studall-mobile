@@ -5,15 +5,9 @@ import 'package:studall/src/features/auth/data/models/role.dart';
 import 'package:studall/src/common_widgets/common_app_bar.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:studall/src/features/auth/presentation/controllers/auth_state_provider.dart';
 import 'package:studall/src/features/auth/data/repositories/auth_firebase_repository.dart';
-import 'package:flutter_initicon/flutter_initicon.dart';
-import 'package:studall/src/features/classroom_sync/presentation/screens/sync_classroom_screen.dart';
-import 'package:studall/src/features/partner/presentation/screens/partner_layout_screen.dart';
-import 'package:studall/src/features/student/presentation/screens/student_layout_screen.dart';
+import 'package:go_router/go_router.dart';
 
-/// Screen for selecting user role during registration.
-/// Uses Role enum (student, partner)
 class SelectRoleScreen extends StatefulWidget {
   const SelectRoleScreen({super.key});
 
@@ -25,10 +19,11 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
   Role? _selectedRole = Role.student;
 
   void _handleRegister(BuildContext context) {
+    print('Selected Role: $_selectedRole'); // Debug print
     if (_selectedRole == Role.student) {
-      Navigator.pushReplacementNamed(context, '/student-layout');
+      context.pushReplacementNamed('/student/home');
     } else if (_selectedRole == Role.partner) {
-      Navigator.pushReplacementNamed(context, '/partner-layout');
+      context.go('/partner-layout');
     }
   }
 

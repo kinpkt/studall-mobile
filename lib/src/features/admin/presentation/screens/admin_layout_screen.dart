@@ -1,22 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/common_widgets/plain_text_app_bar.dart';
-import 'package:studall/src/features/admin/approval/presentation/screens/admin_approval_screen.dart';
-import 'package:studall/src/features/admin/home/presentation/screens/admin_home_screen.dart';
-import 'package:studall/src/features/admin/users/presentation/screens/admin_users_screen.dart';
-import '../providers/admin_layout_controller.dart';
 
 class AdminLayoutScreen extends ConsumerWidget {
-  const AdminLayoutScreen({super.key});
+  final StatefulNavigationShell navigationShell;
 
-  List<Widget> get _pages {
-    return [
-      Center(child: AdminHomeScreen()),
-      Center(child: AdminUsersScreen()),
-      Center(child: AdminApprovalScreen())
-    ];
-  }
+  const AdminLayoutScreen({super.key, required this.navigationShell});
 
   List<NavigationDestination> get _destinations {
     return [
@@ -26,14 +17,14 @@ class AdminLayoutScreen extends ConsumerWidget {
         label: 'หน้าหลัก',
       ),
       NavigationDestination(
-        icon: Icon(PhosphorIconsRegular.userCircle),
-        selectedIcon: Icon(PhosphorIconsFill.userCircle),
-        label: 'ผู้ใช้งาน',
-      ),
-      NavigationDestination(
         icon: Icon(PhosphorIconsRegular.checkCircle),
         selectedIcon: Icon(PhosphorIconsFill.checkCircle),
         label: 'การอนุมัติ',
+      ),
+      NavigationDestination(
+        icon: Icon(PhosphorIconsRegular.userCircle),
+        selectedIcon: Icon(PhosphorIconsFill.userCircle),
+        label: 'ผู้ใช้งาน',
       ),
     ];
   }
@@ -44,16 +35,19 @@ class AdminLayoutScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = ref.watch(adminLayoutControllerProvider);
+    final currentIndex = navigationShell.currentIndex;
 
     return SafeArea(
       child: Scaffold(
         appBar: _buildAppBar(currentIndex),
-        body: SingleChildScrollView(child: IndexedStack(index: currentIndex, children: _pages)),
+        body: navigationShell,
         bottomNavigationBar: NavigationBar(
           selectedIndex: currentIndex,
           onDestinationSelected: (index) {
-            ref.read(adminLayoutControllerProvider.notifier).setIndex(index);
+            navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            );
           },
           destinations: _destinations,
         ),

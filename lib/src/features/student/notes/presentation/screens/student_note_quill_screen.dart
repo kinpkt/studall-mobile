@@ -29,7 +29,6 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
   late final TextEditingController _titleController;
 
   String? _selectedCourseId;
-  final _currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -70,11 +69,12 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
+    final currentUser = FirebaseAuth.instance.currentUser;
 
-    if (_currentUser == null)
+    if (currentUser == null)
       return LogInScreen();
 
-    final ownedCoursesAsyncValue = ref.watch(ownedCoursesProvider(_currentUser.uid));
+    final ownedCoursesAsyncValue = ref.watch(ownedCoursesProvider(currentUser.uid));
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
@@ -93,14 +93,14 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
                 id: widget.note?.id,
                 title: _titleController.text == '' ? 'Untitled' : _titleController.text,
                 content: contentString,
-                userId: _currentUser.uid,
+                userId: currentUser.uid,
                 courseId: _selectedCourseId,
               );
 
               if (widget.note != null)
-                await ref.read(noteFirestoreRepositoryProvider).updateNote(newNote);
+                await ref.read(noteFirestoreRepositoryProvider).updateNote(currentUser.uid, newNote);
               else
-                await ref.read(noteFirestoreRepositoryProvider).addNote(newNote);
+                await ref.read(noteFirestoreRepositoryProvider).addNote(currentUser.uid, newNote);
 
               if (mounted)
                 Navigator.pop(context);
