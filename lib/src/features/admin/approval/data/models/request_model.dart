@@ -1,15 +1,39 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 
 enum RequestType {
   store, // ขอเพิ่มร้านใหม่เข้าสู่ระบบ
   advertise, // ขอเพิ่มโฆษณา (ให้แอดมินตรวจสอบเนื้อหาก่อน)
-  others, // อื่น ๆ (กรณีเป็นคำขอเรื่องอื่น)
+}
+
+extension RequestTypeExtension on RequestType {
+  String get thaiType {
+    switch (this) {
+      case (RequestType.advertise):
+        return 'คำขอเพิ่มโฆษณาใหม่';
+      case (RequestType.store):
+        return 'คำขอใช้งานบัญชีร้านค้า';
+    }
+  }
 }
 
 enum RequestStatus {
   pending,
   approved,
   declined,
+}
+
+extension RequestStatusExtension on RequestStatus {
+  String get thaiStatus {
+    switch (this) {
+      case (RequestStatus.pending):
+        return 'รอดำเนินการ';
+      case (RequestStatus.approved):
+        return 'อนุมัติแล้ว';
+      case (RequestStatus.declined):
+        return 'ปฏิเสธ';
+    }
+  }
 }
 
 class RequestModel {
@@ -19,6 +43,8 @@ class RequestModel {
   final RequestStatus status;
   String? description;
   String? reason;
+  DateTime createdAt;
+  DateTime updatedAt;
 
   static const _uuid = Uuid();
 
@@ -27,18 +53,11 @@ class RequestModel {
     required this.type,
     required this.requestedUserId,
     this.status = RequestStatus.pending,
-  }) : id = id ?? _uuid.v7();
-
-  String get thaiTypeEnumValue {
-    switch (type) {
-      case (RequestType.advertise):
-        return 'คำขอเพิ่มโฆษณาใหม่';
-      case (RequestType.store):
-        return 'คำขอใช้งานบัญชีร้านค้า';
-      default:
-        return '';
-    }
-  }
+    createdAt,
+    updatedAt,
+  }) :  id = id ?? _uuid.v7(),
+        createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 
   factory RequestModel.fromFirestore(Map<String, dynamic> data, String docId) {
     final String? requestTypeString = data['type'] as String?;
@@ -46,7 +65,7 @@ class RequestModel {
 
     final RequestType parsedType = RequestType.values.firstWhere(
       (e) => e.name == requestTypeString,
-      orElse: () => RequestType.others,
+      orElse: () => RequestType.store,
     );
 
     final RequestStatus parsedStatus = RequestStatus.values.firstWhere(
@@ -58,7 +77,9 @@ class RequestModel {
       id: data['id'],
       type: parsedType,
       status: parsedStatus,
-      requestedUserId: data['requestedUserId']
+      requestedUserId: data['requestedUserId'],
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
   }
 
@@ -72,6 +93,8 @@ class RequestModel {
         'description': description,
       if (reason != null)
         'reason': reason,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
     };
   }
 }
