@@ -15,8 +15,8 @@ final advertisementsProvider = StreamProvider<List<AdvertisementModel>>((ref) {
   return repository.getAllPublishedAdvertisements();
 });
 
-class ExploreScreen extends ConsumerWidget {
-  const ExploreScreen({super.key});
+class StudentExploreScreen extends ConsumerWidget {
+  const StudentExploreScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

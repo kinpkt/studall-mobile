@@ -1,58 +1,296 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+// ── Auth providers & models ──────────────────────────────────────────────────
 import 'package:studall/src/features/auth/presentation/controllers/auth_state_provider.dart';
+import 'package:studall/src/features/auth/presentation/controllers/user_profile_provider.dart';
+import 'package:studall/src/features/auth/data/models/role.dart';
+
+// ── Auth screens ─────────────────────────────────────────────────────────────
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
+import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:studall/src/features/auth/presentation/screens/select_role_screen.dart';
+
+// ── Student layout & screens ─────────────────────────────────────────────────
 import 'package:studall/src/features/student/presentation/screens/student_layout_screen.dart';
+import 'package:studall/src/features/student/home/presentation/screens/student_home_screen.dart';
+import 'package:studall/src/features/student/courses/presentation/screens/student_courses_screen.dart';
+import 'package:studall/src/features/student/courses/presentation/screens/course_detail_layout.dart';
+import 'package:studall/src/features/student/courses/presentation/screens/course_forums_screen.dart';
+import 'package:studall/src/features/student/courses/presentation/screens/course_tasks_screen.dart';
+import 'package:studall/src/features/student/courses/presentation/screens/course_notes_screen.dart';
+import 'package:studall/src/features/student/tasks/presentation/screens/student_tasks_screen.dart';
+import 'package:studall/src/features/student/notes/presentation/screens/student_notes_screen.dart';
+import 'package:studall/src/features/student/explore/presentation/screens/student_explore_screen.dart';
+import 'package:studall/src/features/student/tools/presentation/gpa_calculator_screen.dart';
+import 'package:studall/src/features/student/notes/presentation/screens/student_note_quill_screen.dart';
 
-final goRouterProvider = Provider<GoRouter>((ref) {
-  final authStateNotifier = ValueNotifier<bool?>(null);
+// ── Partner layout & screens ─────────────────────────────────────────────────
+import 'package:studall/src/features/partner/presentation/screens/partner_layout_screen.dart';
+import 'package:studall/src/features/partner/home/presentation/screens/partner_home_screen.dart';
+import 'package:studall/src/features/partner/branches/presentation/screens/partner_branches_screen.dart';
+import 'package:studall/src/features/partner/requests/presentation/screens/partner_requests_screen.dart';
+import 'package:studall/src/features/partner/branches/presentation/screens/partner_add_edit_branch_screen.dart';
+import 'package:studall/src/features/partner/advertisements/presentation/screens/partner_add_advertisement_screen.dart';
 
-  ref.listen(authStateProvider, (previous, next) {
-    next.when(
-      data: (user) => authStateNotifier.value = user != null,
-      loading: () => authStateNotifier.value = null,
-      error: (err, stack) => authStateNotifier.value = false,
-    );
-  });
+// ── Admin layout & screens ───────────────────────────────────────────────────
+import 'package:studall/src/features/admin/presentation/screens/admin_layout_screen.dart';
+import 'package:studall/src/features/admin/home/presentation/screens/admin_home_screen.dart';
+import 'package:studall/src/features/admin/users/presentation/screens/admin_users_screen.dart';
+import 'package:studall/src/features/admin/approval/presentation/screens/admin_approval_screen.dart';
 
-  ref.onDispose(() {
-    authStateNotifier.dispose();
-  });
+// ─────────────────────────────────────────────────────────────────────────────
+// Navigator keys
+// ─────────────────────────────────────────────────────────────────────────────
+final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RouterNotifier – triggers GoRouter.redirect when auth / profile changes
+// ─────────────────────────────────────────────────────────────────────────────
+class _RouterNotifier extends ChangeNotifier {
+  _RouterNotifier(this._ref) {
+    _ref.listen(authStateProvider, (_, _) => notifyListeners());
+    _ref.listen(userProfileProvider, (_, _) => notifyListeners());
+  }
+
+  final Ref _ref;
+}
+
+final routerProvider = Provider<GoRouter>((ref) {
+  final notifier = _RouterNotifier(ref);
 
   return GoRouter(
-    refreshListenable: authStateNotifier,
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: '/',
+    debugLogDiagnostics: true,
+    refreshListenable: notifier,
+
     redirect: (context, state) {
       final authState = ref.read(authStateProvider);
+      final profileState = ref.read(userProfileProvider);
+      final path = state.uri.path;
 
-      return authState.when(
-        data: (user) {
-          final isAuthenticated = user != null;
-          final isOnLoginPage = state.fullPath == '/login';
+      if (authState.isLoading || profileState.isLoading) return null;
 
-          if (!isAuthenticated && !isOnLoginPage) {
-            return '/login';
-          }
+      final firebaseUser = authState.value;
+      if (firebaseUser == null) {
+        if (path == '/login' || path == '/signup') return null;
+        return '/login';
+      }
 
-          if (isAuthenticated && isOnLoginPage) {
-            return '/';
-          }
+      final profile = profileState.value;
+      if (profile == null) return null;
 
-          return null;
-        },
-        loading: () => null,
-        error: (err, stack) {
-          final isOnLoginPage = state.fullPath == '/login';
-          return isOnLoginPage ? null : '/login';
-        },
-      );
+      if (profile.roles.isEmpty) {
+        return path == '/select-role' ? null : '/select-role';
+      }
+
+      final isAuthOrRoot =
+          path == '/' ||
+          path == '/login' ||
+          path == '/signup' ||
+          path == '/select-role';
+
+      if (isAuthOrRoot) {
+        return switch (profile.lastActiveRole) {
+          Role.student => '/student/home',
+          Role.partner => '/partner/home',
+          Role.admin => '/admin/home',
+          null => '/select-role',
+        };
+      }
+
+      return null;
     },
+
     routes: [
-      GoRoute(path: '/login', builder: (context, state) => const LogInScreen()),
       GoRoute(
         path: '/',
-        builder: (context, state) => const StudentLayoutScreen(),
+        builder: (_, _) =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
+      ),
+
+      GoRoute(path: '/login', builder: (_, _) => const LogInScreen()),
+      GoRoute(path: '/signup', builder: (_, _) => const SignUpScreen()),
+      GoRoute(
+        path: '/select-role',
+        builder: (_, _) => const SelectRoleScreen(),
+      ),
+
+      GoRoute(
+        path: '/student/tools/gpa-calculator',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, _) => const GPACalculatorScreen(),
+      ),
+      GoRoute(
+        path: '/student/notes/editor',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, _) => NoteQuillScreen(),
+      ),
+      GoRoute(
+        path: '/partner/add-branch',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, _) => const PartnerAddEditBranchScreen(),
+      ),
+      GoRoute(
+        path: '/partner/add-advertisement',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, _) => const PartnerAddAdvertisementScreen(),
+      ),
+
+      StatefulShellRoute.indexedStack(
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state, navigationShell) =>
+            StudentLayoutScreen(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/student/home',
+                builder: (_, _) => const StudentHomeScreen(),
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/student/courses',
+                builder: (_, _) => const StudentCoursesScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':courseId',
+                    redirect: (_, state) =>
+                        '/student/courses/${state.pathParameters['courseId']}/forums',
+                  ),
+
+                  ShellRoute(
+                    builder: (context, state, child) => CourseDetailLayout(
+                      courseId: state.pathParameters['courseId'] ?? '',
+                      child: child,
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: ':courseId/forums',
+                        builder: (_, state) => CourseForumsScreen(
+                          courseId: state.pathParameters['courseId'] ?? '',
+                        ),
+                      ),
+                      GoRoute(
+                        path: ':courseId/tasks',
+                        builder: (_, state) => CourseTasksScreen(
+                          courseId: state.pathParameters['courseId'] ?? '',
+                        ),
+                      ),
+                      GoRoute(
+                        path: ':courseId/notes',
+                        builder: (_, state) => CourseNotesScreen(
+                          courseId: state.pathParameters['courseId'] ?? '',
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/student/tasks',
+                builder: (_, _) => const StudentTasksScreen(),
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/student/note',
+                builder: (_, _) => const StudentNotesScreen(),
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/student/explore',
+                builder: (_, _) => const StudentExploreScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+
+      StatefulShellRoute.indexedStack(
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state, navigationShell) =>
+            PartnerLayoutScreen(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/partner/home',
+                builder: (_, _) => const PartnerHomeScreen(),
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/partner/branches',
+                builder: (_, _) => const PartnerBranchesScreen(),
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/partner/request',
+                builder: (_, _) => const PartnerRequestsScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+
+      StatefulShellRoute.indexedStack(
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state, navigationShell) =>
+            AdminLayoutScreen(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/home',
+                builder: (_, _) => const AdminHomeScreen(),
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/approve',
+                builder: (_, _) => const AdminApprovalScreen(),
+              ),
+            ],
+          ),
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/users',
+                builder: (_, _) => const AdminUsersScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
     ],
   );
