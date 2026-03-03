@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/services/firestore_service.dart';
 import '../models/branch_model.dart';
@@ -24,6 +25,14 @@ class BranchFirestoreRepository {
       path: 'partners/$userId/branches/$id',
       builder: (data, docId) => BranchModel.fromFirestore(data, docId),
     );
+  }
+
+  Future<List<BranchModel>> getAllBranches() async {
+    final snapshot = await FirebaseFirestore.instance.collectionGroup('branches').get();
+
+    return snapshot.docs.map((doc) {
+      return BranchModel.fromFirestore(doc.data(), doc.id);
+    }).toList();
   }
 
   Stream<List<BranchModel>> getBranchesByUserId(String userId) {
