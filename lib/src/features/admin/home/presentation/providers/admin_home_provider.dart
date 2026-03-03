@@ -15,12 +15,12 @@ final partnerCountProvider = FutureProvider<int>((ref) async {
   return repository.getUsersCountByRole(Role.partner);
 });
 
-final advertisementRequestCountProivder = FutureProvider<int>((ref) async {
+final advertisementRequestCountProvider = FutureProvider<int>((ref) async {
   final repository = ref.watch(requestFirestoreRepositoryProvider);
   return repository.getRequestsCountByStatusAndType(RequestStatus.pending, RequestType.advertise);
 });
 
-final partnerRequestCountProivder = FutureProvider<int>((ref) async {
+final partnerRequestCountProvider = FutureProvider<int>((ref) async {
   final repository = ref.watch(requestFirestoreRepositoryProvider);
   return repository.getRequestsCountByStatusAndType(RequestStatus.pending, RequestType.store);
 });

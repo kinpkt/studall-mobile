@@ -13,12 +13,12 @@ class AdminHomeScreen extends ConsumerWidget {
     final studentCountAsync = ref.watch(studentCountProvider);
     final partnerCountAsync = ref.watch(partnerCountProvider);
     final advertisementRequestCountAsync = ref.watch(
-      advertisementRequestCountProivder,
+      advertisementRequestCountProvider,
     );
-    final partnerRequestCountAsync = ref.watch(partnerRequestCountProivder);
+    final partnerRequestCountAsync = ref.watch(partnerRequestCountProvider);
 
     return Padding(
-      padding: const .all(16.0),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         spacing: 16,
         children: [
@@ -28,21 +28,13 @@ class AdminHomeScreen extends ConsumerWidget {
             footer: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                studentCountAsync.when(
-                  data: (count) => Text(
-                    'บัญชีนักเรียนนักศึกษา: $count',
-                    style: theme.textTheme.p,
-                  ),
-                  loading: () => const CircularProgressIndicator(),
-                  error: (error, stack) =>
-                      Text('เกิดข้อผิดพลาด', style: theme.textTheme.p),
+                _AsyncCountText(
+                  asyncValue: studentCountAsync,
+                  label: 'บัญชีนักเรียนนักศึกษา',
                 ),
-                partnerCountAsync.when(
-                  data: (count) =>
-                      Text('บัญชีร้านค้า: $count', style: theme.textTheme.p),
-                  loading: () => const CircularProgressIndicator(),
-                  error: (error, stack) =>
-                      Text('เกิดข้อผิดพลาด', style: theme.textTheme.p),
+                _AsyncCountText(
+                  asyncValue: partnerCountAsync,
+                  label: 'บัญชีร้านค้า',
                 ),
               ],
             ),
@@ -50,37 +42,46 @@ class AdminHomeScreen extends ConsumerWidget {
           ShadCard(
             width: 400,
             title: Text('คำขอเพิ่มโฆษณา', style: theme.textTheme.h2),
-            footer: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                advertisementRequestCountAsync.when(
-                  data: (count) =>
-                      Text('รอการตรวจสอบ: $count', style: theme.textTheme.p),
-                  loading: () => const CircularProgressIndicator(),
-                  error: (error, stack) =>
-                      Text('เกิดข้อผิดพลาด', style: theme.textTheme.p),
-                ),
-              ],
+            footer: _AsyncCountText(
+              asyncValue: advertisementRequestCountAsync,
+              label: 'รอการตรวจสอบ',
             ),
           ),
           ShadCard(
             width: 400,
             title: Text('คำขอเปิดร้านค้า', style: theme.textTheme.h2),
-            footer: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                partnerRequestCountAsync.when(
-                  data: (count) =>
-                      Text('รอการตรวจสอบ: $count', style: theme.textTheme.p),
-                  loading: () => const CircularProgressIndicator(),
-                  error: (error, stack) =>
-                      Text('เกิดข้อผิดพลาด', style: theme.textTheme.p),
-                ),
-              ],
+            footer: _AsyncCountText(
+              asyncValue: partnerRequestCountAsync,
+              label: 'รอการตรวจสอบ',
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AsyncCountText extends StatelessWidget {
+  const _AsyncCountText({
+    required this.asyncValue,
+    required this.label,
+  });
+
+  final AsyncValue<int> asyncValue;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+
+    return asyncValue.when(
+      data: (count) => Text('$label: $count', style: theme.textTheme.p),
+      loading: () => const SizedBox(
+        width: 16,
+        height: 16,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
+      error: (_, __) => Text('เกิดข้อผิดพลาด', style: theme.textTheme.p),
     );
   }
 }
