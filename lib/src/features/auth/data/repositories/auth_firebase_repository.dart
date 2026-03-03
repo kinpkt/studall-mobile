@@ -32,14 +32,14 @@ class AuthFirebaseRepository implements AuthRepository {
   Future<User> signUpWithEmail({
     required String email,
     required String password,
-    required String username,
+    required String displayName,
   }) async {
     try {
       final credential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      await credential.user!.updateDisplayName(username);
+      await credential.user!.updateDisplayName(displayName);
       return credential.user!;
     } on FirebaseAuthException catch (e) {
       throw handleAuthException(e);

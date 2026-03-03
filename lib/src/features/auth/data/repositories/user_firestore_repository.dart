@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:studall/src/features/auth/data/models/role.dart';
 import '../../../../core/services/firestore_service.dart';
 import '../models/user_model.dart';
 import 'user_repository.dart';
@@ -63,6 +64,19 @@ class UserFirestoreRepository implements UserRepository {
     );
 
     return data;
+  }
+
+  @override
+  Future<int> getAllUsersCount() async {
+    return await _service.count(collectionPath: 'users');
+  }
+
+  @override
+  Future<int> getUsersCountByRole(Role role) async {
+    return await _service.count(
+      collectionPath: 'users',
+      queryBuilder: (query) => query.where('roles', arrayContains: role.name),
+    );
   }
 
   @override
