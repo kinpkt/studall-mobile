@@ -22,7 +22,6 @@ class _PartnerMapSelectionScreenState extends State<PartnerMapSelectionScreen> {
   @override
   void initState() {
     super.initState();
-    // Default to Rangsit, Pathum Thani if no initial location is provided
     _selectedLocation = widget.initialLocation ?? const LatLng(13.9883, 100.6171);
   }
 
