@@ -6,7 +6,6 @@ import 'package:studall/src/features/admin/users/presentation/screens/admin_user
 import 'package:studall/src/features/auth/data/models/user_model.dart';
 import 'package:studall/src/features/auth/data/repositories/user_firestore_repository.dart';
 
-
 class UserListTile extends ConsumerWidget {
   final UserModel user;
   const UserListTile({super.key, required this.user});
@@ -17,8 +16,8 @@ class UserListTile extends ConsumerWidget {
 
     return Material(
       child: ListTile(
-        leading: ShadAvatar(user.photoUrl, placeholder: Icon(PhosphorIconsFill.userCircle),),
-        title: Text(user.displayName == '' || user.displayName == null ? user.email : user.displayName, style: theme.textTheme.list,),
+        leading: ShadAvatar(user.photoUrl == '' ? null : user.photoUrl, placeholder: Icon(PhosphorIconsFill.userCircle),),
+        title: Text(user.displayName == '' ? user.email : user.displayName, style: theme.textTheme.list,),
         subtitle: Text('สถานะบัญชี: ${user.isBanned ? 'ถูกระงับ' : 'ใช้งานได้'}',
           style: TextStyle(
             color: user.isBanned ? theme.colorScheme.destructive : theme.colorScheme.custom['green'],
