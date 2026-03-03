@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/presentation/controllers/auth_controller.dart';
 
@@ -103,7 +104,7 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
   // }
 
   void _navigateToLogin() {
-    Navigator.pop(context);
+    context.go('/login');
   }
 
   @override
@@ -216,7 +217,10 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
                           ? SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.primaryForeground),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: theme.colorScheme.primaryForeground,
+                              ),
                             )
                           : const Text('สร้างบัญชี'),
                     ),

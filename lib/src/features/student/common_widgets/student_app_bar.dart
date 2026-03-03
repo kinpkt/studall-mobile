@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
-import 'package:studall/src/features/auth/data/repositories/auth_firebase_repository.dart';
 import 'package:studall/src/features/auth/presentation/controllers/user_profile_provider.dart';
 
 class StudentAppbar extends ConsumerStatefulWidget
@@ -135,8 +135,6 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-
-    final authState = ref.watch(authFirebaseRepositoryProvider);
     final user = ref.watch(userProfileProvider);
     return Container(
       color: colorScheme.background,
@@ -168,21 +166,15 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
                     child: user.when(
                       data: (user) {
                         return GestureDetector(
-                          onDoubleTap: () {
-                            authState.signOut();
-                          },
+                          onTap: () => context.push('/setting'),
                           child: ShadAvatar(
                             user?.photoUrl,
                             size: const Size.square(40),
                             backgroundColor: colorScheme.muted,
                             placeholder: Text(
-                              // TODO แก้ที่หลังเอามาจาก user profile provider
-                              widget.userInitials ?? 'SA',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
+                              'SA',
+                              style: textTheme.muted.copyWith(
                                 color: colorScheme.foreground,
-                                height: 20 / 12,
                               ),
                             ),
                           ),

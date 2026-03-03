@@ -11,6 +11,22 @@ final appThemeLight = ShadThemeData(
   buttonSizesTheme: ShadButtonSizesTheme(
     icon: ShadButtonSizeTheme(height: 40, padding: EdgeInsets.all(8)),
   ),
+  alertDialogTheme: ShadDialogTheme(
+    constraints: BoxConstraints(minWidth: 370),
+    padding: const EdgeInsets.all(16),
+    radius: BorderRadius.circular(12),
+    titleStyle: appTextStyle.lead.copyWith(
+      color: AppColorScheme.lightScheme.foreground,
+    ),
+    titleTextAlign: TextAlign.left,
+    backgroundColor: AppColorScheme.lightScheme.background,
+    actionsAxis: Axis.horizontal,
+    actionsMainAxisAlignment: MainAxisAlignment.end,
+    expandActionsWhenTiny: false,
+    removeBorderRadiusWhenTiny: false,
+    mainAxisAlignment: MainAxisAlignment.start,
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+  ),
 );
 
 final appThemeDark = ShadThemeData(

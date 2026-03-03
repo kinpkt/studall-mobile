@@ -19,6 +19,7 @@ class StudentNotesScreen extends ConsumerWidget {
         decoration: const ShadDecoration(
           secondaryFocusedBorder: ShadBorder.none,
         ),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         placeholder: const Text('ค้นหาโน้ต'),
         leading: Icon(PhosphorIconsRegular.magnifyingGlass, size: 20),
       ),
@@ -66,9 +67,9 @@ class StudentNotesScreen extends ConsumerWidget {
                   return const Center(child: Text('ยังไม่มีโน้ต'));
                 }
             
-                final pinnedNotes = notes
-                    .where((note) => note.isPinned)
-                    .toList();
+                // final pinnedNotes = notes
+                //     .where((note) => note.isPinned)
+                //     .toList();
             
                 return SingleChildScrollView(
                   child: Column(
@@ -90,9 +91,9 @@ class StudentNotesScreen extends ConsumerWidget {
                         ),
                         child: Text('ปักหมุด', style: theme.textTheme.h4),
                       ),
-                      ...pinnedNotes.map(
-                        (note) => NotesListTile(note: note),
-                      ),
+                      // ...pinnedNotes.map(
+                      //   (note) => NotesListTile(note: note),
+                      // ),
             
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -101,7 +102,7 @@ class StudentNotesScreen extends ConsumerWidget {
                         ),
                         child: Text('ทั่วไป', style: theme.textTheme.h4),
                       ),
-                      ...notes.map((note) => NotesListTile(note: note)),
+                      // ...notes.map((note) => NotesListTile(note: note)),
                     ],
                   ),
                 );
