@@ -170,8 +170,8 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
                     const SizedBox(height: 16),
                     ShadInputFormField(
                       controller: _nameController,
-                      id: 'username',
-                      label: const Text('ชื่อผู้ใช้'),
+                      id: 'displayName',
+                      label: const Text('ชื่อผู้ใช้ (ชื่อที่ต้องการให้แสดงในระบบ)'),
                       placeholder: const Text('นอนน้อย'),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: _validateUsername,
@@ -209,7 +209,7 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
                                     .signUp(
                                       email: _emailController.text.trim(),
                                       password: _passwordController.text,
-                                      username: _nameController.text.trim(),
+                                      displayName: _nameController.text.trim(),
                                     );
                               }
                             },

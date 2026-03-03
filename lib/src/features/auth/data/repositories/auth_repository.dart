@@ -12,7 +12,7 @@ abstract class AuthRepository {
   Future<User> signUpWithEmail({
     required String email,
     required String password,
-    required String username,
+    required String displayName,
   });
 
   /// ล็อกอินด้วย Email

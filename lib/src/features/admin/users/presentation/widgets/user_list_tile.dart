@@ -18,7 +18,7 @@ class UserListTile extends ConsumerWidget {
     return Material(
       child: ListTile(
         leading: ShadAvatar(user.photoUrl, placeholder: Icon(PhosphorIconsFill.userCircle),),
-        title: Text(user.fullName == '' || user.fullName == null ? user.email : user.fullName!, style: theme.textTheme.list,),
+        title: Text(user.displayName == '' || user.displayName == null ? user.email : user.displayName, style: theme.textTheme.list,),
         subtitle: Text('สถานะบัญชี: ${user.isBanned ? 'ถูกระงับ' : 'ใช้งานได้'}',
           style: TextStyle(
             color: user.isBanned ? theme.colorScheme.destructive : theme.colorScheme.custom['green'],
@@ -36,7 +36,7 @@ class UserListTile extends ConsumerWidget {
                     builder: (context, setState) {
                       return ShadDialog(
                         title: const Text('จัดการสิทธิ์ผู้ใช้งาน'),
-                        description: Text('คุณกำลังแก้ไขข้อมูลของ ${user.username}'),
+                        description: Text('คุณกำลังแก้ไขข้อมูลของ ${user.displayName}'),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           child: ShadSelect<bool>(
@@ -81,7 +81,7 @@ class UserListTile extends ConsumerWidget {
                                     ShadToast(
                                       title: const Text('อัปเดตสำเร็จ'),
                                       description: Text('แก้ไขสถานะของ ${user
-                                          .username} เรียบร้อยแล้ว'),
+                                          .displayName} เรียบร้อยแล้ว'),
                                     ),
                                   );
                                 }

@@ -16,7 +16,7 @@ class AuthController extends AsyncNotifier<void> {
   Future<void> signUp({
     required String email,
     required String password,
-    required String username,
+    required String displayName,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -25,7 +25,7 @@ class AuthController extends AsyncNotifier<void> {
       final user = await authRepository.signUpWithEmail(
         email: email,
         password: password,
-        username: username,
+        displayName: displayName,
       );
 
       final userRepository = ref.read(userFirestoreRepositoryProvider);

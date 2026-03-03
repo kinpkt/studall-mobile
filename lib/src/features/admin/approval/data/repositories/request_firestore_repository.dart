@@ -34,6 +34,29 @@ class RequestFirestoreRepository {
     );
   }
 
+  Future<int> getRequestsCountByStatus(RequestStatus status) async {
+    return await _service.count(
+      collectionPath: 'requests',
+      queryBuilder: (query) => query.where('status', isEqualTo: status.name),
+    );
+  }
+
+  Future<int> getRequestsCountByType(RequestType type) async {
+    return await _service.count(
+      collectionPath: 'requests',
+      queryBuilder: (query) => query.where('type', isEqualTo: type.name),
+    );
+  }
+
+  Future<int> getRequestsCountByStatusAndType(RequestStatus status, RequestType type) async {
+    return await _service.count(
+      collectionPath: 'requests',
+      queryBuilder: (query) => query
+        .where('status', isEqualTo: status.name)
+        .where('type', isEqualTo: type.name),
+    );
+  }
+
   Future<void> updateRequest(String docId, RequestStatus newStatus) {
     return _service.update(
       path: 'requests/$docId',

@@ -17,20 +17,20 @@ class AdminLayoutScreen extends ConsumerWidget {
         label: 'หน้าหลัก',
       ),
       NavigationDestination(
-        icon: Icon(PhosphorIconsRegular.checkCircle),
-        selectedIcon: Icon(PhosphorIconsFill.checkCircle),
-        label: 'การอนุมัติ',
-      ),
-      NavigationDestination(
         icon: Icon(PhosphorIconsRegular.userCircle),
         selectedIcon: Icon(PhosphorIconsFill.userCircle),
         label: 'ผู้ใช้งาน',
+      ),
+      NavigationDestination(
+        icon: Icon(PhosphorIconsRegular.checkCircle),
+        selectedIcon: Icon(PhosphorIconsFill.checkCircle),
+        label: 'การอนุมัติ',
       ),
     ];
   }
 
   PreferredSizeWidget _buildAppBar(int currentIndex) {
-    return PlainTextAppBar(text: 'Admin');
+    return const PlainTextAppBar(text: 'Admin');
   }
 
   @override
