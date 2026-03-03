@@ -20,10 +20,10 @@ class AdminHomeScreen extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 16,
         children: [
           ShadCard(
-            width: 480,
             title: Text('ยอดผู้ใช้งานในระบบ', style: theme.textTheme.h2),
             footer: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -40,7 +40,6 @@ class AdminHomeScreen extends ConsumerWidget {
             ),
           ),
           ShadCard(
-            width: 400,
             title: Text('คำขอเพิ่มโฆษณา', style: theme.textTheme.h2),
             footer: _AsyncCountText(
               asyncValue: advertisementRequestCountAsync,
@@ -48,7 +47,6 @@ class AdminHomeScreen extends ConsumerWidget {
             ),
           ),
           ShadCard(
-            width: 400,
             title: Text('คำขอเปิดร้านค้า', style: theme.textTheme.h2),
             footer: _AsyncCountText(
               asyncValue: partnerRequestCountAsync,
@@ -62,10 +60,7 @@ class AdminHomeScreen extends ConsumerWidget {
 }
 
 class _AsyncCountText extends StatelessWidget {
-  const _AsyncCountText({
-    required this.asyncValue,
-    required this.label,
-  });
+  const _AsyncCountText({required this.asyncValue, required this.label});
 
   final AsyncValue<int> asyncValue;
   final String label;

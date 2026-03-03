@@ -78,11 +78,18 @@ class _AdminAppBarState extends ConsumerState<AdminAppBar> {
                           ),
                         );
                       },
-                      loading: () => const Scaffold(
-                        body: Center(child: CircularProgressIndicator()),
+                      loading: () => const SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
                       ),
-                      error: (e, trace) =>
-                          Scaffold(body: Center(child: Text('Error: $e'))),
+                      error: (e, trace) => Icon(
+                        PhosphorIconsRegular.warningCircle,
+                        color: colorScheme.destructive,
+                      ),
                     ),
                   ),
                 ],

@@ -3,15 +3,24 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+extension ExceptionExtension on Object {
+  String get message {
+    if (this is Exception) {
+      return toString().replaceAll('Exception: ', '');
+    }
+    return toString();
+  }
+}
+
 Exception handleGoogleSignInException(GoogleSignInException e) {
   print('Google Sign-In error: ${e.code}, description: ${e.description}');
   switch (e.code) {
     case GoogleSignInExceptionCode.canceled:
-    // return Exception('ยกเลิกการเข้าสู่ระบบ');
+      return Exception('การเข้าสู่ระบบด้วย Google ถูกยกเลิก');
     case GoogleSignInExceptionCode.interrupted:
-    // return Exception('การเข้าสู่ระบบถูกขัดจังหวะ กรุณาลองใหม่อีกครั้ง');
+      return Exception('การเข้าสู่ระบบถูกหยุดระหว่างดำเนินการ');
     case GoogleSignInExceptionCode.clientConfigurationError:
-    // return Exception('ตั้งค่า Google Sign-In ไม่ถูกต้อง: ${e.description}');
+      return Exception('การตั้งค่า Google Sign-In ไม่ถูกต้อง');
     case GoogleSignInExceptionCode.providerConfigurationError:
       return Exception('ระบบ Auth ไม่พร้อมใช้งาน กรุณาลองใหม่ภายหลัง');
     case GoogleSignInExceptionCode.uiUnavailable:

@@ -12,6 +12,7 @@ class AppListTile extends StatelessWidget {
     this.leading,
     this.trailing,
     this.onTap,
+    this.onDoubleTap,
   });
 
   final EdgeInsetsGeometry? padding;
@@ -22,6 +23,7 @@ class AppListTile extends StatelessWidget {
   final Widget? leading;
   final List<Widget>? trailing;
   final VoidCallback? onTap;
+  final VoidCallback? onDoubleTap;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +33,7 @@ class AppListTile extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
+      onDoubleTap: onDoubleTap,
       child: Container(
         padding:
             padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

@@ -46,18 +46,26 @@ class AuthController extends AsyncNotifier<void> {
 
   Future<void> signInWithGoogle() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
+    try {
       final authRepository = ref.read(authFirebaseRepositoryProvider);
       final user = await authRepository.signInWithGoogle();
 
+      // ทำงานขั้นตอนถัดไป
       final userRepository = ref.read(userFirestoreRepositoryProvider);
       await userRepository.createUserProfile(UserModel.fromFirebase(user));
-    });
+
+      // สำเร็จ! เปลี่ยนสถานะเป็น Data (หยุด Loading)
+      state = const AsyncData(null);
+    } catch (e, stack) {
+      // เกิด Error จริงๆ เปลี่ยนเป็น Error (หยุด Loading)
+      state = AsyncError(e, stack);
+    }
   }
 
   Future<void> signOut() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
+      await Future.delayed(const Duration(seconds: 5));
       final authRepository = ref.read(authFirebaseRepositoryProvider);
       await authRepository.signOut();
     });

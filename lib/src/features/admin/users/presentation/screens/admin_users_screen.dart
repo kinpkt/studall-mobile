@@ -59,7 +59,6 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 16),
           _buildSearchBar(context),
           if (_selectedRole != 'all')
             Padding(
@@ -114,25 +113,20 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
     final textTheme = theme.textTheme;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: ShadInput(
         controller: _searchBarController,
         decoration: const ShadDecoration(
           secondaryFocusedBorder: ShadBorder.none,
         ),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         placeholder: const Text('ค้นหาผู้ใช้งาน'),
         leading: Icon(PhosphorIconsRegular.magnifyingGlass, size: 20),
         trailing: MenuAnchor(
-          reservedPadding: const EdgeInsets.all(16),
           menuChildren: [
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Text(
-                'ตัวกรองโดยบทบาท',
+                'กรองโดยบทบาท',
                 style: textTheme.small.copyWith(
                   color: theme.colorScheme.mutedForeground,
                 ),

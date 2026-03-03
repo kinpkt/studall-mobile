@@ -27,4 +27,6 @@ abstract class UserRepository {
 
   /// อัปเดทข้อมูลสถานะการแบนของผู้ใช้
   Future<void> updateUserBanStatus(String uid, bool isBanned);
+
+  Future<void> updateUserLastActiveRole(String uid, Role role);
 }

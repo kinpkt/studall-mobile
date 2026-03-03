@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:studall/src/features/auth/domain/auth_exceptions.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
@@ -113,18 +114,17 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
     final signUpState = ref.watch(authControllerProvider);
     final isLoading = signUpState.isLoading;
 
-    ref.listen(authControllerProvider, (_, next) {
-      if (next.hasError) {
+    ref.listen(authControllerProvider, (previous, next) {
+      if (previous is AsyncLoading && next is AsyncError) {
         ShadToaster.of(context).show(
           ShadToast.destructive(
             title: const Text('สร้างบัญชีไม่สำเร็จ'),
-            description: Text(next.error.toString()),
+            description: Text(next.error.message),
             alignment: Alignment.topCenter,
           ),
         );
       }
     });
-
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
       body: SafeArea(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/features/auth/domain/auth_exceptions.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/google_sign_in_button.dart';
@@ -50,12 +51,12 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
     final loginState = ref.watch(authControllerProvider);
     final isLoading = loginState.isLoading;
 
-    ref.listen(authControllerProvider, (_, next) {
-      if (next.hasError) {
+    ref.listen(authControllerProvider, (previous, next) {
+      if (previous is AsyncLoading && next is AsyncError) {
         ShadToaster.of(context).show(
           ShadToast.destructive(
             title: const Text('เข้าสู่ระบบไม่สำเร็จ'),
-            description: Text(next.error.toString()),
+            description: Text(next.error.message),
             alignment: Alignment.topCenter,
           ),
         );
@@ -162,7 +163,10 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                                   _formKey.currentState!.validate()) {
                                 ref
                                     .read(authControllerProvider.notifier)
-                                    .signInWithEmail(email: email, password: password);
+                                    .signInWithEmail(
+                                      email: email,
+                                      password: password,
+                                    );
                               }
                             },
                       child: isLoading

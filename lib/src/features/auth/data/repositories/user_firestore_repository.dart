@@ -81,11 +81,14 @@ class UserFirestoreRepository implements UserRepository {
 
   @override
   Future<void> updateUserBanStatus(String uid, bool isBanned) async {
+    await _service.update(path: 'users/$uid', data: {'isBanned': isBanned});
+  }
+
+  @override
+  Future<void> updateUserLastActiveRole(String uid, Role role) async {
     await _service.update(
       path: 'users/$uid',
-      data: {
-        'isBanned': isBanned,
-      }
+      data: {'lastActiveRole': role.name},
     );
   }
 }

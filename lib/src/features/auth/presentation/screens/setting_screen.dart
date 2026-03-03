@@ -7,7 +7,8 @@ import 'package:studall/src/common_widgets/app_list_tile.dart';
 import 'package:studall/src/common_widgets/common_app_bar.dart';
 import 'package:studall/src/core/theme/theme_provider.dart';
 import 'package:studall/src/features/auth/presentation/controllers/user_profile_provider.dart';
-import 'package:studall/src/features/auth/data/repositories/auth_firebase_repository.dart';
+import 'package:studall/src/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:studall/src/features/auth/data/repositories/user_firestore_repository.dart';
 import 'package:studall/src/features/auth/data/models/role.dart';
 
 class SettingScreen extends ConsumerStatefulWidget {
@@ -106,6 +107,10 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
           ),
           userProfile.when(
             data: (user) {
+              final List<Role> roles = user?.roles ?? [];
+              final List<Role> noRoles = Role.values
+                  .where((r) => (!roles.contains(r) && r != Role.admin))
+                  .toList();
               return Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -116,27 +121,38 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   spacing: 16,
                   children: [
-                    userProfile.when(
-                      data: (user) => AppListTile(
+                    ...roles.map((Role role) {
+                      final roleLabel = switch (role) {
+                        Role.student => 'นักเรียน',
+                        Role.partner => 'ร้านค้า',
+                        Role.admin => 'ผู้ดูแลระบบ',
+                      };
+                      final roleIcon = switch (role) {
+                        Role.student => PhosphorIconsRegular.graduationCap,
+                        Role.partner => PhosphorIconsRegular.storefront,
+                        Role.admin => PhosphorIconsRegular.pipeWrench,
+                      };
+                      return AppListTile(
                         padding: EdgeInsets.zero,
-                        title: "นักเรียน",
+                        title: roleLabel,
                         titleStyle: textTheme.custom['medium']?.copyWith(
                           color: colorScheme.foreground,
                         ),
-                        description: user?.email ?? 'ไม่พบอีเมล',
+                        description: user!.email,
                         leading: SizedBox(
                           width: 40,
                           height: 40,
                           child: Icon(
-                            PhosphorIconsRegular.graduationCap,
+                            roleIcon,
                             size: 24,
                             color: colorScheme.foreground,
                           ),
                         ),
                         trailing: [
-                          (user?.lastActiveRole == Role.student)
+                          user.lastActiveRole == role
                               ? Text(
                                   'ปัจจุบัน',
                                   style: textTheme.small.copyWith(
@@ -145,9 +161,12 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                                   maxLines: 1,
                                 )
                               : GestureDetector(
-                                  onTap: () {
-                                    // ref.read(userProvider.notifier).switchRole(Role.partner);
-                                  },
+                                  onTap: () =>
+                                      _showSwitchRoleConfirmationDialog(
+                                        context,
+                                        user.id,
+                                        role,
+                                      ),
                                   child: Text(
                                     'สลับบทบาท',
                                     style: textTheme.small.copyWith(
@@ -159,103 +178,24 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                                   ),
                                 ),
                         ],
-                      ),
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()),
-                      error: (e, _) => Text('Error: $e'),
-                    ),
-                    userProfile.when(
-                      data: (user) => AppListTile(
-                        padding: EdgeInsets.zero,
-                        title: "ร้านค้า",
-                        titleStyle: textTheme.custom['medium']?.copyWith(
-                          color: colorScheme.foreground,
-                        ),
-                        description: user?.email ?? 'ไม่พบอีเมล',
-                        leading: SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: Icon(
-                            PhosphorIconsRegular.storefront,
-                            size: 24,
-                            color: colorScheme.foreground,
+                      );
+                    }),
+                    ...noRoles.map((Role role) {
+                      final roleLabel = switch (role) {
+                        Role.student => 'นักเรียน',
+                        Role.partner => 'ร้านค้า',
+                        Role.admin => 'ผู้ดูแลระบบ',
+                      };
+                      return ShadButton.ghost(
+                        onPressed: null,
+                        child: Text(
+                          'เพิ่มบทบาท$roleLabel',
+                          style: textTheme.custom['medium']?.copyWith(
+                            color: colorScheme.custom['info'],
                           ),
                         ),
-                        trailing: [
-                          (user?.lastActiveRole == Role.partner)
-                              ? Text(
-                                  'ปัจจุบัน',
-                                  style: textTheme.small.copyWith(
-                                    color: colorScheme.custom['success'],
-                                  ),
-                                  maxLines: 1,
-                                )
-                              : GestureDetector(
-                                  onTap: () {
-                                    // ref.read(userProvider.notifier).switchRole(Role.partner);
-                                  },
-                                  child: Text(
-                                    'สลับบทบาท',
-                                    style: textTheme.small.copyWith(
-                                      color: colorScheme.custom['info'],
-                                      decoration: TextDecoration.underline,
-                                      decorationColor:
-                                          colorScheme.custom['info'],
-                                    ),
-                                  ),
-                                ),
-                        ],
-                      ),
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()),
-                      error: (e, _) => Text('Error: $e'),
-                    ),
-                    userProfile.when(
-                      data: (user) => AppListTile(
-                        padding: EdgeInsets.zero,
-                        title: "ผู้ดูแลระบบ",
-                        titleStyle: textTheme.custom['medium']?.copyWith(
-                          color: colorScheme.foreground,
-                        ),
-                        description: user?.email ?? 'ไม่พบอีเมล',
-                        leading: SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: Icon(
-                            PhosphorIconsRegular.pipeWrench,
-                            size: 24,
-                            color: colorScheme.foreground,
-                          ),
-                        ),
-                        trailing: [
-                          (user?.lastActiveRole == Role.admin)
-                              ? Text(
-                                  'ปัจจุบัน',
-                                  style: textTheme.small.copyWith(
-                                    color: colorScheme.custom['success'],
-                                  ),
-                                  maxLines: 1,
-                                )
-                              : GestureDetector(
-                                  onTap: () {
-                                    // ref.read(userProvider.notifier).switchRole(Role.partner);
-                                  },
-                                  child: Text(
-                                    'สลับบทบาท',
-                                    style: textTheme.small.copyWith(
-                                      color: colorScheme.custom['info'],
-                                      decoration: TextDecoration.underline,
-                                      decorationColor:
-                                          colorScheme.custom['info'],
-                                    ),
-                                  ),
-                                ),
-                        ],
-                      ),
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()),
-                      error: (e, _) => Text('Error: $e'),
-                    ),
+                      );
+                    }),
                   ],
                 ),
               );
@@ -310,7 +250,15 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
               color: colorScheme.foreground,
             ),
           ),
-          onTap: () => ref.read(themeModeProvider.notifier).toggle(),
+          trailing: [
+            Text(
+              'แตะสองครั้ง',
+              style: textTheme.muted.copyWith(
+                color: colorScheme.mutedForeground.withValues(alpha: 0.5),
+              ),
+            ),
+          ],
+          onDoubleTap: () => ref.read(themeModeProvider.notifier).toggle(),
         ),
         // AppListTile(
         //   title: 'ภาษา',
@@ -360,103 +308,93 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
   void _showLogOutConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setState) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ShadDialog.alert(
-              title: Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: const Text('คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?'),
-              ),
-              actions: [
-                ShadButton.secondary(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('ยกเลิก'),
-                ),
-                ShadButton.destructive(
-                  onPressed: () {
-                    ref.read(authFirebaseRepositoryProvider).signOut();
-                    Navigator.of(ctx).pop();
-                  },
-                  child: const Text('ออกจากระบบ'),
-                ),
-              ],
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ShadDialog.alert(
+          title: Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: const Text('คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?'),
+          ),
+          actions: [
+            ShadButton.secondary(
+              onPressed: () => ctx.pop(),
+              child: const Text('ยกเลิก'),
             ),
-          );
-        },
+            ShadButton.destructive(
+              onPressed: () async {
+                await ref.read(authControllerProvider.notifier).signOut();
+                if (!ctx.mounted) return;
+                ctx.pop();
+              },
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final isLoading = ref.watch(authControllerProvider).isLoading;
+                  return isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('ออกจากระบบ');
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  // void _showAccountBottomSheet(BuildContext context) {
-  //   final user = ref.watch(userProfileProvider);
-  //   showModalBottomSheet(
-  //     context: context,
-  //     builder: (ctx) => SafeArea(
-  //       child: Container(
-  //         padding: const EdgeInsets.all(16),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             ListTile(
-  //               leading: const Icon(PhosphorIconsRegular.gear),
-  //               title: const Text('แก้ไขโปรไฟล์'),
-  //               onTap: () {
-  //                 Navigator.of(ctx).pop();
-  //               },
-  //             ),
-  //             user.when(
-  //               data: (user) {
-  //                 if (user?.roles.length == 1) {
-  //                   if (user!.roles.contains(Role.student)) {
-  //                     return ListTile(
-  //                       leading: const Icon(PhosphorIconsRegular.storefront),
-  //                       title: const Text('สร้างบัญชีร้านค้า'),
-  //                       onTap: () {
-  //                         Navigator.of(ctx).pop();
-  //                       },
-  //                     );
-  //                   } else if (user.roles.contains(Role.partner)) {
-  //                     return ListTile(
-  //                       leading: const Icon(PhosphorIconsRegular.graduationCap),
-  //                       title: const Text('สร้างบัญชีนักเรียน'),
-  //                       onTap: () {
-  //                         Navigator.of(ctx).pop();
-  //                       },
-  //                     );
-  //                   } else {
-  //                     return const SizedBox();
-  //                   }
-  //                 } else if (user?.lastActiveRole == Role.student) {
-  //                   return ListTile(
-  //                     leading: const Icon(PhosphorIconsRegular.storefront),
-  //                     title: const Text('สลับบัญชีร้านค้า'),
-  //                     onTap: () {
-  //                       Navigator.of(ctx).pop();
-  //                     },
-  //                   );
-  //                 } else if (user?.lastActiveRole == Role.partner) {
-  //                   return ListTile(
-  //                     leading: const Icon(PhosphorIconsRegular.graduationCap),
-  //                     title: const Text('สลับบัญชีนักเรียน'),
-  //                     onTap: () {
-  //                       Navigator.of(ctx).pop();
-  //                     },
-  //                   );
-  //                 } else {
-  //                   return const SizedBox();
-  //                 }
-  //               },
-  //               loading: () => const SizedBox(),
-  //               error: (e, trace) => const SizedBox(),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  void _showSwitchRoleConfirmationDialog(
+    BuildContext context,
+    String id,
+    Role role,
+  ) {
+    final roleLabel = switch (role) {
+      Role.student => 'นักเรียน',
+      Role.partner => 'ร้านค้า',
+      Role.admin => 'ผู้ดูแลระบบ',
+    };
+
+    showDialog(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ShadDialog.alert(
+          title: Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Text('ต้องการสลับบทบาทเป็น "$roleLabel" หรือไม่?'),
+          ),
+          actions: [
+            ShadButton.secondary(
+              onPressed: () => ctx.pop(),
+              child: const Text('ยกเลิก'),
+            ),
+            ShadButton(
+              onPressed: () async {
+                await ref
+                    .read(userFirestoreRepositoryProvider)
+                    .updateUserLastActiveRole(id, role);
+
+                if (!ctx.mounted) return;
+                ctx.pop();
+
+                final route = switch (role) {
+                  Role.student => '/student/home',
+                  Role.partner => '/partner/home',
+                  Role.admin => '/admin/home',
+                };
+
+                if (!context.mounted) return;
+                context.go(route);
+              },
+              child: const Text('สลับบทบาท'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return CommonAppbar(

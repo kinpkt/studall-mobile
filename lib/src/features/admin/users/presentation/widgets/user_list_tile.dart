@@ -96,7 +96,6 @@ class UserListTile extends ConsumerWidget {
                       } catch (e) {
                         if (context.mounted) {
                           Navigator.of(context).pop();
-
                           ShadToaster.of(context).show(
                             ShadToast.destructive(
                               title: const Text('เกิดข้อผิดพลาด'),
@@ -108,25 +107,22 @@ class UserListTile extends ConsumerWidget {
                     },
                   ),
                 ],
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: ShadSelect<bool>(
-                    placeholder: const Text('เลือกสถานะการแบน'),
-                    initialValue: currentBanStatus,
-                    options: [
-                      ShadOption<bool>(value: true, child: Text('แบน')),
-                      ShadOption<bool>(value: false, child: Text('ใช้งานได้')),
-                    ],
-                    selectedOptionBuilder: (context, value) =>
-                        Text(value ? 'แบน' : 'ใช้งานได้'),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          currentBanStatus = value;
-                        });
-                      }
-                    },
-                  ),
+                child: ShadSelect<bool>(
+                  placeholder: const Text('เลือกสถานะการแบน'),
+                  initialValue: currentBanStatus,
+                  options: [
+                    ShadOption<bool>(value: true, child: Text('แบน')),
+                    ShadOption<bool>(value: false, child: Text('ใช้งานได้')),
+                  ],
+                  selectedOptionBuilder: (context, value) =>
+                      Text(value ? 'แบน' : 'ใช้งานได้'),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        currentBanStatus = value;
+                      });
+                    }
+                  },
                 ),
               ),
             );
