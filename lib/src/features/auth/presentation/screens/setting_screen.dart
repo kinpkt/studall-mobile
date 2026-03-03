@@ -84,9 +84,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              (user?.username == null || user?.username == '')
+                              (user?.displayName == null || user?.displayName == '')
                                   ? 'ไม่พบชื่อ'
-                                  : user!.username,
+                                  : user!.displayName,
                               style: textTheme.custom['medium']?.copyWith(
                                 color: colorScheme.foreground,
                               ),

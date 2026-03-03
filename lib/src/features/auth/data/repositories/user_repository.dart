@@ -1,3 +1,4 @@
+import 'package:studall/src/features/auth/data/models/role.dart';
 import 'package:studall/src/features/auth/data/models/user_model.dart';
 
 abstract class UserRepository {
@@ -17,6 +18,12 @@ abstract class UserRepository {
 
   /// ดึงข้อมูลผู้ใช้ทั้งหมด
   Future<List<UserModel>> getAllUsers();
+
+  /// นับจำนวนผู้ใช้ทั้งหมดในระบบ
+  Future<int> getAllUsersCount();
+
+  /// นับจำนวนผู้ใช้ทั้งหมดที่มียศ
+  Future<int> getUsersCountByRole(Role role);
 
   /// อัปเดทข้อมูลสถานะการแบนของผู้ใช้
   Future<void> updateUserBanStatus(String uid, bool isBanned);
