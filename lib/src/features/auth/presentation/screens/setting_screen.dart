@@ -39,10 +39,10 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     // final shadows = theme.shadows;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
+        spacing: 16,
         children: [
-          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -54,9 +54,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
           GestureDetector(
-            onTap: () => _showAccountBottomSheet(context),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
@@ -115,16 +113,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                             width: 40,
                             height: 40,
                             child: Icon(
-                              PhosphorIconsRegular.arrowsClockwise,
-                              size: 24,
-                              color: colorScheme.mutedForeground,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 40,
-                            height: 40,
-                            child: Icon(
-                              PhosphorIconsRegular.gear,
+                              PhosphorIconsRegular.pencilSimpleLine,
                               size: 24,
                               color: colorScheme.mutedForeground,
                             ),
@@ -142,7 +131,184 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'บทบาท',
+                style: textTheme.custom['medium']?.copyWith(
+                  color: colorScheme.foreground,
+                ),
+              ),
+            ],
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: colorScheme.muted,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              spacing: 16,
+              children: [
+                user.when(
+                  data: (user) {
+                    return Row(
+                      children: [
+                        ShadAvatar(
+                          user?.photoUrl,
+                          size: const Size.square(40),
+                          backgroundColor: colorScheme.muted,
+                          placeholder: Text(
+                            'SA',
+                            style: textTheme.muted.copyWith(
+                              color: colorScheme.foreground,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                (user?.username == null || user?.username == '')
+                                    ? 'ไม่พบชื่อ'
+                                    : user!.username,
+                                style: textTheme.custom['medium']?.copyWith(
+                                  color: colorScheme.foreground,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                user?.email ?? 'ไม่พบอีเมล',
+                                style: textTheme.muted.copyWith(
+                                  color: colorScheme.mutedForeground,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                
+                        const SizedBox(width: 16),
+                
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          spacing: 8,
+                          children: [
+                            SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: Icon(
+                                PhosphorIconsRegular.arrowsClockwise,
+                                size: 24,
+                                color: colorScheme.mutedForeground,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: Icon(
+                                PhosphorIconsRegular.gear,
+                                size: 24,
+                                color: colorScheme.mutedForeground,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                  loading: () => const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (e, trace) =>
+                      Scaffold(body: Center(child: Text('Error: $e'))),
+                ),
+              
+                user.when(
+                  data: (user) {
+                    return Row(
+                      children: [
+                        ShadAvatar(
+                          user?.photoUrl,
+                          size: const Size.square(40),
+                          backgroundColor: colorScheme.muted,
+                          placeholder: Text(
+                            'SA',
+                            style: textTheme.muted.copyWith(
+                              color: colorScheme.foreground,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                (user?.username == null || user?.username == '')
+                                    ? 'ไม่พบชื่อ'
+                                    : user!.username,
+                                style: textTheme.custom['medium']?.copyWith(
+                                  color: colorScheme.foreground,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                user?.email ?? 'ไม่พบอีเมล',
+                                style: textTheme.muted.copyWith(
+                                  color: colorScheme.mutedForeground,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                
+                        const SizedBox(width: 16),
+                
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          spacing: 8,
+                          children: [
+                            SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: Icon(
+                                PhosphorIconsRegular.arrowsClockwise,
+                                size: 24,
+                                color: colorScheme.mutedForeground,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: Icon(
+                                PhosphorIconsRegular.gear,
+                                size: 24,
+                                color: colorScheme.mutedForeground,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                  loading: () => const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (e, trace) =>
+                      Scaffold(body: Center(child: Text('Error: $e'))),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -293,74 +459,74 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     );
   }
 
-  void _showAccountBottomSheet(BuildContext context) {
-    final user = ref.watch(userProfileProvider);
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(PhosphorIconsRegular.gear),
-                title: const Text('แก้ไขโปรไฟล์'),
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                },
-              ),
-              user.when(
-                data: (user) {
-                  if (user?.roles.length == 1) {
-                    if (user!.roles.contains(Role.student)) {
-                      return ListTile(
-                        leading: const Icon(PhosphorIconsRegular.storefront),
-                        title: const Text('สร้างบัญชีร้านค้า'),
-                        onTap: () {
-                          Navigator.of(ctx).pop();
-                        },
-                      );
-                    } else if (user.roles.contains(Role.partner)) {
-                      return ListTile(
-                        leading: const Icon(PhosphorIconsRegular.graduationCap),
-                        title: const Text('สร้างบัญชีนักเรียน'),
-                        onTap: () {
-                          Navigator.of(ctx).pop();
-                        },
-                      );
-                    } else {
-                      return const SizedBox();
-                    }
-                  } else if (user?.lastActiveRole == Role.student) {
-                    return ListTile(
-                      leading: const Icon(PhosphorIconsRegular.storefront),
-                      title: const Text('สลับบัญชีร้านค้า'),
-                      onTap: () {
-                        Navigator.of(ctx).pop();
-                      },
-                    );
-                  } else if (user?.lastActiveRole == Role.partner) {
-                    return ListTile(
-                      leading: const Icon(PhosphorIconsRegular.graduationCap),
-                      title: const Text('สลับบัญชีนักเรียน'),
-                      onTap: () {
-                        Navigator.of(ctx).pop();
-                      },
-                    );
-                  } else {
-                    return const SizedBox();
-                  }
-                },
-                loading: () => const SizedBox(),
-                error: (e, trace) => const SizedBox(),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  // void _showAccountBottomSheet(BuildContext context) {
+  //   final user = ref.watch(userProfileProvider);
+  //   showModalBottomSheet(
+  //     context: context,
+  //     builder: (ctx) => SafeArea(
+  //       child: Container(
+  //         padding: const EdgeInsets.all(16),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             ListTile(
+  //               leading: const Icon(PhosphorIconsRegular.gear),
+  //               title: const Text('แก้ไขโปรไฟล์'),
+  //               onTap: () {
+  //                 Navigator.of(ctx).pop();
+  //               },
+  //             ),
+  //             user.when(
+  //               data: (user) {
+  //                 if (user?.roles.length == 1) {
+  //                   if (user!.roles.contains(Role.student)) {
+  //                     return ListTile(
+  //                       leading: const Icon(PhosphorIconsRegular.storefront),
+  //                       title: const Text('สร้างบัญชีร้านค้า'),
+  //                       onTap: () {
+  //                         Navigator.of(ctx).pop();
+  //                       },
+  //                     );
+  //                   } else if (user.roles.contains(Role.partner)) {
+  //                     return ListTile(
+  //                       leading: const Icon(PhosphorIconsRegular.graduationCap),
+  //                       title: const Text('สร้างบัญชีนักเรียน'),
+  //                       onTap: () {
+  //                         Navigator.of(ctx).pop();
+  //                       },
+  //                     );
+  //                   } else {
+  //                     return const SizedBox();
+  //                   }
+  //                 } else if (user?.lastActiveRole == Role.student) {
+  //                   return ListTile(
+  //                     leading: const Icon(PhosphorIconsRegular.storefront),
+  //                     title: const Text('สลับบัญชีร้านค้า'),
+  //                     onTap: () {
+  //                       Navigator.of(ctx).pop();
+  //                     },
+  //                   );
+  //                 } else if (user?.lastActiveRole == Role.partner) {
+  //                   return ListTile(
+  //                     leading: const Icon(PhosphorIconsRegular.graduationCap),
+  //                     title: const Text('สลับบัญชีนักเรียน'),
+  //                     onTap: () {
+  //                       Navigator.of(ctx).pop();
+  //                     },
+  //                   );
+  //                 } else {
+  //                   return const SizedBox();
+  //                 }
+  //               },
+  //               loading: () => const SizedBox(),
+  //               error: (e, trace) => const SizedBox(),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return CommonAppbar(
