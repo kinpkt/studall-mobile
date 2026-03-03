@@ -12,20 +12,6 @@ import 'package:studall/src/features/student/notes/presentation/widgets/notes_ta
 class StudentNotesScreen extends ConsumerWidget {
   const StudentNotesScreen({super.key});
 
-  Widget _buildSearchBar(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: ShadInput(
-        decoration: const ShadDecoration(
-          secondaryFocusedBorder: ShadBorder.none,
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        placeholder: const Text('ค้นหาโน้ต'),
-        leading: Icon(PhosphorIconsRegular.magnifyingGlass, size: 20),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ShadTheme.of(context);
@@ -54,23 +40,23 @@ class StudentNotesScreen extends ConsumerWidget {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
-            
+
                 if (snapshot.hasError) {
                   return Center(
                     child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'),
                   );
                 }
-            
+
                 final notes = snapshot.data ?? [];
-            
+
                 if (notes.isEmpty) {
                   return const Center(child: Text('ยังไม่มีโน้ต'));
                 }
-            
+
                 // final pinnedNotes = notes
                 //     .where((note) => note.isPinned)
                 //     .toList();
-            
+
                 return SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +68,7 @@ class StudentNotesScreen extends ConsumerWidget {
                         ),
                         child: Text('ล่าสุด', style: theme.textTheme.h4),
                       ),
-            
+
                       // TODO: Filter notes for 'ล่าสุด'
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -91,10 +77,10 @@ class StudentNotesScreen extends ConsumerWidget {
                         ),
                         child: Text('ปักหมุด', style: theme.textTheme.h4),
                       ),
+
                       // ...pinnedNotes.map(
                       //   (note) => NotesListTile(note: note),
                       // ),
-            
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
@@ -110,6 +96,20 @@ class StudentNotesScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: ShadInput(
+        decoration: const ShadDecoration(
+          secondaryFocusedBorder: ShadBorder.none,
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        placeholder: const Text('ค้นหาโน้ต'),
+        leading: Icon(PhosphorIconsRegular.magnifyingGlass, size: 20),
       ),
     );
   }

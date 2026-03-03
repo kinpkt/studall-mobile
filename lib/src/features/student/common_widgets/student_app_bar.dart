@@ -38,7 +38,7 @@ class StudentAppbar extends ConsumerStatefulWidget
   ConsumerState<StudentAppbar> createState() => _StudentAppbarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(92);
+  Size get preferredSize => const Size.fromHeight(94);
 }
 
 class _StudentAppbarState extends ConsumerState<StudentAppbar>
@@ -138,8 +138,8 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
     final user = ref.watch(userProfileProvider);
     return Container(
       color: colorScheme.background,
-      constraints: const BoxConstraints(minHeight: 92),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      constraints: const BoxConstraints(minHeight: 64),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

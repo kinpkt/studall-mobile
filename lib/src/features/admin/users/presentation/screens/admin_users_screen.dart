@@ -20,8 +20,17 @@ class AdminUsersScreen extends ConsumerStatefulWidget {
 
 class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   final _searchBarController = TextEditingController();
+  final popoverController = ShadPopoverController();
+
+  Map<String, String> roleLabels = {
+    'all': 'ทั้งหมด',
+    'student': 'นักเรียน',
+    'partner': 'ร้านค้า',
+    'admin': 'แอดมิน',
+  };
+
   String _searchQuery = '';
-  String _selectedRole = 'All';
+  String _selectedRole = 'all';
 
   @override
   void initState() {
@@ -36,6 +45,8 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   @override
   void dispose() {
     _searchBarController.dispose();
+    popoverController.dispose();
+
     super.dispose();
   }
 
@@ -44,94 +55,105 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
     final theme = ShadTheme.of(context);
     final usersAsyncValue = ref.watch(usersProvider);
 
-    return Scaffold(
-      body: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('ผู้ใช้งานในระบบ', style: theme.textTheme.h2,),
-              const SizedBox(height: 16,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: ShadInput(
-                      placeholder: Text('กรอกชื่อผู้ใช้...'),
-                      controller: _searchBarController,
-                    )
-                  ),
-                  PopupMenuButton<String>(
-                    icon: Icon(PhosphorIconsRegular.funnel),
-                    tooltip: 'กรองผู้ใช้งาน',
-                    onSelected: (String newValue) {
-                      setState(() {
-                        _selectedRole = newValue;
-                      });
-                    },
-                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                      CheckedPopupMenuItem<String>(
-                        value: 'All',
-                        checked: _selectedRole == 'All',
-                        child: Text('ทั้งหมด', style: theme.textTheme.p),
-                      ),
-                      CheckedPopupMenuItem<String>(
-                        value: 'Admin',
-                        checked: _selectedRole == 'Admin',
-                        child: Text('แอดมิน', style: theme.textTheme.p),
-                      ),
-                      CheckedPopupMenuItem<String>(
-                        value: 'Student',
-                        checked: _selectedRole == 'Student',
-                        child: Text('นักเรียน', style: theme.textTheme.p),
-                      ),
-                      CheckedPopupMenuItem<String>(
-                        value: 'Partner',
-                        checked: _selectedRole == 'Partner',
-                        child: Text('ร้านค้า', style: theme.textTheme.p),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-              if (_selectedRole != 'All')
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Text(
-                    'กรองโดย: $_selectedRole',
-                    style: theme.textTheme.small.copyWith(color: theme.colorScheme.mutedForeground),
-                  ),
+    return SizedBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 16),
+          _buildSearchBar(context),
+          if (_selectedRole != 'all')
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+              child: Text(
+                'กรองโดย: ${roleLabels[_selectedRole]}',
+                style: theme.textTheme.small.copyWith(
+                  color: theme.colorScheme.mutedForeground,
                 ),
-              const SizedBox(height: 8,),
-              Expanded(
-                child: usersAsyncValue.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) => Text('เกิดข้อผิดพลาด: $error', style: theme.textTheme.p,),
-                  data: (users) {
-                    final filteredUsers = users.where((user) {
-                      final displayName = user.displayName.toLowerCase();
-                      final matchesSearch = displayName.contains(_searchQuery);
+              ),
+            ),
+          Expanded(
+            child: usersAsyncValue.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) =>
+                  Text('เกิดข้อผิดพลาด: $error', style: theme.textTheme.p),
+              data: (users) {
+                final filteredUsers = users.where((user) {
+                  final displayName = user.displayName.toLowerCase();
+                  final matchesSearch = displayName.contains(_searchQuery);
 
-                      final matchesRole = _selectedRole == 'All' || user.lastActiveRole?.name == _selectedRole.toLowerCase();
+                  final matchesRole =
+                      _selectedRole == 'all' ||
+                      user.lastActiveRole?.name == _selectedRole.toLowerCase();
 
-                      return matchesSearch && matchesRole;
-                    }).toList();
+                  return matchesSearch && matchesRole;
+                }).toList();
 
-                    if (filteredUsers.isEmpty) {
-                      return Text('ไม่พบผู้ใช้ที่ตรงกับการค้นหา', style: theme.textTheme.p,);
-                    }
+                if (filteredUsers.isEmpty) {
+                  return Text(
+                    'ไม่พบผู้ใช้ที่ตรงกับการค้นหา',
+                    style: theme.textTheme.p,
+                  );
+                }
 
-                    return ListView.builder(
-                      itemCount: filteredUsers.length,
-                      itemBuilder: (context, index) {
-                        return UserListTile(user: filteredUsers[index]);
-                      },
-                    );
+                return ListView.builder(
+                  itemCount: filteredUsers.length,
+                  itemBuilder: (context, index) {
+                    return UserListTile(user: filteredUsers[index]);
                   },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    final textTheme = theme.textTheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ShadInput(
+        controller: _searchBarController,
+        decoration: const ShadDecoration(
+          secondaryFocusedBorder: ShadBorder.none,
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        placeholder: const Text('ค้นหาผู้ใช้งาน'),
+        leading: Icon(PhosphorIconsRegular.magnifyingGlass, size: 20),
+        trailing: MenuAnchor(
+          reservedPadding: const EdgeInsets.all(16),
+          menuChildren: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+              child: Text(
+                'ตัวกรองโดยบทบาท',
+                style: textTheme.small.copyWith(
+                  color: theme.colorScheme.mutedForeground,
                 ),
               ),
-            ],
+            ),
+            ...roleLabels.entries.map((entry) {
+              final value = entry.key;
+              final label = entry.value;
+              return MenuItemButton(
+                leadingIcon: _selectedRole == value
+                    ? Icon(PhosphorIconsRegular.check, size: 16)
+                    : const SizedBox(width: 16),
+                onPressed: () => setState(() => _selectedRole = value),
+                child: Text(label, style: theme.textTheme.p),
+              );
+            }),
+          ],
+          builder: (context, controller, child) => GestureDetector(
+            onTap: () =>
+                controller.isOpen ? controller.close() : controller.open(),
+            child: Icon(PhosphorIconsRegular.sliders, size: 20),
           ),
         ),
       ),

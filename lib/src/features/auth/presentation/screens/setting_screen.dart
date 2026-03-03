@@ -69,11 +69,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                         user?.photoUrl,
                         size: const Size.square(40),
                         backgroundColor: colorScheme.muted,
-                        placeholder: Text(
-                          'SA',
-                          style: textTheme.muted.copyWith(
-                            color: colorScheme.foreground,
-                          ),
+                        placeholder: Icon(
+                          PhosphorIconsRegular.user,
+                          color: colorScheme.foreground,
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -82,7 +80,8 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              (user?.displayName == null || user?.displayName == '')
+                              (user?.displayName == null ||
+                                      user?.displayName == '')
                                   ? 'ไม่พบชื่อ'
                                   : user!.displayName,
                               style: textTheme.custom['medium']?.copyWith(
@@ -159,11 +158,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                           user?.photoUrl,
                           size: const Size.square(40),
                           backgroundColor: colorScheme.muted,
-                          placeholder: Text(
-                            'SA',
-                            style: textTheme.muted.copyWith(
-                              color: colorScheme.foreground,
-                            ),
+                          placeholder: Icon(
+                            PhosphorIconsRegular.user,
+                            color: colorScheme.foreground,
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -172,9 +169,10 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                (user?.username == null || user?.username == '')
+                                (user?.displayName == null ||
+                                        user?.displayName == '')
                                     ? 'ไม่พบชื่อ'
-                                    : user!.username,
+                                    : user!.displayName,
                                 style: textTheme.custom['medium']?.copyWith(
                                   color: colorScheme.foreground,
                                 ),
@@ -192,9 +190,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                             ],
                           ),
                         ),
-                
+
                         const SizedBox(width: 16),
-                
+
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           spacing: 8,
@@ -228,7 +226,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                   error: (e, trace) =>
                       Scaffold(body: Center(child: Text('Error: $e'))),
                 ),
-              
+
                 user.when(
                   data: (user) {
                     return Row(
@@ -250,9 +248,10 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                (user?.username == null || user?.username == '')
+                                (user?.displayName == null ||
+                                        user?.displayName == '')
                                     ? 'ไม่พบชื่อ'
-                                    : user!.username,
+                                    : user!.displayName,
                                 style: textTheme.custom['medium']?.copyWith(
                                   color: colorScheme.foreground,
                                 ),
@@ -270,9 +269,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                             ],
                           ),
                         ),
-                
+
                         const SizedBox(width: 16),
-                
+
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           spacing: 8,
@@ -434,7 +433,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
   void _showLogOutConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => Padding(
+      builder: (ctx) => Padding(
         padding: const EdgeInsets.all(16.0),
         child: ShadDialog.alert(
           title: Padding(
@@ -443,13 +442,13 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
           ),
           actions: [
             ShadButton.secondary(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(ctx).pop(),
               child: const Text('ยกเลิก'),
             ),
             ShadButton.destructive(
               onPressed: () {
                 ref.read(authFirebaseRepositoryProvider).signOut();
-                Navigator.of(context).pop();
+                Navigator.of(ctx).pop();
               },
               child: const Text('ออกจากระบบ'),
             ),

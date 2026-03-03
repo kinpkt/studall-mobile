@@ -53,6 +53,7 @@ class StudentLayoutScreen extends ConsumerWidget {
       showNextEvent: currentIndex == 0,
       showSubtitle: currentIndex != 4,
       pageTitle: title,
+      onProfileTap: () => context.push('/setting'),
       actions: [
         ShadIconButton.outline(
           iconSize: 24,

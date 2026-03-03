@@ -15,10 +15,11 @@ final appThemeLight = ShadThemeData(
     constraints: BoxConstraints(minWidth: 370),
     padding: const EdgeInsets.all(16),
     radius: BorderRadius.circular(12),
-    titleStyle: appTextStyle.lead.copyWith(
+    titleStyle: appTextStyle.h4.copyWith(
       color: AppColorScheme.lightScheme.foreground,
     ),
     titleTextAlign: TextAlign.left,
+    descriptionTextAlign: TextAlign.left,
     backgroundColor: AppColorScheme.lightScheme.background,
     actionsAxis: Axis.horizontal,
     actionsMainAxisAlignment: MainAxisAlignment.end,
@@ -34,6 +35,26 @@ final appThemeDark = ShadThemeData(
   colorScheme: AppColorScheme.darkScheme,
   textTheme: appTextStyle,
   inputTheme: appInputTheme,
+  buttonSizesTheme: ShadButtonSizesTheme(
+    icon: ShadButtonSizeTheme(height: 40, padding: EdgeInsets.all(8)),
+  ),
+  alertDialogTheme: ShadDialogTheme(
+    constraints: BoxConstraints(minWidth: 370),
+    padding: const EdgeInsets.all(16),
+    radius: BorderRadius.circular(12),
+    titleStyle: appTextStyle.lead.copyWith(
+      color: AppColorScheme.darkScheme.foreground,
+    ),
+    titleTextAlign: TextAlign.left,
+    descriptionTextAlign: TextAlign.left,
+    backgroundColor: AppColorScheme.darkScheme.background,
+    actionsAxis: Axis.horizontal,
+    actionsMainAxisAlignment: MainAxisAlignment.end,
+    expandActionsWhenTiny: false,
+    removeBorderRadiusWhenTiny: false,
+    mainAxisAlignment: MainAxisAlignment.start,
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+  ),
 );
 
 final appTextStyle = ShadTextTheme(
