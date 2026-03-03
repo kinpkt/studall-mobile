@@ -278,8 +278,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/admin/approve',
-                builder: (_, _) => const AdminApprovalScreen(),
+                path: '/admin/users',
+                builder: (_, _) => const AdminUsersScreen(),
               ),
             ],
           ),
@@ -287,8 +287,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/admin/users',
-                builder: (_, _) => const AdminUsersScreen(),
+                path: '/admin/approve',
+                builder: (_, _) => const AdminApprovalScreen(),
               ),
             ],
           ),
