@@ -107,7 +107,6 @@ class StudentNotesScreen extends ConsumerWidget {
         decoration: const ShadDecoration(
           secondaryFocusedBorder: ShadBorder.none,
         ),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         placeholder: const Text('ค้นหาโน้ต'),
         leading: Icon(PhosphorIconsRegular.magnifyingGlass, size: 20),
       ),

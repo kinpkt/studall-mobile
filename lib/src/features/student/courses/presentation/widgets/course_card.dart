@@ -25,6 +25,7 @@ class CourseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
     return GestureDetector(
       onTap: enabled && onTap != null ? onTap : null,
@@ -71,13 +72,8 @@ class CourseCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               course.name,
-                              style: TextStyle(
-                                fontFamily: 'Google Sans',
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                height: 28 / 20,
-                                letterSpacing: -0.5,
-                                color: colorScheme.secondaryForeground,
+                              style: textTheme.h4.copyWith(
+                                color: colorScheme.foreground,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -98,23 +94,16 @@ class CourseCard extends StatelessWidget {
                               children: [
                                 Text(
                                   course.description ?? '',
-                                  style: TextStyle(
-                                    fontFamily: 'Google Sans',
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    height: 20 / 14,
+                                  style: textTheme.muted.copyWith(
                                     color: colorScheme.mutedForeground,
                                   ),
                                 ),
                                 Text(
                                   course.teacherName ?? '',
-                                  style: TextStyle(
-                                    fontFamily: 'Google Sans',
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    height: 20 / 14,
-                                    color: colorScheme.secondaryForeground,
+                                  style: textTheme.muted.copyWith(
+                                    color: colorScheme.foreground,
                                   ),
+
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),

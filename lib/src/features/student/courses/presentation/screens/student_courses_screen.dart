@@ -14,19 +14,14 @@ class StudentCoursesScreen extends ConsumerWidget {
   const StudentCoursesScreen({super.key});
 
   void _showAddCourseModal(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AddEditCourseModal();
-      },
-    );
+    showDialog(context: context, builder: (_) => const AddEditCourseModal());
   }
 
-  Widget _inlineIconButton({
-    required BuildContext context,
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
+  Widget _iconButton(
+    BuildContext context,
+    IconData icon,
+    VoidCallback onPressed,
+  ) {
     final theme = ShadTheme.of(context);
     return ShadIconButton.ghost(
       onPressed: onPressed,
@@ -34,7 +29,7 @@ class StudentCoursesScreen extends ConsumerWidget {
       height: 24,
       foregroundColor: theme.colorScheme.mutedForeground,
       iconSize: 20,
-      padding: EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
     );
   }
 
@@ -63,20 +58,16 @@ class StudentCoursesScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Text(
-                    'วิชา',
-                    style: textTheme.custom['medium']?.copyWith(
-                      color: colorScheme.foreground,
-                    ),
-                  ),
-                ],
+              Text(
+                'วิชา',
+                style: textTheme.custom['medium']?.copyWith(
+                  color: colorScheme.foreground,
+                ),
               ),
-              _inlineIconButton(
-                context: context,
-                icon: PhosphorIconsBold.plus,
-                onPressed: () => _showAddCourseModal(context),
+              _iconButton(
+                context,
+                PhosphorIconsBold.plus,
+                () => _showAddCourseModal(context),
               ),
             ],
           ),
@@ -99,6 +90,7 @@ class StudentCoursesScreen extends ConsumerWidget {
 
                 return SingleChildScrollView(
                   child: Column(
+                    spacing: 16,
                     children: [
                       ...courses.map((course) => CourseCard(course: course)),
                     ],

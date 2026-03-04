@@ -62,7 +62,7 @@ final appTextStyle = ShadTextTheme(
 );
 
 final appInputTheme = ShadInputTheme(
-  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
   style: appTextStyle.custom['medium']?.copyWith(
     color: AppColorScheme.lightScheme.foreground,
     fontWeight: FontWeight.w400,
