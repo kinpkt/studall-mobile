@@ -70,40 +70,6 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
     return null;
   }
 
-  // Future<void> _handleSignup() async {
-  //   if (_formKey.currentState?.validate() ?? false) {
-  //     await ref
-  //         .read(authControllerProvider.notifier)
-  //         .signUpWithEmail(
-  //           email: _emailController.text.trim(),
-  //           password: _passwordController.text,
-  //           displayName: _nameController.text.trim(),
-  //         );
-  //
-  //     if (mounted) {
-  //       final error = ref.read(authControllerProvider).error;
-  //       if (error != null) {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(content: Text(error), backgroundColor: Colors.red),
-  //         );
-  //       }
-  //     }
-  //   }
-  // }
-  //
-  // Future<void> _handleGoogleSignIn() async {
-  //   await ref.read(authControllerProvider.notifier).signInWithGoogle();
-  //
-  //   if (mounted) {
-  //     final error = ref.read(authControllerProvider).error;
-  //     if (error != null) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text(error), backgroundColor: Colors.red),
-  //       );
-  //     }
-  //   }
-  // }
-
   void _navigateToLogin() {
     context.go('/login');
   }

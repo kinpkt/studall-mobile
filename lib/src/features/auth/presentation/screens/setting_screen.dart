@@ -38,6 +38,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    late List<Role> noRoles, roles;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -107,8 +108,8 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
           ),
           userProfile.when(
             data: (user) {
-              final List<Role> roles = user?.roles ?? [];
-              final List<Role> noRoles = Role.values
+              roles = user?.roles ?? [];
+              noRoles = Role.values
                   .where((r) => (!roles.contains(r) && r != Role.admin))
                   .toList();
               return Container(
@@ -180,22 +181,6 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                         ],
                       );
                     }),
-                    ...noRoles.map((Role role) {
-                      final roleLabel = switch (role) {
-                        Role.student => 'นักเรียน',
-                        Role.partner => 'ร้านค้า',
-                        Role.admin => 'ผู้ดูแลระบบ',
-                      };
-                      return ShadButton.ghost(
-                        onPressed: null,
-                        child: Text(
-                          'เพิ่มบทบาท$roleLabel',
-                          style: textTheme.custom['medium']?.copyWith(
-                            color: colorScheme.custom['info'],
-                          ),
-                        ),
-                      );
-                    }),
                   ],
                 ),
               );
@@ -203,6 +188,22 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Text('Error: $e'),
           ),
+          ...noRoles.map((Role role) {
+            final roleLabel = switch (role) {
+              Role.student => 'นักเรียน',
+              Role.partner => 'ร้านค้า',
+              Role.admin => 'ผู้ดูแลระบบ',
+            };
+            return ShadButton.ghost(
+              onPressed: null,
+              child: Text(
+                'เพิ่มบทบาท$roleLabel',
+                style: textTheme.custom['medium']?.copyWith(
+                  color: colorScheme.custom['info'],
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );

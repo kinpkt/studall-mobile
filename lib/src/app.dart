@@ -6,6 +6,7 @@ import 'package:studall/src/core/theme/app_theme.dart';
 import 'package:studall/src/core/theme/theme_provider.dart';
 import 'package:studall/src/core/theme/material_theme_builder.dart';
 import 'package:studall/src/core/routes/app_router.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -13,7 +14,6 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
-    // GoRouter instance – redirect logic handles auth/role routing.
     final router = ref.watch(routerProvider);
 
     return ShadApp.router(
@@ -24,7 +24,12 @@ class MyApp extends ConsumerWidget {
       materialThemeBuilder: (context, theme) =>
           materialThemeBuilder(context, theme),
       routerConfig: router,
-      localizationsDelegates: const [FlutterQuillLocalizations.delegate],
+      localizationsDelegates: const [
+        FlutterQuillLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       supportedLocales: const [Locale('en', 'US'), Locale('th', 'TH')],
     );
   }

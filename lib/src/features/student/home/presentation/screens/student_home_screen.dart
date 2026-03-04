@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/core/constants/constants.dart';
 import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
 import 'package:studall/src/features/student/home/presentation/widgets/recent_card.dart';
@@ -58,17 +59,19 @@ class StudentHomeScreen extends StatelessWidget {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Container(
-      color: colorScheme.background,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
-          Schedule(scheduleItems: sampleSchedule, height: 208),
-          const SizedBox(height: 16),
-          // _buildRecentContent(context, items),
-          // _buildTaskList(context, demoTasks),
-        ],
+    return SingleChildScrollView(
+      child: Container(
+        color: colorScheme.background,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            Schedule(scheduleItems: sampleSchedule, height: 208),
+            const SizedBox(height: 16),
+            _buildRecentContent(context, kDEMORECENTITEMS),
+            _buildTaskList(context, kDEMOTASKTILES),
+          ],
+        ),
       ),
     );
   }

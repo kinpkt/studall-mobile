@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:studall/src/core/theme/input_theme.dart';
 import 'package:studall/src/core/theme/color_scheme.dart';
 
 final appThemeLight = ShadThemeData(
@@ -11,50 +10,22 @@ final appThemeLight = ShadThemeData(
   buttonSizesTheme: ShadButtonSizesTheme(
     icon: ShadButtonSizeTheme(height: 40, padding: EdgeInsets.all(8)),
   ),
-  alertDialogTheme: ShadDialogTheme(
-    constraints: BoxConstraints(minWidth: 370),
-    padding: const EdgeInsets.all(16),
-    radius: BorderRadius.circular(12),
-    titleStyle: appTextStyle.h4.copyWith(
-      color: AppColorScheme.lightScheme.foreground,
-    ),
-    titleTextAlign: TextAlign.left,
-    descriptionTextAlign: TextAlign.left,
-    backgroundColor: AppColorScheme.lightScheme.background,
-    actionsAxis: Axis.horizontal,
-    actionsMainAxisAlignment: MainAxisAlignment.end,
-    expandActionsWhenTiny: false,
-    removeBorderRadiusWhenTiny: false,
-    mainAxisAlignment: MainAxisAlignment.start,
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-  ),
+  primaryDialogTheme: appDialogTheme,
+  alertDialogTheme: appDialogTheme,
+  selectTheme: appSelectTheme,
 );
 
 final appThemeDark = ShadThemeData(
   brightness: Brightness.dark,
   colorScheme: AppColorScheme.darkScheme,
   textTheme: appTextStyle,
-  inputTheme: appInputTheme,
+  inputTheme: appInputDarkTheme,
   buttonSizesTheme: ShadButtonSizesTheme(
     icon: ShadButtonSizeTheme(height: 40, padding: EdgeInsets.all(8)),
   ),
-  alertDialogTheme: ShadDialogTheme(
-    constraints: BoxConstraints(minWidth: 370),
-    padding: const EdgeInsets.all(16),
-    radius: BorderRadius.circular(12),
-    titleStyle: appTextStyle.lead.copyWith(
-      color: AppColorScheme.darkScheme.foreground,
-    ),
-    titleTextAlign: TextAlign.left,
-    descriptionTextAlign: TextAlign.left,
-    backgroundColor: AppColorScheme.darkScheme.background,
-    actionsAxis: Axis.horizontal,
-    actionsMainAxisAlignment: MainAxisAlignment.end,
-    expandActionsWhenTiny: false,
-    removeBorderRadiusWhenTiny: false,
-    mainAxisAlignment: MainAxisAlignment.start,
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-  ),
+  primaryDialogTheme: appDialogDarkTheme,
+  alertDialogTheme: appDialogDarkTheme,
+  selectTheme: appSelectDarkTheme,
 );
 
 final appTextStyle = ShadTextTheme(
@@ -88,4 +59,68 @@ final appTextStyle = ShadTextTheme(
       letterSpacing: 0,
     ),
   },
+);
+
+final appInputTheme = ShadInputTheme(
+  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+  style: appTextStyle.custom['medium']?.copyWith(
+    color: AppColorScheme.lightScheme.foreground,
+    fontWeight: FontWeight.w400,
+  ),
+  placeholderStyle: appTextStyle.custom['medium']?.copyWith(
+    color: AppColorScheme.lightScheme.mutedForeground,
+    fontWeight: FontWeight.w400,
+  ),
+);
+
+final appInputDarkTheme = appInputTheme.copyWith(
+  style: appTextStyle.custom['medium']?.copyWith(
+    color: AppColorScheme.darkScheme.foreground,
+    fontWeight: FontWeight.w400,
+  ),
+  placeholderStyle: appTextStyle.custom['medium']?.copyWith(
+    color: AppColorScheme.darkScheme.mutedForeground,
+    fontWeight: FontWeight.w400,
+  ),
+);
+
+final appDialogTheme = ShadDialogTheme(
+  constraints: BoxConstraints(minWidth: 370),
+  padding: const EdgeInsets.all(16),
+  radius: BorderRadius.circular(12),
+  titleStyle: appTextStyle.h4.copyWith(
+    color: AppColorScheme.lightScheme.foreground,
+  ),
+  titleTextAlign: TextAlign.left,
+  descriptionTextAlign: TextAlign.left,
+  backgroundColor: AppColorScheme.lightScheme.background,
+  actionsAxis: Axis.horizontal,
+  actionsMainAxisAlignment: MainAxisAlignment.end,
+  expandActionsWhenTiny: false,
+  removeBorderRadiusWhenTiny: false,
+  mainAxisAlignment: MainAxisAlignment.start,
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  scrollPadding: EdgeInsets.only(bottom: 16),
+);
+
+final appDialogDarkTheme = appDialogTheme.copyWith(
+  titleStyle: appTextStyle.h4.copyWith(
+    color: AppColorScheme.darkScheme.foreground,
+  ),
+  backgroundColor: AppColorScheme.darkScheme.background,
+);
+
+final appSelectTheme = ShadSelectTheme(
+  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+  placeholderStyle: appTextStyle.custom['medium']?.copyWith(
+    color: AppColorScheme.lightScheme.mutedForeground,
+    fontWeight: FontWeight.w400,
+  ),
+);
+
+final appSelectDarkTheme = appSelectTheme.copyWith(
+  placeholderStyle: appTextStyle.custom['medium']?.copyWith(
+    color: AppColorScheme.darkScheme.mutedForeground,
+    fontWeight: FontWeight.w400,
+  ),
 );

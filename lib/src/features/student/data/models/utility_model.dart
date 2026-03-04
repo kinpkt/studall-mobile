@@ -1,15 +1,18 @@
 import 'package:uuid/uuid.dart';
 
 enum UtilityType {
-  work, // ภาระงานที่ต้องทำ
-  material // แหล่งเรียนรู้ต่าง ๆ (ชีท, จดบันทึก, ภาพกระดาน)
+  assignment,
+  shortAnswerQuestion,
+  multipleChoiceQuestion,
+  material,
+  event,
 }
 
 class UtilityModel {
   final String id;
   final String? courseId;
   final UtilityType type;
-  final String title;
+  final String? title;
   final String? description;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -21,7 +24,7 @@ class UtilityModel {
     String? id,
     this.courseId,
     required this.type,
-    required this.title,
+    this.title,
     this.description,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -35,7 +38,7 @@ class UtilityModel {
       id: data['id'] as String,
       courseId: data['courseId'] as String?,
       type: UtilityType.values.byName(data['type'] as String),
-      title: data['title'] as String,
+      title: data['title'] as String?,
       description: data['description'] as String?,
       createdAt: data['createdAt'].toDate(),
       updatedAt: data['updatedAt'].toDate(),
