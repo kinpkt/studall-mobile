@@ -10,6 +10,7 @@ import 'package:studall/src/features/auth/presentation/controllers/user_profile_
 import 'package:studall/src/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:studall/src/features/auth/data/repositories/user_firestore_repository.dart';
 import 'package:studall/src/features/auth/data/models/role.dart';
+import 'package:studall/src/features/student/data/repositories/student_firestore_repository.dart';
 
 class SettingScreen extends ConsumerStatefulWidget {
   const SettingScreen({super.key});
@@ -19,20 +20,6 @@ class SettingScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingScreenState extends ConsumerState<SettingScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: Column(
-        children: [
-          _buildProfileSettingSection(context),
-          _buildGeneralSettingSection(context),
-          _buildBottomActionSection(context),
-        ],
-      ),
-    );
-  }
-
   Widget _buildProfileSettingSection(BuildContext context) {
     final userProfile = ref.watch(userProfileProvider);
     final theme = ShadTheme.of(context);
@@ -282,6 +269,72 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     );
   }
 
+  Widget _buildStudentOnlySettingSection(BuildContext context, String id) {
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final studentSettingsAsync = ref.watch(studentSettingsProvider(id));
+
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'นักเรียน',
+                style: textTheme.custom['medium']?.copyWith(
+                  color: colorScheme.foreground,
+                ),
+              ),
+            ],
+          ),
+        ),
+        studentSettingsAsync.when(
+          data: (studentSettings) {
+            // Assuming 2000 is in meters. We convert it to km for display.
+            final currentRadiusMeters = studentSettings?.radius ?? 2000.0;
+            final displayRadiusKm = currentRadiusMeters / 1000;
+
+            return AppListTile(
+              title: 'รัศมีร้านใกล้ฉัน',
+              titleStyle: textTheme.custom['medium']?.copyWith(
+                color: colorScheme.foreground,
+              ),
+              description: 'รัศมีการค้นหาร้านใกล้ฉัน (${displayRadiusKm.toStringAsFixed(1)} km)',
+              leading: SizedBox(
+                width: 40,
+                height: 40,
+                child: Icon(
+                  PhosphorIconsRegular.ruler,
+                  size: 24,
+                  color: colorScheme.foreground,
+                ),
+              ),
+              trailing: [
+                Text(
+                  'แก้ไข',
+                  style: textTheme.muted.copyWith(
+                    color: colorScheme.mutedForeground.withValues(alpha: 0.5),
+                  ),
+                ),
+              ],
+              onTap: () => _showRadiusSettingDialog(context, id, currentRadiusMeters),
+            );
+          },
+          loading: () => const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+          error: (error, stackTrace) => Text('เกิดข้อผิดพลาด: $error'),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
   Widget _buildBottomActionSection(BuildContext context) {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
@@ -397,6 +450,66 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     );
   }
 
+  void _showRadiusSettingDialog(BuildContext context, String id, double currentRadiusMeters) {
+    final double initialRadiusKm = currentRadiusMeters / 1000;
+    final TextEditingController radiusController = TextEditingController(
+      text: initialRadiusKm.toStringAsFixed(1),
+    );
+
+    showDialog(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ShadDialog.alert(
+          title: const Padding(
+            padding: EdgeInsets.only(bottom: 16.0),
+            child: Text('ตั้งค่ารัศมีการค้นหา (กิโลเมตร)'),
+          ),
+          actions: [
+            ShadButton.secondary(
+              onPressed: () => ctx.pop(),
+              child: const Text('ยกเลิก'),
+            ),
+            ShadButton(
+              onPressed: () async {
+                final double? parsedRadiusKm = double.tryParse(radiusController.text);
+
+                if (parsedRadiusKm != null && parsedRadiusKm > 0) {
+                  final double newRadiusMeters = parsedRadiusKm * 1000;
+
+                  await ref
+                      .read(studentFirestoreRepositoryProvider)
+                      .updateSearchRadius(id, newRadiusMeters);
+
+                  ref.invalidate(studentSettingsProvider(id));
+                }
+
+                if (!ctx.mounted) return;
+                ctx.pop();
+              },
+              child: const Text('บันทึก'),
+            ),
+          ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ShadInput(
+                controller: radiusController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                placeholder: const Text('ระบุระยะทาง'),
+                trailing: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Text('km'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return CommonAppbar(
       title: 'ตั้งค่า',
@@ -407,6 +520,36 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
           onPressed: () => context.pop(),
         ),
       ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userProfile = ref.watch(userProfileProvider);
+
+    return Scaffold(
+      appBar: _buildAppBar(context),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildProfileSettingSection(context),
+            _buildGeneralSettingSection(context),
+            userProfile.when(
+              data: (user) {
+                final isStudent = user?.lastActiveRole == Role.student;
+
+                if (isStudent)
+                  return _buildStudentOnlySettingSection(context, user!.id);
+                else
+                  return const SizedBox.shrink();
+              },
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+            ),
+            _buildBottomActionSection(context),
+          ],
+        ),
+      )
     );
   }
 }
