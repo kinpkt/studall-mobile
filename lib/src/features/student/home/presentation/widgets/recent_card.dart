@@ -20,7 +20,6 @@ class RecentItemCard extends StatelessWidget {
   });
 
   @override
-
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
@@ -34,9 +33,9 @@ class RecentItemCard extends StatelessWidget {
     String time = '';
 
     switch (item.type) {
-      case UtilityType.work:
-        title = item.title ?? 'Untitled Work';
-        label = item.courseId ?? 'Generic';
+      case UtilityType.assignment:
+        title = item.title ?? 'Untitled Assignment';
+        label = item.courseId ?? '';
         date = dateTimeToThaiString(
           item.dueDate ?? item.createdAt,
           withYear: false,
@@ -46,9 +45,15 @@ class RecentItemCard extends StatelessWidget {
         time =
             '${item.dueDate?.hour.toString().padLeft(2, '0')}:${item.dueDate?.minute.toString().padLeft(2, '0')}';
         break;
+      case UtilityType.shortAnswerQuestion:
+        title = item.title ?? 'Untitled Short Answer Question';
+        label = item.courseId ?? '';
+      case UtilityType.multipleChoiceQuestion:
+        title = item.title ?? 'Untitled Multiple Choice Question';
+        label = item.courseId ?? '';
       case UtilityType.material:
         title = item.title ?? 'Untitled Material';
-        label = item.courseId  ?? 'Generic';
+        label = item.courseId ?? '';
         date = dateTimeToThaiString(
           item.createdAt,
           withYear: false,
@@ -57,6 +62,18 @@ class RecentItemCard extends StatelessWidget {
         );
         time =
             '${item.createdAt.hour.toString().padLeft(2, '0')}:${item.createdAt.minute.toString().padLeft(2, '0')}';
+        break;
+      case UtilityType.event:
+        title = item.title ?? 'Untitled Event';
+        label = item.courseId ?? '';
+        date = dateTimeToThaiString(
+          item.dueDate ?? item.createdAt,
+          withYear: false,
+          acronymMonth: true,
+          withTime: false,
+        );
+        time =
+            '${item.dueDate?.hour.toString().padLeft(2, '0')}:${item.dueDate?.minute.toString().padLeft(2, '0')}';
         break;
     }
 
@@ -106,7 +123,8 @@ class RecentItemCard extends StatelessWidget {
                               color: colorScheme.foreground,
                             ),
                           ),
-                          if (showTime && item.type == UtilityType.work) ...[
+                          if (showTime &&
+                              item.type == UtilityType.assignment) ...[
                             const SizedBox(width: 2),
                             Text(
                               time,

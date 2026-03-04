@@ -27,24 +27,37 @@ class ResourceIcon extends StatelessWidget {
 
     ResourceIconStyle getStyleForType(UtilityType type) {
       switch (type) {
-        case UtilityType.work:
-          // switch (workType.workType) {
-            // case WorkType.assignment:
-              return ResourceIconStyle(
-                backgroundColor: colorScheme.custom['blue'] ?? Colors.blue,
-                iconColor: colorScheme.custom['blueForeground'] ?? Colors.white,
-                iconData: PhosphorIconsRegular.clipboardText,
-              );
-            // case WorkType.shortAnswerQuestion:
-            // case WorkType.multipleChoiceQuestion:
-            //   return ResourceIconStyle(
-            //     backgroundColor: colorScheme.custom['orange'] ?? Colors.orange,
-            //     iconColor:
-            //         colorScheme.custom['orangeForeground'] ?? Colors.white,
-            //     iconData: PhosphorIconsRegular.sealQuestion,
-            //   );
-          // }
+        case UtilityType.assignment:
+          return ResourceIconStyle(
+            backgroundColor: colorScheme.custom['blue'] ?? Colors.blue,
+            iconColor: colorScheme.custom['blueForeground'] ?? Colors.white,
+            iconData: PhosphorIconsRegular.fileText,
+          );
+        case UtilityType.shortAnswerQuestion:
+          return ResourceIconStyle(
+            backgroundColor: colorScheme.custom['orange'] ?? Colors.orange,
+            iconColor: colorScheme.custom['orangeForeground'] ?? Colors.white,
+            iconData: PhosphorIconsRegular.sealQuestion,
+          );
+        case UtilityType.multipleChoiceQuestion:
+          return ResourceIconStyle(
+            backgroundColor: colorScheme.custom['orange'] ?? Colors.orange,
+            iconColor: colorScheme.custom['orangeForeground'] ?? Colors.white,
+            iconData: PhosphorIconsRegular.sealQuestion,
+          );
         case UtilityType.material:
+          return ResourceIconStyle(
+            backgroundColor: colorScheme.custom['gray'] ?? Colors.grey,
+            iconColor: colorScheme.custom['grayForeground'] ?? Colors.white,
+            iconData: PhosphorIconsRegular.fileText,
+          );
+        case UtilityType.event:
+          return ResourceIconStyle(
+            backgroundColor: colorScheme.custom['purple'] ?? Colors.purple,
+            iconColor: colorScheme.custom['purpleForeground'] ?? Colors.white,
+            iconData: PhosphorIconsRegular.calendarCheck,
+          );
+        default:
           return ResourceIconStyle(
             backgroundColor: colorScheme.custom['gray'] ?? Colors.grey,
             iconColor: colorScheme.custom['grayForeground'] ?? Colors.white,

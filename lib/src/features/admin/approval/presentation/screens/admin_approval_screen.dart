@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:studall/src/features/admin/approval/data/repositories/request_firestore_repository.dart';
-import 'package:studall/src/features/auth/data/models/user_model.dart';
 
 import '../../data/models/request_model.dart';
+import '../providers/admin_requests_provider.dart';
 import '../widgets/request_list_tile.dart';
-
-final requestsProvider = StreamProvider<List<RequestModel>>((ref) {
-  final repository = ref.watch(requestFirestoreRepositoryProvider);
-  return repository.getAllRequests();
-});
 
 class AdminApprovalScreen extends ConsumerWidget {
   const AdminApprovalScreen({super.key});
@@ -19,7 +13,7 @@ class AdminApprovalScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ShadTheme.of(context);
 
-    final requestsAsyncValue = ref.watch(requestsProvider);
+    final requestsAsyncValue = ref.watch(adminRequestsProvider);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),

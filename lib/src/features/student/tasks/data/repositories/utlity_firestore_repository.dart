@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/services/firestore_service.dart';
 import '../../../data/models/utility_model.dart';
 
-final requestFirestoreRepositoryProvider = Provider<UtlityFirestoreRepository>((ref) {
+final utilityFirestoreRepositoryProvider = Provider<UtlityFirestoreRepository>((ref) {
   final firestoreService = ref.watch(firestoreServiceProvider);
   return UtlityFirestoreRepository(firestoreService);
 });

@@ -4,8 +4,7 @@ import './role.dart';
 class UserModel {
   final String id;
   final String email;
-  final String username;
-  final String? fullName;
+  final String displayName;
   final String? photoUrl;
   final bool isBanned;
   final Role? lastActiveRole;
@@ -14,8 +13,7 @@ class UserModel {
   const UserModel({
     required this.id,
     required this.email,
-    required this.username,
-    this.fullName,
+    required this.displayName,
     this.photoUrl,
     this.isBanned = false,
     this.lastActiveRole,
@@ -26,8 +24,7 @@ class UserModel {
     return UserModel(
       id: firebaseUser.uid,
       email: firebaseUser.email ?? '',
-      username: '',
-      fullName: firebaseUser.displayName ?? '',
+      displayName: firebaseUser.displayName ?? '',
       photoUrl: firebaseUser.photoURL,
       isBanned: false,
       lastActiveRole: null,
@@ -39,8 +36,7 @@ class UserModel {
     return UserModel(
       id: docId,
       email: data['email'] as String,
-      username: data['username'] as String,
-      fullName: data['fullName'] as String?,
+      displayName: data['displayName'] as String,
       photoUrl: data['photoUrl'] as String?,
       isBanned: data['isBanned'] as bool? ?? false,
       lastActiveRole: data['lastActiveRole'] != null
@@ -66,8 +62,7 @@ class UserModel {
     return {
       'id': id,
       'email': email,
-      'username': username,
-      'fullName': fullName,
+      'username': displayName,
       'photoUrl': photoUrl,
       'isBanned': isBanned,
       'lastActiveRole': lastActiveRole?.name,
@@ -77,15 +72,14 @@ class UserModel {
 
   void debugPrint() {
     print(
-      'UserModel: {id: $id, email: $email, username: $username, fullName: $fullName, photoUrl: $photoUrl, isBanned: $isBanned, lastActiveRole: $lastActiveRole, roles: $roles}',
+      'UserModel: {id: $id, email: $email, displayName: $displayName, photoUrl: $photoUrl, isBanned: $isBanned, lastActiveRole: $lastActiveRole, roles: $roles}',
     );
   }
 
   UserModel copyWith({
     String? id,
     String? email,
-    String? username,
-    String? fullName,
+    String? displayName,
     String? photoUrl,
     bool? isBanned,
     Role? lastActiveRole,
@@ -94,8 +88,7 @@ class UserModel {
     return UserModel(
       id: id ?? this.id,
       email: email ?? this.email,
-      username: username ?? this.username,
-      fullName: fullName ?? this.fullName,
+      displayName: displayName ?? this.displayName,
       photoUrl: photoUrl ?? this.photoUrl,
       isBanned: isBanned ?? this.isBanned,
       lastActiveRole: lastActiveRole ?? this.lastActiveRole,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/common_widgets/plain_text_app_bar.dart';
+import 'package:studall/src/features/admin/common_widgets/admin_app_bar.dart';
 
 class AdminLayoutScreen extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -17,20 +18,25 @@ class AdminLayoutScreen extends ConsumerWidget {
         label: 'หน้าหลัก',
       ),
       NavigationDestination(
-        icon: Icon(PhosphorIconsRegular.checkCircle),
-        selectedIcon: Icon(PhosphorIconsFill.checkCircle),
-        label: 'การอนุมัติ',
-      ),
-      NavigationDestination(
         icon: Icon(PhosphorIconsRegular.userCircle),
         selectedIcon: Icon(PhosphorIconsFill.userCircle),
         label: 'ผู้ใช้งาน',
       ),
+      NavigationDestination(
+        icon: Icon(PhosphorIconsRegular.checkCircle),
+        selectedIcon: Icon(PhosphorIconsFill.checkCircle),
+        label: 'การอนุมัติ',
+      ),
     ];
   }
 
-  PreferredSizeWidget _buildAppBar(int currentIndex) {
-    return PlainTextAppBar(text: 'Admin');
+  PreferredSizeWidget _buildAppBar(BuildContext context, int currentIndex) {
+    const adminPageTitles = ['หน้าหลัก', 'ผู้ใช้งาน', 'การอนุมัติ'];
+
+    return AdminAppBar(
+      pageTitle: adminPageTitles[currentIndex],
+      onProfileTap: () => context.push('/setting'),
+    );
   }
 
   @override
@@ -38,8 +44,9 @@ class AdminLayoutScreen extends ConsumerWidget {
     final currentIndex = navigationShell.currentIndex;
 
     return SafeArea(
+      bottom: false,
       child: Scaffold(
-        appBar: _buildAppBar(currentIndex),
+        appBar: _buildAppBar(context, currentIndex),
         body: navigationShell,
         bottomNavigationBar: NavigationBar(
           selectedIndex: currentIndex,

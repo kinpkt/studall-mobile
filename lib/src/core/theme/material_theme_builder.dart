@@ -76,5 +76,14 @@ ThemeData materialThemeBuilder(BuildContext context, ThemeData theme) {
       backgroundColor: shadColorScheme.primary,
       foregroundColor: shadColorScheme.primaryForeground,
     ),
+    menuTheme: MenuThemeData(
+     style: MenuStyle(
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+        ),
+      ),
+    ),
   );
 }

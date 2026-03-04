@@ -11,6 +11,7 @@ import 'package:studall/src/features/auth/data/models/role.dart';
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/select_role_screen.dart';
+import 'package:studall/src/features/auth/presentation/screens/setting_screen.dart';
 
 // ── Student layout & screens ─────────────────────────────────────────────────
 import 'package:studall/src/features/student/presentation/screens/student_layout_screen.dart';
@@ -117,6 +118,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/select-role',
         builder: (_, _) => const SelectRoleScreen(),
       ),
+      GoRoute(path: '/setting', builder: (_, _) => const SettingScreen()),
 
       GoRoute(
         path: '/student/tools/gpa-calculator',
@@ -276,8 +278,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/admin/approve',
-                builder: (_, _) => const AdminApprovalScreen(),
+                path: '/admin/users',
+                builder: (_, _) => const AdminUsersScreen(),
               ),
             ],
           ),
@@ -285,8 +287,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/admin/users',
-                builder: (_, _) => const AdminUsersScreen(),
+                path: '/admin/approve',
+                builder: (_, _) => const AdminApprovalScreen(),
               ),
             ],
           ),

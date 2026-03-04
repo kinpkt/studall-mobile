@@ -115,4 +115,18 @@ class FirestoreService {
     final snap = await query.get();
     return snap.docs.isNotEmpty;
   }
+
+  Future<int> count({
+    required String collectionPath,
+    Query Function(Query query)? queryBuilder,
+  }) async {
+    Query query = _db.collection(collectionPath);
+
+    if (queryBuilder != null) {
+      query = queryBuilder(query);
+    }
+
+    final snapshot = await query.count().get();
+    return snapshot.count ?? 0;
+  }
 }

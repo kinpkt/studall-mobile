@@ -1466,6 +1466,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.1.0"
+  time_picker_spinner_pop_up:
+    dependency: "direct main"
+    description:
+      name: time_picker_spinner_pop_up
+      sha256: "245fd1ad9eb2a6ec800e06b933a06829c2d91757f70591ea0dc6b5236a754013"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   two_dimensional_scrollables:
     dependency: transitive
     description:

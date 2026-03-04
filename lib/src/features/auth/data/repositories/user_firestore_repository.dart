@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:studall/src/features/auth/data/models/role.dart';
 import '../../../../core/services/firestore_service.dart';
 import '../models/user_model.dart';
 import 'user_repository.dart';
@@ -66,12 +67,28 @@ class UserFirestoreRepository implements UserRepository {
   }
 
   @override
+  Future<int> getAllUsersCount() async {
+    return await _service.count(collectionPath: 'users');
+  }
+
+  @override
+  Future<int> getUsersCountByRole(Role role) async {
+    return await _service.count(
+      collectionPath: 'users',
+      queryBuilder: (query) => query.where('roles', arrayContains: role.name),
+    );
+  }
+
+  @override
   Future<void> updateUserBanStatus(String uid, bool isBanned) async {
+    await _service.update(path: 'users/$uid', data: {'isBanned': isBanned});
+  }
+
+  @override
+  Future<void> updateUserLastActiveRole(String uid, Role role) async {
     await _service.update(
       path: 'users/$uid',
-      data: {
-        'isBanned': isBanned,
-      }
+      data: {'lastActiveRole': role.name},
     );
   }
 }

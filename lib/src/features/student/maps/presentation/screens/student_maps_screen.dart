@@ -1,23 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/features/student/maps/presentation/providers/student_maps_provider.dart';
 
 import '../../../../partner/branches/data/models/branch_model.dart';
 
-class StudentMapsScreen extends StatefulWidget {
+class StudentMapsScreen extends ConsumerStatefulWidget {
   const StudentMapsScreen({super.key});
 
   @override
-  State<StudentMapsScreen> createState() => _StudentMapsScreenState();
+  ConsumerState<StudentMapsScreen> createState() => _StudentMapsScreenState();
 }
 
-class _StudentMapsScreenState extends State<StudentMapsScreen> {
+class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
   LatLng? position;
   String error = '';
+  final int radius = 2500;
 
   @override
   void initState() {
@@ -73,7 +77,10 @@ class _StudentMapsScreenState extends State<StudentMapsScreen> {
         onTap: () {
           _showBranchDetails(context, branch);
         },
-        child: Icon(PhosphorIconsFill.mapPin),
+        child: Icon(
+          PhosphorIconsFill.mapPin,
+          color: Colors.red,
+        ),
       )
     );
   }
@@ -93,7 +100,6 @@ class _StudentMapsScreenState extends State<StudentMapsScreen> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8.0),
-              // Replace these with your actual BranchModel properties
               Text('Name: ${branch.name}'),
               Text('Status: ${branch.status}'),
               const SizedBox(height: 16.0),
@@ -108,11 +114,6 @@ class _StudentMapsScreenState extends State<StudentMapsScreen> {
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
 
-    final List<BranchModel> branches = [
-      BranchModel(name: 'ร้านปริ้นเอกสารใต้ตึกฟิสิกส์', location: GeoPoint(13.845989047424123, 100.57071887786084)),
-      BranchModel(name: 'Natang Cafe & Listening Bar', location: GeoPoint(13.838248432568644, 100.582614486534))
-    ];
-
     if (error.isNotEmpty) {
       return Scaffold(
         body: Center(
@@ -122,29 +123,71 @@ class _StudentMapsScreenState extends State<StudentMapsScreen> {
     }
 
     if (position != null) {
-      return Scaffold(
-          appBar: AppBar(
-            title: Text('แผนที่', style: theme.textTheme.h1),
-          ),
-          body: Stack(
-            children: [
-              FlutterMap(
-                options: MapOptions(
-                  initialCenter: position!,
-                  initialZoom: 15,
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'ku.cs.studall',
-                  ),
-                  MarkerLayer(markers: branches.map((branch) => _buildMarker(branch)).toList())
-                ],
+      final radiusAsync = ref.watch(studentRadiusProvider);
+
+      return radiusAsync.when(
+        data: (radius) {
+          final nearbyBranches = ref.watch(
+              nearbyBranchesProvider((center: position!, radius: radius.round()))
+          );
+
+          return Scaffold(
+              appBar: AppBar(
+                title: Text('แผนที่', style: theme.textTheme.h1),
               ),
-            ],
-          )
+              body: Stack(
+                children: [
+                  FlutterMap(
+                    options: MapOptions(
+                      initialCenter: position!,
+                      initialZoom: 15,
+                      interactionOptions: const InteractionOptions(
+                        flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                      ),
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'ku.cs.studall',
+                      ),
+                      CircleLayer(
+                        circles: [
+                          CircleMarker(
+                            point: position!,
+                            radius: radius,
+                            useRadiusInMeter: true,
+                            color: Colors.blue.withAlpha(64),
+                            borderColor: Colors.blue,
+                            borderStrokeWidth: 2.0,
+                          ),
+                        ],
+                      ),
+                      nearbyBranches.when(
+                        data: (branches) => MarkerLayer(
+                            markers: branches.map((branch) => _buildMarker(branch)).toList()
+                        ),
+                        loading: () => const Center(
+                            child: CircularProgressIndicator()
+                        ),
+                        error: (err, stack) => Center(
+                            child: Text('Failed to load map data: $err')
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+          );
+        },
+        loading: () => const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        error: (err, stack) => Scaffold(
+          body: Center(child: Text('Error loading radius: $err')),
+        ),
       );
-    } else {
+    }
+    else {
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),

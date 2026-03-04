@@ -1,23 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
-import 'package:studall/src/features/partner/branches/data/models/branch_model.dart';
-import 'package:studall/src/features/partner/branches/data/repositories/branch_firestore_repository.dart';
 import 'package:studall/src/features/partner/branches/presentation/widgets/branch_details_card.dart';
 
-final partnerBranchesProvider = StreamProvider<List<BranchModel>>((ref) {
-  final currentUser = FirebaseAuth.instance.currentUser;
-
-  if (currentUser == null) {
-    return Stream.value([]);
-  }
-
-  final repository = ref.watch(branchFirestoreRepositoryProvider);
-  return repository.getBranchesByUserId(currentUser.uid);
-});
+import '../providers/partner_branches_provider.dart';
 
 class PartnerBranchesScreen extends ConsumerWidget {
   const PartnerBranchesScreen({super.key});

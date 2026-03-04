@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -18,12 +19,60 @@ class PartnerMapSelectionScreen extends StatefulWidget {
 class _PartnerMapSelectionScreenState extends State<PartnerMapSelectionScreen> {
   final MapController _mapController = MapController();
   LatLng? _selectedLocation;
+  bool _isLoadingLocation = false;
 
   @override
   void initState() {
     super.initState();
-    // Default to Rangsit, Pathum Thani if no initial location is provided
-    _selectedLocation = widget.initialLocation ?? const LatLng(13.9883, 100.6171);
+    if (widget.initialLocation != null) {
+      _selectedLocation = widget.initialLocation;
+    }
+    else {
+      _selectedLocation = const LatLng(13.9883, 100.6171);
+      _getCurrentLocation();
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    setState(() {
+      _isLoadingLocation = true;
+    });
+
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      setState(() {
+        _isLoadingLocation = false;
+      });
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        setState(() {
+          _isLoadingLocation = false;
+        });
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      setState(() {
+        _isLoadingLocation = false;
+      });
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition();
+    final currentLatLng = LatLng(position.latitude, position.longitude);
+
+    setState(() {
+      _selectedLocation = currentLatLng;
+      _isLoadingLocation = false;
+    });
+
+    _mapController.move(currentLatLng, 15.0);
   }
 
   @override

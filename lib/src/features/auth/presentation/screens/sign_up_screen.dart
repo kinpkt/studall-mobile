@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:studall/src/features/auth/domain/auth_exceptions.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
@@ -68,42 +70,8 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
     return null;
   }
 
-  // Future<void> _handleSignup() async {
-  //   if (_formKey.currentState?.validate() ?? false) {
-  //     await ref
-  //         .read(authControllerProvider.notifier)
-  //         .signUpWithEmail(
-  //           email: _emailController.text.trim(),
-  //           password: _passwordController.text,
-  //           displayName: _nameController.text.trim(),
-  //         );
-  //
-  //     if (mounted) {
-  //       final error = ref.read(authControllerProvider).error;
-  //       if (error != null) {
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(content: Text(error), backgroundColor: Colors.red),
-  //         );
-  //       }
-  //     }
-  //   }
-  // }
-  //
-  // Future<void> _handleGoogleSignIn() async {
-  //   await ref.read(authControllerProvider.notifier).signInWithGoogle();
-  //
-  //   if (mounted) {
-  //     final error = ref.read(authControllerProvider).error;
-  //     if (error != null) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text(error), backgroundColor: Colors.red),
-  //       );
-  //     }
-  //   }
-  // }
-
   void _navigateToLogin() {
-    Navigator.pop(context);
+    context.go('/login');
   }
 
   @override
@@ -112,18 +80,17 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
     final signUpState = ref.watch(authControllerProvider);
     final isLoading = signUpState.isLoading;
 
-    ref.listen(authControllerProvider, (_, next) {
-      if (next.hasError) {
+    ref.listen(authControllerProvider, (previous, next) {
+      if (previous is AsyncLoading && next is AsyncError) {
         ShadToaster.of(context).show(
           ShadToast.destructive(
             title: const Text('สร้างบัญชีไม่สำเร็จ'),
-            description: Text(next.error.toString()),
+            description: Text(next.error.message),
             alignment: Alignment.topCenter,
           ),
         );
       }
     });
-
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
       body: SafeArea(
@@ -169,8 +136,8 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
                     const SizedBox(height: 16),
                     ShadInputFormField(
                       controller: _nameController,
-                      id: 'username',
-                      label: const Text('ชื่อผู้ใช้'),
+                      id: 'displayName',
+                      label: const Text('ชื่อผู้ใช้ (ชื่อที่ต้องการให้แสดงในระบบ)'),
                       placeholder: const Text('นอนน้อย'),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: _validateUsername,
@@ -208,7 +175,7 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
                                     .signUp(
                                       email: _emailController.text.trim(),
                                       password: _passwordController.text,
-                                      username: _nameController.text.trim(),
+                                      displayName: _nameController.text.trim(),
                                     );
                               }
                             },
@@ -216,7 +183,10 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
                           ? SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.primaryForeground),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: theme.colorScheme.primaryForeground,
+                              ),
                             )
                           : const Text('สร้างบัญชี'),
                     ),
