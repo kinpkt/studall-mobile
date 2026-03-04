@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,7 +21,7 @@ class StudentMapsScreen extends ConsumerStatefulWidget {
 class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
   LatLng? position;
   String error = '';
-  final int radius = 10000;
+  final int radius = 2500;
 
   @override
   void initState() {
@@ -76,7 +77,10 @@ class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
         onTap: () {
           _showBranchDetails(context, branch);
         },
-        child: Icon(PhosphorIconsFill.mapPin),
+        child: Icon(
+          PhosphorIconsFill.mapPin,
+          color: Colors.red,
+        ),
       )
     );
   }
@@ -96,7 +100,6 @@ class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8.0),
-              // Replace these with your actual BranchModel properties
               Text('Name: ${branch.name}'),
               Text('Status: ${branch.status}'),
               const SizedBox(height: 16.0),
@@ -120,41 +123,71 @@ class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
     }
 
     if (position != null) {
-      final nearbyBranches = ref.watch(nearbyBranchesProvider((center: position!, radius: radius)));
+      final radiusAsync = ref.watch(studentRadiusProvider);
 
-      return Scaffold(
-          appBar: AppBar(
-            title: Text('แผนที่', style: theme.textTheme.h1),
-          ),
-          body: Stack(
-            children: [
-              FlutterMap(
-                options: MapOptions(
-                  initialCenter: position!,
-                  initialZoom: 15,
-                ),
+      return radiusAsync.when(
+        data: (radius) {
+          final nearbyBranches = ref.watch(
+              nearbyBranchesProvider((center: position!, radius: radius.round()))
+          );
+
+          return Scaffold(
+              appBar: AppBar(
+                title: Text('แผนที่', style: theme.textTheme.h1),
+              ),
+              body: Stack(
                 children: [
-                  TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'ku.cs.studall',
-                  ),
-                  nearbyBranches.when(
-                    data: (branches) => MarkerLayer(
-                        markers: branches.map((branch) => _buildMarker(branch)).toList()
+                  FlutterMap(
+                    options: MapOptions(
+                      initialCenter: position!,
+                      initialZoom: 15,
+                      interactionOptions: const InteractionOptions(
+                        flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                      ),
                     ),
-                    loading: () => const Center(
-                        child: CircularProgressIndicator()
-                    ),
-                    error: (err, stack) => Center(
-                        child: Text('Failed to load map data: $err')
-                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'ku.cs.studall',
+                      ),
+                      CircleLayer(
+                        circles: [
+                          CircleMarker(
+                            point: position!,
+                            radius: radius,
+                            useRadiusInMeter: true,
+                            color: Colors.blue.withAlpha(64),
+                            borderColor: Colors.blue,
+                            borderStrokeWidth: 2.0,
+                          ),
+                        ],
+                      ),
+                      nearbyBranches.when(
+                        data: (branches) => MarkerLayer(
+                            markers: branches.map((branch) => _buildMarker(branch)).toList()
+                        ),
+                        loading: () => const Center(
+                            child: CircularProgressIndicator()
+                        ),
+                        error: (err, stack) => Center(
+                            child: Text('Failed to load map data: $err')
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-            ],
-          )
+              )
+          );
+        },
+        loading: () => const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        error: (err, stack) => Scaffold(
+          body: Center(child: Text('Error loading radius: $err')),
+        ),
       );
-    } else {
+    }
+    else {
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),

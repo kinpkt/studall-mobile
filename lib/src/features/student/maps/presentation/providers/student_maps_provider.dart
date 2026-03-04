@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../../partner/branches/data/models/branch_model.dart';
 import '../../../../partner/branches/data/repositories/branch_firestore_repository.dart';
+import '../../../data/repositories/student_firestore_repository.dart';
 
 final nearbyBranchesProvider = FutureProvider.family<List<BranchModel>, ({LatLng center, int radius})>((ref, args) async {
   final repository = ref.watch(branchFirestoreRepositoryProvider);
@@ -25,4 +27,16 @@ final nearbyBranchesProvider = FutureProvider.family<List<BranchModel>, ({LatLng
   }
 
   return filteredBranches;
+});
+
+final studentRadiusProvider = FutureProvider<double>((ref) async {
+  final userId = FirebaseAuth.instance.currentUser?.uid;
+
+  if (userId == null)
+    return 2000.0;
+
+  final repository = ref.read(studentFirestoreRepositoryProvider);
+  final settings = await repository.getStudentSettings(userId);
+
+  return settings?.radius ?? 2000.0;
 });
