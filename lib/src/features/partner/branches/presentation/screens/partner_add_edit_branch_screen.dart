@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -87,8 +88,12 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
     setState(() => _isLoading = true);
 
     try {
+      final partner = await FirebaseFirestore.instance.collection('partners').doc(currentUser.uid).get();
+      final partnerName = partner.data()?['name'] as String;
+
       final BranchModel newBranch = BranchModel(
         id: widget.branch?.id,
+        partnerName: partnerName,
         name: _nameController.text,
         location: GeoPoint(_selectedLocation!.latitude, _selectedLocation!.longitude),
         status: _selectedStatus!,

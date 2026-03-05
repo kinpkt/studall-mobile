@@ -129,7 +129,7 @@ class StudentExploreScreen extends ConsumerWidget {
           ShadButton(
             width: 500,
             height: 64,
-            child: Text('หรือค้นหาจากตำแหน่งของฉัน', style: theme.textTheme.h3,),
+            child: Text('ค้นหาร้านใกล้ฉัน', style: theme.textTheme.h3,),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => StudentMapsScreen()));
             },

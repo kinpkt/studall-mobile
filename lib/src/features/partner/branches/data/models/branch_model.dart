@@ -36,12 +36,14 @@ extension BranchStatusExtension on BranchStatus {
 
 class BranchModel {
   final String id;
+  final String partnerName;
   final String name;
   final GeoPoint location;
   final BranchStatus status;
 
   BranchModel({
     String? id,
+    required this.partnerName,
     required this.name,
     required this.location,
     this.status = BranchStatus.available,
@@ -52,6 +54,7 @@ class BranchModel {
   factory BranchModel.fromFirestore(Map<String, dynamic> data, String docId) {
     return BranchModel(
       id: docId,
+      partnerName: data['partnerName'] as String,
       name: data['name'] as String,
       location: data['location'] as GeoPoint,
       status: BranchStatus.values.firstWhere(
@@ -64,6 +67,7 @@ class BranchModel {
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,
+      'partnerName': partnerName,
       'name': name,
       'location': location,
       'status': status.name,

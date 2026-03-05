@@ -54,9 +54,9 @@ class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
       }
 
       final pos = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.high,
-          )
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        )
       );
 
       setState(() {
@@ -86,27 +86,14 @@ class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
   }
 
   void _showBranchDetails(BuildContext context, BranchModel branch) {
-    showModalBottomSheet(
+    showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Branch Details',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8.0),
-              Text('Name: ${branch.name}'),
-              Text('Status: ${branch.status}'),
-              const SizedBox(height: 16.0),
-            ],
-          ),
+        return ShadDialog(
+          title: Text('${branch.partnerName}\n${branch.name}'),
+          description: Text(branch.status.thaiStatus, style: TextStyle(color: branch.status.getColor(ShadTheme.of(context))),),
         );
-      },
+      }
     );
   }
 
@@ -128,55 +115,66 @@ class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
       return radiusAsync.when(
         data: (radius) {
           final nearbyBranches = ref.watch(
-              nearbyBranchesProvider((center: position!, radius: radius.round()))
+            nearbyBranchesProvider((center: position!, radius: radius.round()))
           );
 
           return Scaffold(
-              appBar: AppBar(
-                title: Text('แผนที่', style: theme.textTheme.h1),
-              ),
-              body: Stack(
-                children: [
-                  FlutterMap(
-                    options: MapOptions(
-                      initialCenter: position!,
-                      initialZoom: 15,
-                      interactionOptions: const InteractionOptions(
-                        flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+            appBar: AppBar(
+              title: Text('แผนที่', style: theme.textTheme.h3),
+            ),
+            body: Stack(
+              children: [
+                FlutterMap(
+                  options: MapOptions(
+                    initialCenter: position!,
+                    initialZoom: 15,
+                    interactionOptions: const InteractionOptions(
+                      flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                    ),
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'ku.cs.studall',
+                    ),
+                    CircleLayer(
+                      circles: [
+                        CircleMarker(
+                          point: position!,
+                          radius: radius,
+                          useRadiusInMeter: true,
+                          color: Colors.blue.withAlpha(64),
+                          borderColor: Colors.blue,
+                          borderStrokeWidth: 2.0,
+                        ),
+                      ],
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: position!,
+                          child: Icon(
+                            PhosphorIconsFill.user,
+                            color: Colors.blue,
+                          )
+                        )
+                      ],
+                    ),
+                    nearbyBranches.when(
+                      data: (branches) => MarkerLayer(
+                        markers: branches.map((branch) => _buildMarker(branch)).toList()
+                      ),
+                      loading: () => const Center(
+                        child: CircularProgressIndicator()
+                      ),
+                      error: (err, stack) => Center(
+                        child: Text('Failed to load map data: $err')
                       ),
                     ),
-                    children: [
-                      TileLayer(
-                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'ku.cs.studall',
-                      ),
-                      CircleLayer(
-                        circles: [
-                          CircleMarker(
-                            point: position!,
-                            radius: radius,
-                            useRadiusInMeter: true,
-                            color: Colors.blue.withAlpha(64),
-                            borderColor: Colors.blue,
-                            borderStrokeWidth: 2.0,
-                          ),
-                        ],
-                      ),
-                      nearbyBranches.when(
-                        data: (branches) => MarkerLayer(
-                            markers: branches.map((branch) => _buildMarker(branch)).toList()
-                        ),
-                        loading: () => const Center(
-                            child: CircularProgressIndicator()
-                        ),
-                        error: (err, stack) => Center(
-                            child: Text('Failed to load map data: $err')
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              )
+                  ],
+                ),
+              ],
+            )
           );
         },
         loading: () => const Scaffold(
