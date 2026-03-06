@@ -116,6 +116,7 @@ final appSelectTheme = ShadSelectTheme(
     color: AppColorScheme.lightScheme.mutedForeground,
     fontWeight: FontWeight.w400,
   ),
+  
 );
 
 final appSelectDarkTheme = appSelectTheme.copyWith(

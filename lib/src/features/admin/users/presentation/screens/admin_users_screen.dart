@@ -60,16 +60,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildSearchBar(context),
-          if (_selectedRole != 'all')
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-              child: Text(
-                'กรองโดย: ${roleLabels[_selectedRole]}',
-                style: theme.textTheme.small.copyWith(
-                  color: theme.colorScheme.mutedForeground,
-                ),
-              ),
-            ),
+          if (_selectedRole != 'all') _buildActiveFilterText(context),
           Expanded(
             child: usersAsyncValue.when(
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -104,6 +95,41 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActiveFilterText(BuildContext context) {
+    final theme = ShadTheme.of(context);
+
+    return GestureDetector(
+      onTap: () => setState(() => _selectedRole = 'all'),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+        child: Row(
+          children: [
+            Flexible(
+              child: Text(
+                'กรองโดย: ${roleLabels[_selectedRole]}',
+                style: theme.textTheme.small.copyWith(
+                  color: theme.colorScheme.mutedForeground,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                'ล้างตัวกรอง',
+                style: theme.textTheme.small.copyWith(
+                  color: theme.colorScheme.custom['info'],
+                  decoration: TextDecoration.underline,
+                  decorationColor: theme.colorScheme.custom['info']!,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

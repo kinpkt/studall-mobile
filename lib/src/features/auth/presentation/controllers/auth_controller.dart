@@ -65,7 +65,7 @@ class AuthController extends AsyncNotifier<void> {
   Future<void> signOut() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await Future.delayed(const Duration(seconds: 5));
+      await Future.delayed(const Duration(seconds: 3));
       final authRepository = ref.read(authFirebaseRepositoryProvider);
       await authRepository.signOut();
     });

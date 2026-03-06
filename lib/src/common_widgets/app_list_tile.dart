@@ -49,7 +49,7 @@ class AppListTile extends StatelessWidget {
                     title,
                     style:
                         titleStyle ??
-                        textTheme.p.copyWith(color: colorScheme.foreground),
+                        textTheme.list.copyWith(color: colorScheme.foreground),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

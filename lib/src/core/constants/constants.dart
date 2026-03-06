@@ -2,7 +2,7 @@ import '/src/features/student/data/models/utility_model.dart';
 
 final kPreferredSize = 92;
 
-final kDEMORECENTITEMS = [
+final kDemoRecentItems = [
   UtilityModel(
     courseId: 'CS101',
     type: UtilityType.assignment,
@@ -25,7 +25,7 @@ final kDEMORECENTITEMS = [
   ),
 ];
 
-final kDEMOTASKTILES = [
+final kDemoTaskTiles = [
   UtilityModel(
     courseId: 'CS101',
     type: UtilityType.assignment,
@@ -35,7 +35,7 @@ final kDEMOTASKTILES = [
   ),
   UtilityModel(
     courseId: 'CS102',
-    type: UtilityType.assignment,
+    type: UtilityType.assignment, 
     title: 'ส่งรายงานโปรเจกต์กลุ่ม',
     description: 'จัดทำรายงานและ source code พร้อมส่งผ่าน LMS',
     dueDate: DateTime.now().add(const Duration(days: 7)),
@@ -67,5 +67,50 @@ final kDEMOTASKTILES = [
     title: 'นำเสนอโปรเจกต์ขั้นกลาง',
     description: 'เตรียม demo และ slide สำหรับนำเสนอต่ออาจารย์และกลุ่มเพื่อน',
     dueDate: DateTime.now().add(const Duration(days: 5)),
+  ),
+];
+
+final kDemoMaterialTiles = [
+  UtilityModel(
+    courseId: 'CS101',
+    type: UtilityType.note,
+    title: 'สรุปบทที่ 1 - Introduction',
+    description: 'สรุปเนื้อหาเบื้องต้นและแนวคิดหลักของวิชา',
+    isPined: true,
+  ),
+  UtilityModel(
+    courseId: 'CS102',
+    type: UtilityType.note,
+    title: 'โน้ต OOP Concepts',
+    description: 'Encapsulation, Inheritance, Polymorphism, Abstraction',
+    isPined: false,
+  ),
+  UtilityModel(
+    courseId: 'general',
+    type: UtilityType.note,
+    title: 'ตารางสอบกลางภาค',
+    description: 'รวมตารางสอบกลางภาคทุกวิชา ภาคเรียนที่ 2/2568',
+    isPined: true,
+  ),
+  UtilityModel(
+    courseId: 'CS103',
+    type: UtilityType.note,
+    title: 'สรุป Sorting Algorithms',
+    description: 'เปรียบเทียบ Bubble, Merge, Quick Sort พร้อม Big-O',
+    isPined: false,
+  ),
+  UtilityModel(
+    courseId: 'CS104',
+    type: UtilityType.note,
+    title: 'โน้ต Database Normalization',
+    description: '1NF, 2NF, 3NF และ BCNF พร้อมตัวอย่าง',
+    isPined: true,
+  ),
+  UtilityModel(
+    courseId: 'general',
+    type: UtilityType.note,
+    title: 'รายการหนังสือที่ต้องอ่าน',
+    description: 'รวมหนังสือและแหล่งอ้างอิงสำหรับทุกวิชาในเทอมนี้',
+    isPined: false,
   ),
 ];

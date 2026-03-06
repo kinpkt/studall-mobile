@@ -77,13 +77,21 @@ ThemeData materialThemeBuilder(BuildContext context, ThemeData theme) {
       foregroundColor: shadColorScheme.primaryForeground,
     ),
     menuTheme: MenuThemeData(
-     style: MenuStyle(
+      style: MenuStyle(
         shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
-          ),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         ),
       ),
+    ),
+    expansionTileTheme: ExpansionTileThemeData(
+      backgroundColor: shadColorScheme.background,
+      // collapsedBackgroundColor: shadColorScheme.card,
+      textColor: shadColorScheme.foreground,
+      collapsedTextColor: shadColorScheme.foreground,
+      iconColor: shadColorScheme.foreground,
+      collapsedIconColor: shadColorScheme.foreground,
+      tilePadding: const EdgeInsets.fromLTRB(16.0, 6, 24, 0),
+      shape: Border(),
     ),
   );
 }

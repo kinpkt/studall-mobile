@@ -30,6 +30,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 16,
         children: [
           Row(
@@ -303,7 +304,8 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
               titleStyle: textTheme.custom['medium']?.copyWith(
                 color: colorScheme.foreground,
               ),
-              description: 'รัศมีการค้นหาร้านใกล้ฉัน (${displayRadiusKm.toStringAsFixed(1)} km)',
+              description:
+                  'รัศมีการค้นหาร้านใกล้ฉัน (${displayRadiusKm.toStringAsFixed(1)} km)',
               leading: SizedBox(
                 width: 40,
                 height: 40,
@@ -321,7 +323,8 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                   ),
                 ),
               ],
-              onTap: () => _showRadiusSettingDialog(context, id, currentRadiusMeters),
+              onTap: () =>
+                  _showRadiusSettingDialog(context, id, currentRadiusMeters),
             );
           },
           loading: () => const Padding(
@@ -450,7 +453,11 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     );
   }
 
-  void _showRadiusSettingDialog(BuildContext context, String id, double currentRadiusMeters) {
+  void _showRadiusSettingDialog(
+    BuildContext context,
+    String id,
+    double currentRadiusMeters,
+  ) {
     final double initialRadiusKm = currentRadiusMeters / 1000;
     final TextEditingController radiusController = TextEditingController(
       text: initialRadiusKm.toStringAsFixed(1),
@@ -472,7 +479,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             ),
             ShadButton(
               onPressed: () async {
-                final double? parsedRadiusKm = double.tryParse(radiusController.text);
+                final double? parsedRadiusKm = double.tryParse(
+                  radiusController.text,
+                );
 
                 if (parsedRadiusKm != null && parsedRadiusKm > 0) {
                   final double newRadiusMeters = parsedRadiusKm * 1000;
@@ -496,7 +505,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             children: [
               ShadInput(
                 controller: radiusController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 placeholder: const Text('ระบุระยะทาง'),
                 trailing: const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12.0),
@@ -549,7 +560,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             _buildBottomActionSection(context),
           ],
         ),
-      )
+      ),
     );
   }
 }

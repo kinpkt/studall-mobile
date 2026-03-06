@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/core/constants/constants.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
 import '../widgets/tasks_tab_bar.dart';
 import '../widgets/task_tile.dart';
@@ -19,9 +20,9 @@ class StudentTasksScreen extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: [
-                  Center(child: Text("หน้ามอบหมายแล้ว")),
-                  Center(child: Text("หน้าเลยกำหนด")),
-                  Center(child: Text("หน้าเสร็จสิ้น")),
+                  _buildAssignedSectionTaskList(context, kDemoTaskTiles),
+                  _buildOverdueSectionTaskList(context, kDemoTaskTiles),
+                  _buildDoneSectionTaskList(context, kDemoTaskTiles),
                 ],
               ),
             ),
@@ -31,68 +32,90 @@ class StudentTasksScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTaskList(BuildContext context, List<UtilityModel> tasks) {
+  Widget _buildAssignedSectionTaskList(
+    BuildContext context,
+    List<UtilityModel> tasks,
+  ) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildExpansionTaskList(context, 'ไม่มีวันครบกำหนด', tasks),
+          _buildExpansionTaskList(context, 'สัปดาห์นี้', tasks),
+          _buildExpansionTaskList(context, 'สัปดาห์ถัดไป', tasks),
+          _buildExpansionTaskList(context, 'ไว้ทีหลัง', tasks),
+          const SizedBox(height: 56 * 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOverdueSectionTaskList(
+    BuildContext context,
+    List<UtilityModel> tasks,
+  ) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildExpansionTaskList(context, 'สัปดาห์นี้', tasks),
+          _buildExpansionTaskList(context, 'สัปดาห์ที่ผ่านมา', tasks),
+          _buildExpansionTaskList(context, 'ก่อนหน้านี้', tasks),
+          const SizedBox(height: 56 * 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDoneSectionTaskList(
+    BuildContext context,
+    List<UtilityModel> tasks,
+  ) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildExpansionTaskList(context, 'ไม่มีวันครบกำหนด', tasks),
+          _buildExpansionTaskList(context, 'เสร็จก่อนกำหนด', tasks),
+          _buildExpansionTaskList(context, 'สัปดาห์นี้', tasks),
+          _buildExpansionTaskList(context, 'สัปดาห์ถัดไป', tasks),
+          _buildExpansionTaskList(context, 'ไว้ทีหลัง', tasks),
+          const SizedBox(height: 56 * 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpansionTaskList(
+    BuildContext context,
+    String title,
+    List<UtilityModel> tasks,
+  ) {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Row with title, count and "See All" link
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Left side: Title
-                Text(
-                  'ที่ต้องทำสัปดาห์นี้',
-                  style: textTheme.custom['medium']?.copyWith(
-                    color: colorScheme.foreground,
-                  ),
-                ),
-
-                Row(
-                  children: [
-                    Text(
-                      '${tasks.length}',
-                      style: textTheme.custom['medium']?.copyWith(
-                        color: colorScheme.mutedForeground,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    GestureDetector(
-                      onTap: () {
-                        // TODO: Navigate to full todo list
-                      },
-                      child: Text(
-                        'ทั้งหมด',
-                        style: textTheme.muted.copyWith(
-                          color: colorScheme.mutedForeground,
-                          decoration: TextDecoration.underline,
-                          decorationColor: colorScheme.mutedForeground,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 4, 0, 10),
+      child: ExpansionTile(
+        minTileHeight: 24.0,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: textTheme.custom['medium']?.copyWith(
+                color: colorScheme.foreground,
+              ),
             ),
-          ),
+            Text(
+              tasks.length.toString(),
+              style: textTheme.custom['medium']?.copyWith(
+                color: colorScheme.mutedForeground,
+                height: 20 / 16,
+              ),
+            ),
+          ],
+        ),
 
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              final task = tasks[index];
-              return TaskTile(task: task);
-            },
-          ),
-        ],
+        childrenPadding: const EdgeInsets.only(bottom: 6.0),
+        children: tasks.map((task) => TaskTile(task: task)).toList(),
       ),
     );
   }

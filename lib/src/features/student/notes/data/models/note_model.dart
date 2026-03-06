@@ -1,4 +1,4 @@
-import 'package:studall/src/features/student/courses/data/models/course_model.dart';
+import 'package:studall/src/features/student/data/models/utility_model.dart';
 import 'package:uuid/uuid.dart';
 
 class NoteModel {
@@ -11,20 +11,19 @@ class NoteModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  NoteModel(
-    {
-      id,
-      required this.title,
-      required this.content,
-      this.courseId,
-      required this.userId,
-      isPinned,
-      createdAt,
-      updatedAt
-    }) :  id = id ?? const Uuid().v7(),
-          isPinned = isPinned ?? false,
-          createdAt = createdAt ?? DateTime.now(),
-          updatedAt = updatedAt ?? DateTime.now();
+  NoteModel({
+    id,
+    required this.title,
+    required this.content,
+    this.courseId,
+    required this.userId,
+    isPinned,
+    createdAt,
+    updatedAt,
+  }) : id = id ?? const Uuid().v7(),
+       isPinned = isPinned ?? false,
+       createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   factory NoteModel.fromFirestore(Map<String, dynamic> data, String docId) {
     return NoteModel(
@@ -44,8 +43,7 @@ class NoteModel {
       'id': id,
       'title': title,
       'content': content,
-      if (courseId != null)
-        'courseId': courseId,
+      if (courseId != null) 'courseId': courseId,
       'userId': userId,
       'isPinned': isPinned,
       'createdAt': createdAt,
@@ -56,10 +54,10 @@ class NoteModel {
   String get timeDifferenceString {
     DateTime now = DateTime.now();
 
-    int totalMonths = (now.year - createdAt.year)*12 + now.month - createdAt.month;
+    int totalMonths =
+        (now.year - createdAt.year) * 12 + now.month - createdAt.month;
 
-    if (now.day < createdAt.day)
-      totalMonths--;
+    if (now.day < createdAt.day) totalMonths--;
 
     int years = totalMonths ~/ 12;
     int months = totalMonths % 12;
@@ -81,5 +79,18 @@ class NoteModel {
       return '$minutes นาทีที่แล้ว';
     else
       return 'เพิ่งสร้าง';
+  }
+
+  UtilityModel toUtilityModel() {
+    return UtilityModel(
+      id: id,
+      courseId: courseId,
+      type: UtilityType.note,
+      title: title,
+      description: content,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      isPined: isPinned,
+    );
   }
 }

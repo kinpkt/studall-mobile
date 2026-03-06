@@ -22,9 +22,7 @@ class TaskTile extends StatelessWidget {
     return AppListTile(
       leading: ResourceIcon(type: task.type),
       title: task.title ?? 'Untitled Task',
-      titleStyle: textTheme.custom['medium']?.copyWith(
-        color: colorScheme.foreground,
-      ),
+      titleStyle: textTheme.list.copyWith(color: colorScheme.foreground),
       description: task.courseId ?? '',
       descriptionStyle: textTheme.muted.copyWith(
         color: colorScheme.mutedForeground,

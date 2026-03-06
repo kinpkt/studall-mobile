@@ -63,6 +63,18 @@ class RecentItemCard extends StatelessWidget {
         time =
             '${item.createdAt.hour.toString().padLeft(2, '0')}:${item.createdAt.minute.toString().padLeft(2, '0')}';
         break;
+      case UtilityType.note:
+        title = item.title ?? 'Untitled Note';
+        label = item.courseId ?? '';
+        date = dateTimeToThaiString(
+          item.createdAt,
+          withYear: false,
+          acronymMonth: true,
+          withTime: false,
+        );
+        time =
+            '${item.createdAt.hour.toString().padLeft(2, '0')}:${item.createdAt.minute.toString().padLeft(2, '0')}';
+        break;
       case UtilityType.event:
         title = item.title ?? 'Untitled Event';
         label = item.courseId ?? '';
@@ -92,9 +104,7 @@ class RecentItemCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: textTheme.custom['medium']?.copyWith(
-              color: colorScheme.foreground,
-            ),
+            style: textTheme.list.copyWith(color: colorScheme.foreground),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

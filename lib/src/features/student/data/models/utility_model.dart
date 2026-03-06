@@ -5,6 +5,7 @@ enum UtilityType {
   shortAnswerQuestion,
   multipleChoiceQuestion,
   material,
+  note,
   event,
 }
 
@@ -17,6 +18,7 @@ class UtilityModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? dueDate;
+  final bool? isPined;
 
   static const _uuid = Uuid();
 
@@ -28,10 +30,11 @@ class UtilityModel {
     this.description,
     DateTime? createdAt,
     DateTime? updatedAt,
-    this.dueDate
-  }) :  id = id ?? _uuid.v7(),
-        createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+    this.dueDate,
+    this.isPined,
+  }) : id = id ?? _uuid.v7(),
+       createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   factory UtilityModel.fromFirestore(Map<String, dynamic> data, String docId) {
     return UtilityModel(
@@ -43,22 +46,21 @@ class UtilityModel {
       createdAt: data['createdAt'].toDate(),
       updatedAt: data['updatedAt'].toDate(),
       dueDate: data['dueDate'].toDate(),
+      isPined: data['isPined'] as bool?,
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,
-      if (courseId != null)
-        'courseId': courseId,
+      if (courseId != null) 'courseId': courseId,
       'type': type.name,
       'title': title,
-      if (description != null)
-        'description': description,
+      if (description != null) 'description': description,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
-      if (dueDate != null)
-        'dueDate': dueDate,
+      if (dueDate != null) 'dueDate': dueDate,
+      if (isPined != null) 'isPined': isPined,
     };
   }
 }
