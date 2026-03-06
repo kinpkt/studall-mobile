@@ -90,9 +90,9 @@ class StudentLayoutScreen extends ConsumerWidget {
                 ),
                 ListTile(
                   leading: const Icon(PhosphorIconsRegular.notebook),
-                  title: Text('เพิ่มรูปจดบันทึก', style: theme.textTheme.p),
+                  title: Text('เพิ่มการจดบันทึก', style: theme.textTheme.p),
                   onTap: () {
-                    Navigator.pop(ctx);
+                    context.push('/student/notes/editor');
                   },
                 ),
               ],

@@ -72,16 +72,43 @@ class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
 
   Marker _buildMarker(BranchModel branch) {
     return Marker(
-      point: branch.leafletCoordinate,
-      child: GestureDetector(
-        onTap: () {
-          _showBranchDetails(context, branch);
-        },
-        child: Icon(
-          PhosphorIconsFill.mapPin,
-          color: Colors.red,
-        ),
-      )
+        point: branch.leafletCoordinate,
+        width: 100,
+        height: 60,
+        alignment: Alignment.topCenter,
+        child: GestureDetector(
+          onTap: () {
+            _showBranchDetails(context, branch);
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                PhosphorIconsFill.mapPin,
+                color: Colors.red,
+                size: 30,
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(204),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  branch.partnerName,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        )
     );
   }
 

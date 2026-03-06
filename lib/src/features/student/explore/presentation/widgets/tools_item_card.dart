@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/utils/datetime_to_thai_string.dart';
@@ -12,14 +13,12 @@ class ToolsItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
 
-    // TO-DO: add routing to the designated tool route
-
     return ShadButton(
       width: 240,
       height: 50,
       child: Text(name, style: theme.textTheme.h4,),
       onPressed: () {
-        Navigator.pushNamed(context, path);
+        context.push(path);
       },
     );
   }

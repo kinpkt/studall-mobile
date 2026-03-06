@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:uuid/uuid.dart';
 
 enum RequestType {
@@ -32,6 +34,17 @@ extension RequestStatusExtension on RequestStatus {
         return 'อนุมัติแล้ว';
       case (RequestStatus.declined):
         return 'ปฏิเสธ';
+    }
+  }
+
+  Color getColor(ShadThemeData theme) {
+    switch (this) {
+      case RequestStatus.approved:
+        return theme.colorScheme.custom['green'] ?? Colors.green;
+      case RequestStatus.pending:
+        return theme.colorScheme.custom['warning'] ?? Colors.orange;
+      case RequestStatus.declined:
+        return theme.colorScheme.destructive;
     }
   }
 }

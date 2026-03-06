@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:studall/src/core/services/r2_service.dart';
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
 import 'package:studall/src/features/student/courses/data/repositories/course_firestore_repository.dart';
 import 'package:studall/src/features/student/notes/data/models/note_model.dart';
@@ -64,6 +68,64 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
     _quillController.dispose();
     _titleController.dispose();
     super.dispose();
+  }
+
+  Future<String?> _uploadFile(String localPath) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+
+      final file = File(localPath);
+      final fileName = 'students/${currentUser!.uid}/notes/${DateTime.now().millisecondsSinceEpoch}.png';
+
+      final String fileUrl = await ref.read(r2ServiceProvider).uploadFile(file, fileName);
+
+      return fileUrl;
+    }
+    catch (e) {
+      debugPrint('Error uploading to Cloudflare R2: $e');
+      return null;
+    }
+  }
+
+  Future<void> _pickAndInsertImage() async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
+      final uploadedImageUrl = await _uploadFile(image.path);
+
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      if (uploadedImageUrl != null) {
+        final index = _quillController.selection.baseOffset;
+        final length = _quillController.selection.extentOffset-index;
+
+        _quillController.replaceText(
+          index,
+          length,
+          BlockEmbed.image(uploadedImageUrl),
+          null,
+        );
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ')),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -156,10 +218,16 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
           ),
           QuillSimpleToolbar(
             controller: _quillController,
-            config: const QuillSimpleToolbarConfig(
+            config: QuillSimpleToolbarConfig(
               showDividers: true,
               showFontFamily: false,
               showSearchButton: false,
+              customButtons: [
+                QuillToolbarCustomButtonOptions(
+                  icon: const Icon(Icons.image),
+                  onPressed: _pickAndInsertImage,
+                ),
+              ],
             ),
           ),
           Divider(color: theme.colorScheme.border, height: 1),
@@ -170,6 +238,7 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
                 controller: _quillController,
                 config: QuillEditorConfig(
                   placeholder: 'เริ่มพิมพ์ที่นี่...',
+                  embedBuilders: FlutterQuillEmbeds.editorBuilders(),
                   customStyles: DefaultStyles(
                     paragraph: DefaultTextBlockStyle(
                       theme.textTheme.p.copyWith(

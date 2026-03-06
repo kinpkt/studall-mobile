@@ -24,8 +24,8 @@ class StudentExploreScreen extends ConsumerWidget {
 
     List<Map<String, String>> tools = [
       {
-        'name': 'ถ่ายรูปจดโน้ต',
-        'path': '/photo'
+        'name': 'จดโน้ต',
+        'path': '/student/note'
       },
       {
         'name': 'รวมไฟล์ PDF',
@@ -33,26 +33,7 @@ class StudentExploreScreen extends ConsumerWidget {
       },
       {
         'name': 'คำนวณเกรดเฉลี่ย',
-        'path': '/gpa-calculator',
-      },
-    ];
-
-    List<Map<String, dynamic>> workingSpaceTypes = [
-      {
-        'description': 'คาเฟ่',
-        'icon': Icon(PhosphorIconsBold.coffee),
-      },
-      {
-        'description': '24 ชม.',
-        'icon': Icon(PhosphorIconsBold.clock),
-      },
-      {
-        'description': 'ห้องสมุด',
-        'icon': Icon(PhosphorIconsBold.books),
-      },
-      {
-        'description': 'ห้องประชุม',
-        'icon': Icon(PhosphorIconsBold.presentationChart),
+        'path': '/student/tools/gpa-calculator',
       },
     ];
 
@@ -102,30 +83,14 @@ class StudentExploreScreen extends ConsumerWidget {
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: ToolsItemCard(
-                      name: tools[index]['name'] ?? '',
-                      path: tools[index]['path'] ?? ''
+                    name: tools[index]['name'] ?? '',
+                    path: tools[index]['path'] ?? ''
                   ),
                 );
               }),
             ),
           ),
           Text('หาที่อ่านหนังสืออยู่รึเปล่า?', style: theme.textTheme.h3,),
-          Text('ประเภท', style: theme.textTheme.h4,),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: List.generate(workingSpaceTypes.length, (index) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 24.0),
-                  child: WorkingSpaceItemCard(
-                      description: workingSpaceTypes[index]['description'] ?? '',
-                      icon: workingSpaceTypes[index]['icon'],
-                  ),
-                );
-              }),
-            ),
-          ),
           ShadButton(
             width: 500,
             height: 64,

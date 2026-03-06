@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/core/services/r2_service.dart';
 import 'package:studall/src/features/partner/advertisements/data/models/advertisement_model.dart';
 import 'package:studall/src/features/partner/advertisements/data/repositories/advertisement_firestore_repository.dart';
 
@@ -22,11 +26,52 @@ class _PartnerAddAdvertisementScreenState extends ConsumerState<PartnerAddAdvert
 
   bool _isLoading = false;
 
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void dispose() {
     _topicController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80
+      );
+
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
+      }
+    }
+    catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to pick image: $e')),
+      );
+    }
+  }
+
+  Future<String?> _uploadImageToStorage(String userId) async {
+    if (_selectedImage == null)
+      return null;
+
+    try {
+      final r2Service = R2Service();
+
+      final String fileName = 'advertisements/$userId/${DateTime.now().millisecondsSinceEpoch}.png';
+      final String imageUrl = await r2Service.uploadFile(_selectedImage!, fileName);
+
+      return imageUrl;
+    }
+    catch (e) {
+      debugPrint('Error uploading image to R2: $e');
+      rethrow;
+    }
   }
 
   Future<void> _submit() async {
@@ -36,15 +81,27 @@ class _PartnerAddAdvertisementScreenState extends ConsumerState<PartnerAddAdvert
       return;
 
     if (_formKey.currentState!.validate()) {
+      if (_selectedImage == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('กรุณาเลือกภาพประกอบโฆษณา')),
+        );
+
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
 
-      final topic = _topicController.text;
-      final description = _descriptionController.text;
-      const imageUrl = 'https://placehold.co/600x400/png';
-
       try {
+        final topic = _topicController.text;
+        final description = _descriptionController.text;
+
+        final String? imageUrl = await _uploadImageToStorage(currentUser.uid);
+
+        if (imageUrl == null)
+          throw Exception('Failed to get image URL from R2');
+
         debugPrint('Submitting Advertisement:');
         debugPrint('Topic: $topic');
         debugPrint('Description: $description');
@@ -79,12 +136,17 @@ class _PartnerAddAdvertisementScreenState extends ConsumerState<PartnerAddAdvert
         _topicController.clear();
         _descriptionController.clear();
 
-      } catch (e) {
+        Navigator.pop(context);
+      }
+      catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
+        ShadToaster.of(context).show(
+          ShadToast(
+            description: Text('เกิดข้อผิดพลาด: $e'),
+          ),
         );
-      } finally {
+      }
+      finally {
         if (mounted) {
           setState(() {
             _isLoading = false;
@@ -125,9 +187,7 @@ class _PartnerAddAdvertisementScreenState extends ConsumerState<PartnerAddAdvert
               Text('ภาพประกอบโฆษณา', style: theme.textTheme.p,),
               const SizedBox(height: 8),
               GestureDetector(
-                onTap: () {
-                  // TODO: Implement actual image picking logic
-                },
+                onTap: _isLoading ? null : _pickImage,
                 child: Container(
                   height: 150,
                   width: double.infinity,
@@ -135,7 +195,16 @@ class _PartnerAddAdvertisementScreenState extends ConsumerState<PartnerAddAdvert
                     border: Border.all(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Center(
+                  child: _selectedImage != null
+                  ? ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      _selectedImage!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
+                  )
+                  : Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -155,9 +224,9 @@ class _PartnerAddAdvertisementScreenState extends ConsumerState<PartnerAddAdvert
                 placeholder: const Text('กรอกรายละเอียดโฆษณาที่นี่'),
                 maxLines: 5,
                 validator: (v) {
-                  if (v.isEmpty) {
+                  if (v.isEmpty)
                     return 'กรุณากรอกรายละเอียดโฆษณา';
-                  }
+
                   return null;
                 },
               ),
@@ -172,7 +241,7 @@ class _PartnerAddAdvertisementScreenState extends ConsumerState<PartnerAddAdvert
                     width: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                      : const Text('ส่งคำขอเพิ่มโฆษณา'),
+                    : const Text('ส่งคำขอเพิ่มโฆษณา'),
                 ),
               ),
             ],

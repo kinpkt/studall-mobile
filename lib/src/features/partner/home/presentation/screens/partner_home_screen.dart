@@ -14,36 +14,7 @@ import 'package:studall/src/features/partner/home/presentation/widgets/advertise
 import 'package:studall/src/features/partner/home/presentation/widgets/branch_card_minimal.dart';
 
 import '../../../data/models/partner_model.dart';
-
-final partnerProvider = StreamProvider<PartnerModel?>((ref) {
-  final currentUser = FirebaseAuth.instance.currentUser;
-
-  if (currentUser == null)
-    return Stream.value(null);
-
-  final repository = ref.watch(partnerFirestoreRepositoryProvider);
-  return repository.getPartnerByUserId(currentUser.uid);
-});
-
-final branchesProvider = StreamProvider<List<BranchModel>>((ref) {
-  final currentUser = FirebaseAuth.instance.currentUser;
-
-  if (currentUser == null)
-    return Stream.value([]);
-
-  final repository = ref.watch(branchFirestoreRepositoryProvider);
-  return repository.getBranchesByUserId(currentUser.uid);
-});
-
-final advertisementsProvider = StreamProvider<List<AdvertisementModel>>((ref) {
-  final currentUser = FirebaseAuth.instance.currentUser;
-
-  if (currentUser == null)
-    return Stream.value([]);
-
-  final repository = ref.watch(advertisementFirestoreRepositoryProvider);
-  return repository.getAdvertisementsFromUserId(currentUser.uid);
-});
+import '../providers/partner_home_provider.dart';
 
 class PartnerHomeScreen extends ConsumerWidget {
   const PartnerHomeScreen({super.key});
@@ -61,6 +32,7 @@ class PartnerHomeScreen extends ConsumerWidget {
     final partnerAsync = ref.watch(partnerProvider);
     final branchesAsync = ref.watch(branchesProvider);
     final advertisementsAsync = ref.watch(advertisementsProvider);
+    final requestsAsync = ref.watch(requestsProvider);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -127,19 +99,35 @@ class PartnerHomeScreen extends ConsumerWidget {
               if (ads.isEmpty) {
                 return const Center(child: Text('ไม่มีโฆษณา'));
               }
-              return SizedBox(
-                height: 150,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: ads.length,
-                  itemBuilder: (context, index) {
-                    final ad = ads[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: AdvertisementBanner(ads: ad),
-                    );
-                  },
-                ),
+
+              return requestsAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => Center(child: Text('เกิดข้อผิดพลาด: $err')),
+                data: (requests) {
+                  return SizedBox(
+                    height: 150,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: ads.length,
+                      itemBuilder: (context, index) {
+                        final ad = ads[index];
+
+                        final matchingRequest = requests
+                            .where((req) => req.id == ad.id)
+                            .firstOrNull;
+
+
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: AdvertisementBanner(
+                            ads: ad,
+                            status: matchingRequest?.status,
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
               );
             },
           ),

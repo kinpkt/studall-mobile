@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class GPACalculatorScreen extends StatefulWidget {
@@ -45,7 +46,6 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
     final gradeStr = _gradeController.text;
     final parsedGrade = _parseGrade(gradeStr);
 
-    // Only add if all fields have data AND the grade is valid
     if (_nameController.text.isNotEmpty &&
         _creditController.text.isNotEmpty &&
         parsedGrade != null) {
@@ -54,7 +54,6 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
           'name': _nameController.text,
           'credits': double.tryParse(_creditController.text) ?? 3.0,
           'grade': parsedGrade,
-          // Store what the user actually typed so we can display it nicely in the list
           'displayGrade': gradeStr.trim().toUpperCase(),
         });
         _nameController.clear();
@@ -82,7 +81,18 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('คำนวณเกรดเฉลี่ย', style: theme.textTheme.h1,),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            }
+            else {
+              context.go('/student/explore');
+            }
+          },
+        ),
+        title: Text('คำนวณเกรดเฉลี่ย', style: theme.textTheme.h2,),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
