@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/constants/constants.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
@@ -108,9 +109,9 @@ class StudentHomeScreen extends StatelessWidget {
                 child: Text(
                   'ทั้งหมด',
                   style: textTheme.muted.copyWith(
-                    color: colorScheme.mutedForeground,
+                    color: colorScheme.custom['info']!,
                     decoration: TextDecoration.underline,
-                    decorationColor: colorScheme.mutedForeground,
+                    decorationColor: colorScheme.custom['info']!,
                   ),
                 ),
               ),
@@ -168,15 +169,13 @@ class StudentHomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     GestureDetector(
-                      onTap: () {
-                        // TODO: Navigate to full todo list
-                      },
+                      onTap: () => context.go('/student/tasks'),
                       child: Text(
                         'ทั้งหมด',
                         style: textTheme.muted.copyWith(
-                          color: colorScheme.mutedForeground,
+                          color: colorScheme.custom['info']!,
                           decoration: TextDecoration.underline,
-                          decorationColor: colorScheme.mutedForeground,
+                          decorationColor: colorScheme.custom['info']!,
                         ),
                       ),
                     ),

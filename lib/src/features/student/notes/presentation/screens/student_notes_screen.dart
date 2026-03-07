@@ -18,7 +18,6 @@ class StudentNotesScreen extends ConsumerStatefulWidget {
 }
 
 class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
-  /// null = show all notes, non-null = filter by courseId
   String? _selectedCourseId;
 
   @override
@@ -150,7 +149,7 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
                     'ล้างตัวกรอง',
                     style: theme.textTheme.small.copyWith(
                       color: theme.colorScheme.custom['info'],
-                      decoration: TextDecoration.underline,
+                      decoration: .underline,
                       decorationColor: theme.colorScheme.custom['info']!,
                     ),
                   ),
@@ -233,13 +232,9 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
                 onTap: () =>
                     controller.isOpen ? controller.close() : controller.open(),
                 child: Icon(
-                  _selectedCourseId != null
-                      ? PhosphorIconsFill.funnel
-                      : PhosphorIconsRegular.sliders,
+                  PhosphorIconsRegular.sliders,
                   size: 20,
-                  color: _selectedCourseId != null
-                      ? theme.colorScheme.primary
-                      : null,
+                  color: theme.colorScheme.primary,
                 ),
               ),
             );

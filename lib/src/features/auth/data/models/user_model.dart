@@ -32,32 +32,32 @@ class UserModel {
     );
   }
 
-  factory UserModel.fromFirestore(Map<String, dynamic> data, String docId) {
+factory UserModel.fromFirestore(Map<String, dynamic> data, String docId) {
     return UserModel(
       id: docId,
-      email: data['email'] as String,
-      displayName: data['displayName'] as String,
+      email: data['email'] as String? ?? '',
+      displayName: data['displayName'] as String? ?? 'ผู้ใช้งาน',
       photoUrl: data['photoUrl'] as String?,
       isBanned: data['isBanned'] as bool? ?? false,
       lastActiveRole: data['lastActiveRole'] != null
-        ? Role.values.firstWhere(
-            (role) => role.name == data['lastActiveRole'],
-            orElse: () => Role.values.first,
-          )
-        : null,
-      roles:
-        (data['roles'] as List<dynamic>?)
-            ?.map(
-              (roleStr) => Role.values.firstWhere(
-                (role) => role.name == roleStr,
-                orElse: () => Role.values.first,
-              ),
+          ? Role.values.firstWhere(
+              (role) => role.name == data['lastActiveRole'],
+              orElse: () => Role.values.first,
             )
-            .toList() ??
-        [],
+          : null,
+      roles:
+          (data['roles'] as List<dynamic>?)
+              ?.map(
+                (roleStr) => Role.values.firstWhere(
+                  (role) => role.name == roleStr,
+                  orElse: () => Role.values.first,
+                ),
+              )
+              .toList() ??
+          [],
     );
   }
-
+  
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,

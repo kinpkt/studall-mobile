@@ -70,70 +70,82 @@ class RadioCard<T> extends StatelessWidget {
               ),
             ),
           ),
-        GestureDetector(
-          onTap: enabled && onChanged != null ? () => onChanged!(value) : null,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            constraints: const BoxConstraints(minWidth: 394, minHeight: 124),
-            decoration: BoxDecoration(
-              color: colorScheme.card,
-              border: Border.all(color: colorScheme.border, width: 1),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: _isSelected ? theme.shadows.sm : null,
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: Stack(
-                children: [
-                  if (backgroundImage != null) _buildBackgroundImage(),
-                  Positioned.fill(
-                    child: Container(
-                      color: colorScheme.card.withValues(alpha: .5),
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            colorScheme.card,
-                            colorScheme.card.withValues(alpha: .5),
-                          ],
-                          stops: const [0.0, 1.0],
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: enabled && onChanged != null
+                ? () => onChanged!(value)
+                : null,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              constraints: const BoxConstraints(minWidth: 394, minHeight: 124),
+              decoration: BoxDecoration(
+                color: colorScheme.card,
+                border: Border.all(color: colorScheme.border, width: 1),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: _isSelected ? theme.shadows.sm : null,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: IntrinsicHeight(
+                  child: Stack(
+                    fit: StackFit.passthrough,
+                    children: [
+                      if (backgroundImage != null) _buildBackgroundImage(),
+                      Positioned.fill(
+                        child: Container(
+                          color: colorScheme.card.withValues(alpha: .5),
                         ),
                       ),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: theme.textTheme.h4.copyWith(
-                            color: colorScheme.cardForeground,
+                      if (!_isSelected)
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  colorScheme.card,
+                                  colorScheme.card.withValues(alpha: .5),
+                                ],
+                                stops: const [0.0, 1.0],
+                              ),
+                            ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          description,
-                          style: theme.textTheme.muted.copyWith(
-                            color: colorScheme.mutedForeground,
-                          ),
-                          maxLines: 3,
-                          overflow: TextOverflow.fade,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
                         ),
-                      ],
-                    ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              title,
+                              style: theme.textTheme.h3.copyWith(
+                                color: colorScheme.cardForeground,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              description,
+                              style: theme.textTheme.custom['medium']?.copyWith(
+                                color: colorScheme.foreground.withValues(
+                                  alpha: .7,
+                                ),
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -145,7 +157,6 @@ class RadioCard<T> extends StatelessWidget {
   Widget _buildBackgroundImage() {
     if (backgroundImage == null) return const SizedBox.shrink();
 
-    // Check if it's a network image or asset
     final isNetwork =
         backgroundImage!.startsWith('http://') ||
         backgroundImage!.startsWith('https://');

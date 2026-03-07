@@ -113,18 +113,18 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('รหัสผ่าน'),
-                          GestureDetector(
-                            onTap: () {
-                              // TODO: Implement forgot password functionality
-                            },
-                            child: Text(
-                              'ลืมรหัสผ่าน',
-                              style: theme.textTheme.muted.copyWith(
-                                color: theme.colorScheme.foreground,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
+                          // GestureDetector(
+                          //   onTap: () {
+                          //     // TODO: Implement forgot password functionality
+                          //   },
+                          //   child: Text(
+                          //     'ลืมรหัสผ่าน',
+                          //     style: theme.textTheme.muted.copyWith(
+                          //       color: theme.colorScheme.foreground,
+                          //       decoration: TextDecoration.underline,
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,

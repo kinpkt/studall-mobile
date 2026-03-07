@@ -7,6 +7,7 @@ final appThemeLight = ShadThemeData(
   colorScheme: AppColorScheme.lightScheme,
   textTheme: appTextStyle,
   inputTheme: appInputTheme,
+  textareaTheme: appTextareaTheme,
   buttonSizesTheme: ShadButtonSizesTheme(
     icon: ShadButtonSizeTheme(height: 40, padding: EdgeInsets.all(8)),
   ),
@@ -20,6 +21,7 @@ final appThemeDark = ShadThemeData(
   colorScheme: AppColorScheme.darkScheme,
   textTheme: appTextStyle,
   inputTheme: appInputDarkTheme,
+  textareaTheme: appTextareaDarkTheme,
   buttonSizesTheme: ShadButtonSizesTheme(
     icon: ShadButtonSizeTheme(height: 40, padding: EdgeInsets.all(8)),
   ),
@@ -73,6 +75,7 @@ final appInputTheme = ShadInputTheme(
   ),
 );
 
+
 final appInputDarkTheme = appInputTheme.copyWith(
   style: appTextStyle.custom['medium']?.copyWith(
     color: AppColorScheme.darkScheme.foreground,
@@ -84,6 +87,28 @@ final appInputDarkTheme = appInputTheme.copyWith(
   ),
 );
 
+final appTextareaTheme = ShadTextareaTheme(
+  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+  style: appTextStyle.custom['medium']?.copyWith(
+    color: AppColorScheme.lightScheme.foreground,
+    fontWeight: FontWeight.w400,
+  ),
+  placeholderStyle: appTextStyle.custom['medium']?.copyWith(
+    color: AppColorScheme.lightScheme.mutedForeground,
+    fontWeight: FontWeight.w400,
+  ),
+);
+
+final appTextareaDarkTheme = appTextareaTheme.copyWith(
+  style: appTextStyle.custom['medium']?.copyWith(
+    color: AppColorScheme.darkScheme.foreground,
+    fontWeight: FontWeight.w400,
+  ),
+  placeholderStyle: appTextStyle.custom['medium']?.copyWith(
+    color: AppColorScheme.darkScheme.mutedForeground,
+    fontWeight: FontWeight.w400,
+  ),
+);
 final appDialogTheme = ShadDialogTheme(
   constraints: BoxConstraints(minWidth: 370),
   padding: const EdgeInsets.all(16),

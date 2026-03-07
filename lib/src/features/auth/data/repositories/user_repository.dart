@@ -25,6 +25,8 @@ abstract class UserRepository {
   /// นับจำนวนผู้ใช้ทั้งหมดที่มียศ
   Future<int> getUsersCountByRole(Role role);
 
+  Future<void> addUserRole(String uid, Role role);
+
   /// อัปเดทข้อมูลสถานะการแบนของผู้ใช้
   Future<void> updateUserBanStatus(String uid, bool isBanned);
 
