@@ -1,17 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/common_widgets/app_list_tile.dart';
-import 'package:studall/src/core/theme/theme_extension.dart';
+import 'package:studall/src/core/utils/datetime_to_thai_string.dart';
 import 'package:studall/src/features/student/common_widgets/resource_icon.dart';
-import 'package:studall/src/features/student/data/models/utility_model.dart';
+import 'package:studall/src/features/student/tasks/data/repositories/task_firestore_repository.dart';
 
-class TaskTile extends StatelessWidget {
-  final UtilityModel task;
+import '../../../home/presentation/providers/home_controller.dart';
+import '../../data/models/task_model.dart';
+
+class TaskTile extends ConsumerWidget {
+  final TaskModel task;
 
   const TaskTile({super.key, required this.task});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -19,29 +24,164 @@ class TaskTile extends StatelessWidget {
     final dueDateColor = colorScheme.custom['success'] ?? Colors.green;
     final dateStyle = textTheme.muted.copyWith(color: dueDateColor);
 
-    return AppListTile(
-      leading: ResourceIcon(type: task.type),
-      title: task.title ?? 'Untitled Task',
-      titleStyle: textTheme.list.copyWith(color: colorScheme.foreground),
-      description: task.courseId ?? '',
-      descriptionStyle: textTheme.muted.copyWith(
-        color: colorScheme.mutedForeground,
-      ),
-      trailing: task.dueDate != null
-          ? [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(_formatDueDate(task.dueDate!), style: dateStyle),
-                  Text(
-                    '${task.dueDate!.hour.toString().padLeft(2, '0')}:${task.dueDate!.minute.toString().padLeft(2, '0')}',
-                    style: dateStyle,
-                  ),
-                ],
+    String descriptionText = '';
+
+    if (task.courseId != null && task.courseId!.isNotEmpty) {
+      final courseAsync = ref.watch(courseNameProvider(task.courseId!));
+
+      descriptionText = courseAsync.when(
+        data: (name) => name != null ? 'วิชา: ${name}' : '',
+        loading: () => 'กำลังโหลด...',
+        error: (_, __) => 'โหลดข้อมูลล้มเหลว',
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (mainDialogContext) {
+            return ShadDialog(
+              title: Text(task.title),
+              description: Text(
+                '$descriptionText'
+                '${task.description != null ? '\nรายละเอียด: ${task.description}' : ''}'
+                '\n${task.type == TaskType.toDo
+                ? 'กำหนดส่ง: ${dateTimeToThaiString(task.endDateTime, withTime: true, withDayOfWeek: true)}'
+                : 'ระยะเวลา: ${dateTimeToThaiString(task.startDateTime!, withTime: true, withDayOfWeek: true)} - ${dateTimeToThaiString(task.endDateTime, withTime: true, withDayOfWeek: true)}'}'
               ),
-            ]
-          : null,
+              actions: [
+                ShadButton.secondary(
+                  child: const Text('ปิด'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                ShadButton.destructive(
+                  child: const Text('ลบ'),
+                  onPressed: () {
+                    showDialog(
+                      context: mainDialogContext,
+                      builder: (confirmContext) {
+                        return ShadDialog(
+                          title: const Text('ยืนยันการลบ'),
+                          description: const Text('คุณแน่ใจหรือไม่ว่าต้องการลบงานนี้? การกระทำนี้ไม่สามารถย้อนกลับได้'),
+                          actions: [
+                            ShadButton.secondary(
+                              child: const Text('ยกเลิก'),
+                              onPressed: () => Navigator.of(confirmContext).pop(),
+                            ),
+                            ShadButton.destructive(
+                              child: const Text('ยืนยัน'),
+                              onPressed: () async {
+                                try {
+                                  final currentUser = FirebaseAuth.instance.currentUser;
+
+                                  if (currentUser == null) throw Exception('ผู้ใช้ยังไม่ได้เข้าสู่ระบบ');
+
+                                  await ref.read(taskFirestoreRepositoryProvider).deleteTask(currentUser.uid, task.id);
+
+                                  if (!confirmContext.mounted)
+                                    return;
+                                  Navigator.of(confirmContext).pop();
+
+                                  if (!mainDialogContext.mounted)
+                                    return;
+                                  Navigator.of(mainDialogContext).pop();
+
+                                  if (!context.mounted)
+                                    return;
+                                  ShadToaster.of(context).show(
+                                    const ShadToast(
+                                      title: Text('สำเร็จ'),
+                                      description: Text('ลบงานเรียบร้อยแล้ว'),
+                                    ),
+                                  );
+                                }
+                                catch (e) {
+                                  if (!confirmContext.mounted)
+                                    return;
+                                  Navigator.of(confirmContext).pop();
+
+                                  if (!context.mounted) return;
+                                  ShadToaster.of(context).show(
+                                    ShadToast.destructive(
+                                      title: const Text('เกิดข้อผิดพลาด'),
+                                      description: Text('ไม่สามารถลบข้อมูลได้: $e'),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+                if (!task.isDone)
+                  ShadButton(
+                    child: const Text('ทำงานเสร็จเรียบร้อยแล้ว'),
+                    onPressed: () {
+                      final updatedTask = task.copyWith(isDone: true);
+                      final currentUser = FirebaseAuth.instance.currentUser;
+
+                      ref.read(taskFirestoreRepositoryProvider).updateTask(currentUser!.uid, updatedTask);
+
+                      Navigator.of(context).pop();
+
+                      ShadToaster.of(context).show(
+                        const ShadToast(
+                          title: Text('สำเร็จ'),
+                          description: Text('ปรับสถานะให้งานเสร็จสิ้นเรียบร้อยแล้ว'),
+                        ),
+                      );
+                    },
+                  ),
+                if (task.isDone)
+                  ShadButton(
+                    child: const Text('ปรับให้งานยังไม่เสร็จ'),
+                    onPressed: () {
+                      final updatedTask = task.copyWith(isDone: false);
+                      final currentUser = FirebaseAuth.instance.currentUser;
+
+                      ref.read(taskFirestoreRepositoryProvider).updateTask(currentUser!.uid, updatedTask);
+
+                      Navigator.of(context).pop();
+
+                      ShadToaster.of(context).show(
+                        const ShadToast(
+                          title: Text('สำเร็จ'),
+                          description: Text('ปรับสถานะให้งานไม่เสร็จเรียบร้อยแล้ว'),
+                        ),
+                      );
+                    },
+                  ),
+              ],
+            );
+          }
+        );
+      },
+      child: AppListTile(
+        leading: ResourceIcon(type: task.type),
+        title: task.title,
+        titleStyle: textTheme.list.copyWith(color: colorScheme.foreground),
+        description: descriptionText,
+        descriptionStyle: textTheme.muted.copyWith(
+          color: colorScheme.mutedForeground,
+        ),
+        trailing: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_formatDueDate(task.endDateTime), style: dateStyle),
+              Text(
+                '${task.endDateTime.hour.toString().padLeft(2, '0')}:${task.endDateTime.minute.toString().padLeft(2, '0')}',
+                style: dateStyle,
+              ),
+            ],
+          ),
+        ]
+      )
     );
   }
 

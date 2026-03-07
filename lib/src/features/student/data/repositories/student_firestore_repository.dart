@@ -18,7 +18,7 @@ class StudentFirestoreRepository {
   StudentFirestoreRepository(this._service);
 
   Future<StudentModel?> getStudentSettings(String id) async {
-    final data = _service.get(
+    final data = await _service.get(
       path: 'students/$id',
       builder: (data, docId) => StudentModel.fromFirestore(data, docId),
     );

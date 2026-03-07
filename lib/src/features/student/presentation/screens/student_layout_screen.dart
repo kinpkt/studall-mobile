@@ -85,7 +85,7 @@ class StudentLayoutScreen extends ConsumerWidget {
                   leading: const Icon(PhosphorIconsRegular.listChecks),
                   title: Text('เพิ่มสิ่งที่ต้องทำ', style: theme.textTheme.p),
                   onTap: () {
-                    Navigator.pop(ctx);
+                    context.push('/student/tasks/add-edit');
                   },
                 ),
                 ListTile(

@@ -41,6 +41,9 @@ import 'package:studall/src/features/admin/home/presentation/screens/admin_home_
 import 'package:studall/src/features/admin/users/presentation/screens/admin_users_screen.dart';
 import 'package:studall/src/features/admin/approval/presentation/screens/admin_approval_screen.dart';
 
+import '../../features/student/tasks/data/models/task_model.dart';
+import '../../features/student/tasks/presentation/screens/student_add_edit_task_screen.dart';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Navigator keys
 // ─────────────────────────────────────────────────────────────────────────────
@@ -164,7 +167,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: ':courseId',
                     redirect: (_, state) =>
-                        '/student/courses/${state.pathParameters['courseId']}/forums',
+                      '/student/courses/${state.pathParameters['courseId']}/forums',
                   ),
 
                   ShellRoute(
@@ -203,6 +206,17 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/student/tasks',
                 builder: (_, _) => const StudentTasksScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'add-edit',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) {
+                      final taskToEdit = state.extra as TaskModel?;
+
+                      return StudentAddEditTaskScreen(task: taskToEdit);
+                    },
+                  ),
+                ]
               ),
             ],
           ),

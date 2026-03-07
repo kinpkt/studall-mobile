@@ -90,7 +90,7 @@ class NoteModel {
       description: content,
       createdAt: createdAt,
       updatedAt: updatedAt,
-      isPined: isPinned,
+      isPinned: isPinned,
     );
   }
 }

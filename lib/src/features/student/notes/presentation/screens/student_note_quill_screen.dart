@@ -10,15 +10,12 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:studall/src/core/services/r2_service.dart';
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
-import 'package:studall/src/features/student/courses/data/repositories/course_firestore_repository.dart';
+import 'package:studall/src/features/student/data/models/utility_model.dart';
+import 'package:studall/src/features/student/data/repositories/utility_firestore_repository.dart';
 import 'package:studall/src/features/student/notes/data/models/note_model.dart';
 
-import '../../../courses/data/models/course_model.dart';
 import '../../data/repositories/note_firestore_repository.dart';
-
-final ownedCoursesProvider = FutureProvider.autoDispose.family<List<CourseModel>, String>((ref, userId) {
-  return ref.watch(courseFirestoreRepositoryProvider).getCoursesByUserId(userId);
-});
+import '../providers/student_note_quill_provider.dart';
 
 class NoteQuillScreen extends ConsumerStatefulWidget {
   final NoteModel? note;
@@ -33,6 +30,7 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
   late final TextEditingController _titleController;
 
   String? _selectedCourseId;
+  bool _isPinned = false;
 
   @override
   void initState() {
@@ -41,6 +39,7 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
     _titleController = TextEditingController(text: widget.note?.title ?? '');
 
     _selectedCourseId = widget.note?.courseId;
+    _isPinned = widget.note?.isPinned ?? false;
 
     if (widget.note != null && widget.note!.content.isNotEmpty) {
       try {
@@ -118,7 +117,8 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
           BlockEmbed.image(uploadedImageUrl),
           null,
         );
-      } else {
+      }
+      else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ')),
@@ -145,6 +145,61 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
         iconTheme: IconThemeData(color: theme.colorScheme.foreground),
         title: Text('จดโน้ต', style: theme.textTheme.h4),
         actions: [
+          IconButton(
+            icon: Icon(
+              _isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+              color: _isPinned ? theme.colorScheme.primary : theme.colorScheme.foreground,
+            ),
+            onPressed: () {
+              setState(() {
+                _isPinned = !_isPinned;
+              });
+            },
+          ),
+          if (widget.note != null)
+            IconButton(
+              icon: Icon(
+                Icons.delete_outline,
+                color: theme.colorScheme.destructive,
+              ),
+              onPressed: () {
+                showDialog<bool>(
+                  context: context,
+                  builder: (dialogContext) {
+                    return ShadDialog.alert(
+                      title: const Text('ลบโน้ต'),
+                      description: const Padding(
+                        padding: EdgeInsets.only(bottom: 8),
+                        child: Text('คุณแน่ใจหรือไม่ว่าต้องการลบโน้ตนี้? การกระทำนี้ไม่สามารถย้อนกลับได้'),
+                      ),
+                      actions: [
+                        ShadButton.outline(
+                          child: const Text('ยกเลิก'),
+                          onPressed: () => Navigator.of(dialogContext).pop(false),
+                        ),
+                        ShadButton.destructive(
+                          child: const Text('ลบ'),
+                          onPressed: () => Navigator.of(dialogContext).pop(true),
+                        ),
+                      ],
+                    );
+                  }
+                ).then((shouldDelete) async {
+                  if (shouldDelete == true) {
+                    final currentUser = FirebaseAuth.instance.currentUser;
+
+                    final nav = Navigator.of(context);
+
+                    if (currentUser != null && widget.note?.id != null) {
+                      await ref.read(noteFirestoreRepositoryProvider).deleteNote(currentUser.uid, widget.note!.id!);
+                      await ref.read(utilityFirestoreRepositoryProvider).deleteUtility(currentUser.uid, widget.note!.id!);
+                    }
+
+                    nav.pop();
+                  }
+                });
+              },
+            ),
           ShadButton.ghost(
             onPressed: () async {
               final deltaJson = _quillController.document.toDelta().toJson();
@@ -157,12 +212,19 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
                 content: contentString,
                 userId: currentUser.uid,
                 courseId: _selectedCourseId,
+                isPinned: _isPinned,
               );
 
-              if (widget.note != null)
+              final newUtility = UtilityModel.fromNoteModel(newNote);
+
+              if (widget.note != null) {
                 await ref.read(noteFirestoreRepositoryProvider).updateNote(currentUser.uid, newNote);
-              else
+                await ref.read(utilityFirestoreRepositoryProvider).updateUtility(currentUser.uid, newUtility);
+              }
+              else {
                 await ref.read(noteFirestoreRepositoryProvider).addNote(currentUser.uid, newNote);
+                await ref.read(utilityFirestoreRepositoryProvider).addUtility(currentUser.uid, newUtility);
+              }
 
               if (mounted)
                 Navigator.pop(context);
@@ -184,6 +246,7 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
                 child: ShadSelect<String>(
                   placeholder: Text('เลือกวิชา'),
                   initialValue: _selectedCourseId,
+                  allowDeselection: true,
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {
