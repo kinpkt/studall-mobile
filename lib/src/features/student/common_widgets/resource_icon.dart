@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/core/interfaces/resource_type.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
+
+import '../tasks/data/models/task_model.dart';
 
 class ResourceIconStyle {
   final Color backgroundColor;
@@ -16,7 +19,7 @@ class ResourceIconStyle {
 }
 
 class ResourceIcon extends StatelessWidget {
-  final UtilityType type;
+  final ResourceType type;
 
   const ResourceIcon({super.key, required this.type});
 
@@ -25,33 +28,34 @@ class ResourceIcon extends StatelessWidget {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
 
-    ResourceIconStyle getStyleForType(UtilityType type) {
+    ResourceIconStyle getStyleForType(ResourceType type) {
       switch (type) {
-        case UtilityType.assignment:
+        case TaskType.toDo:
+        case UtilityType.toDo:
           return ResourceIconStyle(
             backgroundColor: colorScheme.custom['blue'] ?? Colors.blue,
             iconColor: colorScheme.custom['blueForeground'] ?? Colors.white,
             iconData: PhosphorIconsRegular.fileText,
           );
-        case UtilityType.shortAnswerQuestion:
-          return ResourceIconStyle(
-            backgroundColor: colorScheme.custom['orange'] ?? Colors.orange,
-            iconColor: colorScheme.custom['orangeForeground'] ?? Colors.white,
-            iconData: PhosphorIconsRegular.sealQuestion,
-          );
-        case UtilityType.multipleChoiceQuestion:
-          return ResourceIconStyle(
-            backgroundColor: colorScheme.custom['orange'] ?? Colors.orange,
-            iconColor: colorScheme.custom['orangeForeground'] ?? Colors.white,
-            iconData: PhosphorIconsRegular.sealQuestion,
-          );
-        case UtilityType.material:
+        // case UtilityType.shortAnswerQuestion:
+        //   return ResourceIconStyle(
+        //     backgroundColor: colorScheme.custom['orange'] ?? Colors.orange,
+        //     iconColor: colorScheme.custom['orangeForeground'] ?? Colors.white,
+        //     iconData: PhosphorIconsRegular.sealQuestion,
+        //   );
+        // case UtilityType.multipleChoiceQuestion:
+        //   return ResourceIconStyle(
+        //     backgroundColor: colorScheme.custom['orange'] ?? Colors.orange,
+        //     iconColor: colorScheme.custom['orangeForeground'] ?? Colors.white,
+        //     iconData: PhosphorIconsRegular.sealQuestion,
+        //   );
+        case UtilityType.note:
           return ResourceIconStyle(
             backgroundColor: colorScheme.custom['gray'] ?? Colors.grey,
             iconColor: colorScheme.custom['grayForeground'] ?? Colors.white,
             iconData: PhosphorIconsRegular.fileText,
           );
-        case UtilityType.event:
+        case UtilityType.appointment:
           return ResourceIconStyle(
             backgroundColor: colorScheme.custom['purple'] ?? Colors.purple,
             iconColor: colorScheme.custom['purpleForeground'] ?? Colors.white,

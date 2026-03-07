@@ -18,69 +18,96 @@ class StudentNotesScreen extends ConsumerStatefulWidget {
 }
 
 class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
-  String? _selectedCourseId;
+  String? _selectedCourseId; // null = show all notes, non-null = filter by courseId
+  Future<List<NoteModel>>? _ownedNotesFuture;
+  Future<List<CourseModel>>? _ownedCoursesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  void _fetchData() {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      setState(() {
+        _ownedNotesFuture = ref
+          .read(noteFirestoreRepositoryProvider)
+          .getNotesByUserId(currentUser.uid);
+
+        _ownedCoursesFuture = ref
+          .read(courseFirestoreRepositoryProvider)
+          .getCoursesByUserId(currentUser.uid);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
-
     final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) {
-      return LogInScreen();
+      return const LogInScreen();
     }
 
-    final ownedNotes = ref
-        .watch(noteFirestoreRepositoryProvider)
-        .getNotesByUserId(currentUser.uid);
-
-    final ownedCourses = ref
-        .watch(courseFirestoreRepositoryProvider)
-        .getCoursesByUserId(currentUser.uid);
+    // Ensure futures aren't null just in case build runs before initState finishes
+    if (_ownedNotesFuture == null || _ownedCoursesFuture == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return Container(
       color: colorScheme.background,
       child: Column(
         children: [
-          _buildSearchBar(context, ownedCourses),
+          // Add a refresh indicator at the top so users can pull to refresh manually
+          _buildSearchBar(context, _ownedCoursesFuture!),
           if (_selectedCourseId != null) _buildActiveFilterText(context),
           Expanded(
-            child: FutureBuilder<List<NoteModel>>(
-              future: ownedNotes,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            // Wrap the list in a RefreshIndicator for manual pull-to-refresh
+            child: RefreshIndicator(
+              onRefresh: () async {
+                _fetchData();
+                // Wait for the new future to complete before stopping the spinner
+                await _ownedNotesFuture;
+              },
+              child: FutureBuilder<List<NoteModel>>(
+                future: _ownedNotesFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'),
-                  );
-                }
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'),
+                    );
+                  }
 
-                final allNotes = snapshot.data ?? [];
+                  final allNotes = snapshot.data ?? [];
 
-                final notes = _selectedCourseId != null
-                    ? allNotes
-                          .where((note) => note.courseId == _selectedCourseId)
-                          .toList()
-                    : allNotes;
+                  final notes = _selectedCourseId != null
+                      ? allNotes
+                      .where((note) => note.courseId == _selectedCourseId)
+                      .toList()
+                      : allNotes;
 
-                if (notes.isEmpty) {
-                  return const Center(child: Text('ยังไม่มีโน้ต'));
-                }
+                  if (notes.isEmpty) {
+                    return ListView(
+                      children: [
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                        Center(child: Text('ยังไม่มีโน้ต', style: theme.textTheme.h3)),
+                      ],
+                    );
+                  }
 
-                final pinnedNotes = notes
-                    .where((note) => note.isPinned)
-                    .toList();
-                final unpinnedNotes = notes
-                    .where((note) => !note.isPinned)
-                    .toList();
+                  final pinnedNotes = notes.where((note) => note.isPinned).toList();
+                  final unpinnedNotes = notes.where((note) => !note.isPinned).toList();
 
-                return SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     children: [
                       if (pinnedNotes.isNotEmpty) ...[
                         Padding(
@@ -101,9 +128,9 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
                       ),
                       ...unpinnedNotes.map((note) => NotesListTile(note: note)),
                     ],
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ],

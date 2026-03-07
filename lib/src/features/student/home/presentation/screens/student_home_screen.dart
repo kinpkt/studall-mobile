@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:studall/src/core/constants/constants.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
+import 'package:studall/src/features/student/home/presentation/providers/home_controller.dart';
 import 'package:studall/src/features/student/home/presentation/widgets/recent_card.dart';
+import 'package:studall/src/features/student/tasks/data/models/task_model.dart';
 import 'package:studall/src/features/student/tasks/presentation/widgets/task_tile.dart';
 import 'package:studall/src/features/student/home/data/models/schedule_model.dart';
 import 'package:studall/src/features/student/home/presentation/widgets/schedule.dart';
 
-class StudentHomeScreen extends StatelessWidget {
+class StudentHomeScreen extends ConsumerWidget {
   const StudentHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final utilitiesAsync = ref.watch(ownedUtilitiesProvider);
+    final tasksAsync = ref.watch(ownedTasksProvider);
+
     List<ScheduleModel> sampleSchedule = [
       ScheduleModel(
         id: '1',
@@ -67,8 +72,20 @@ class StudentHomeScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Schedule(scheduleItems: sampleSchedule, height: 208),
             const SizedBox(height: 16),
-            _buildRecentContent(context, kDemoRecentItems),
-            _buildTaskList(context, kDemoTaskTiles),
+            utilitiesAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) =>
+                  Center(child: Text('Error loading items: $err')),
+              data: (utility) => _buildRecentContent(context, utility),
+            ),
+            tasksAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) =>
+                  Center(child: Text('Error loading items: $err')),
+              data: (task) => _buildTaskList(context, task),
+            ),
+            // _buildRecentContent(context, kDemoRecentItems),
+            // _buildTaskList(context, kDemoTaskTiles),
           ],
         ),
       ),
@@ -118,9 +135,23 @@ class StudentHomeScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            height: 104,
-            child: ListView.separated(
+          if (items.isEmpty) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: colorScheme.card,
+                border: Border.all(color: colorScheme.border, width: 1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'ยังไม่มีรายการล่าสุด',
+                style: textTheme.p.copyWith(color: colorScheme.mutedForeground),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ] else ...[
+            ListView.separated(
               clipBehavior: Clip.none,
               scrollDirection: Axis.horizontal,
               itemCount: items.length,
@@ -129,40 +160,44 @@ class StudentHomeScreen extends StatelessWidget {
                 return RecentItemCard(item: items[index]);
               },
             ),
-          ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildTaskList(BuildContext context, List<UtilityModel> tasks) {
+  Widget _buildTaskList(BuildContext context, List<TaskModel> tasks) {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+
+    final today = DateTime.now();
+    final nextWeek = today.add(const Duration(days: 7));
+
+    final thisWeekTasks = tasks
+        .where((task) => task.endDateTime.isBefore(nextWeek))
+        .toList();
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row with title, count and "See All" link
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Left side: Title
                 Text(
                   'ที่ต้องทำสัปดาห์นี้',
                   style: textTheme.custom['medium']?.copyWith(
                     color: colorScheme.foreground,
                   ),
                 ),
-
                 Row(
                   children: [
                     Text(
-                      '${tasks.length}',
+                      '${thisWeekTasks.length}',
                       style: textTheme.custom['medium']?.copyWith(
                         color: colorScheme.mutedForeground,
                       ),
@@ -184,16 +219,36 @@ class StudentHomeScreen extends StatelessWidget {
               ],
             ),
           ),
+          if (thisWeekTasks.isEmpty) ...[
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: colorScheme.card,
+                border: Border.all(color: colorScheme.border, width: 1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'ไม่มีงานที่ต้องทำในสัปดาห์นี้',
+                style: textTheme.p.copyWith(
+                  color: colorScheme.mutedForeground,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ] else ...[
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: thisWeekTasks.length,
+              itemBuilder: (context, index) {
+                final task = thisWeekTasks[index];
 
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              final task = tasks[index];
-              return TaskTile(task: task);
-            },
-          ),
+                return TaskTile(task: task);
+              },
+            ),
+          ],
         ],
       ),
     );

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
 import 'package:studall/src/core/utils/datetime_to_thai_string.dart';
 import 'package:studall/src/features/student/common_widgets/resource_icon.dart';
 
 import '../../../data/models/utility_model.dart';
+import '../providers/home_controller.dart';
 
-class RecentItemCard extends StatelessWidget {
+class RecentItemCard extends ConsumerWidget {
   final UtilityModel item;
   final bool showTime;
   final String? avatarUrl;
@@ -19,8 +21,7 @@ class RecentItemCard extends StatelessWidget {
   });
 
   @override
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -32,39 +33,38 @@ class RecentItemCard extends StatelessWidget {
     String time = '';
 
     switch (item.type) {
-      case UtilityType.assignment:
-        title = item.title ?? 'Untitled Assignment';
+      case UtilityType.toDo:
+        title = item.title ?? 'ภาระงานที่ไม่ได้ถูกตั้งชื่อ';
         label = item.courseId ?? '';
         date = dateTimeToThaiString(
-          item.dueDate ?? item.createdAt,
+          item.endDateTime ?? item.createdAt,
           withYear: false,
           acronymMonth: true,
           withTime: false,
         );
         time =
-            '${item.dueDate?.hour.toString().padLeft(2, '0')}:${item.dueDate?.minute.toString().padLeft(2, '0')}';
+            '${item.endDateTime?.hour.toString().padLeft(2, '0')}:${item.endDateTime?.minute.toString().padLeft(2, '0')}';
         break;
-      case UtilityType.shortAnswerQuestion:
-        title = item.title ?? 'Untitled Short Answer Question';
-        label = item.courseId ?? '';
-      case UtilityType.multipleChoiceQuestion:
-        title = item.title ?? 'Untitled Multiple Choice Question';
-        label = item.courseId ?? '';
-      case UtilityType.material:
-        title = item.title ?? 'Untitled Material';
-        label = item.courseId ?? '';
-        date = dateTimeToThaiString(
-          item.createdAt,
-          withYear: false,
-          acronymMonth: true,
-          withTime: false,
-        );
-        time =
-            '${item.createdAt.hour.toString().padLeft(2, '0')}:${item.createdAt.minute.toString().padLeft(2, '0')}';
-        break;
+      // case UtilityType.shortAnswerQuestion:
+      //   title = item.title ?? 'Untitled Short Answer Question';
+      //   label = item.courseId ?? '';
+      // case UtilityType.multipleChoiceQuestion:
+      //   title = item.title ?? 'Untitled Multiple Choice Question';
+      //   label = item.courseId ?? '';
+      // case UtilityType.material:
+      //   title = item.title ?? 'Untitled Material';
+      //   label = item.courseId ?? '';
+      //   date = dateTimeToThaiString(
+      //     item.createdAt,
+      //     withYear: false,
+      //     acronymMonth: true,
+      //     withTime: false,
+      //   );
+      //   time =
+      //       '${item.createdAt.hour.toString().padLeft(2, '0')}:${item.createdAt.minute.toString().padLeft(2, '0')}';
+      //   break;
       case UtilityType.note:
         title = item.title ?? 'Untitled Note';
-        label = item.courseId ?? '';
         date = dateTimeToThaiString(
           item.createdAt,
           withYear: false,
@@ -74,18 +74,54 @@ class RecentItemCard extends StatelessWidget {
         time =
             '${item.createdAt.hour.toString().padLeft(2, '0')}:${item.createdAt.minute.toString().padLeft(2, '0')}';
         break;
-      case UtilityType.event:
-        title = item.title ?? 'Untitled Event';
-        label = item.courseId ?? '';
+      case UtilityType.appointment:
+        title = item.title ?? 'การนัดหมายที่ไม่ได้ตั้งชื่อ';
         date = dateTimeToThaiString(
-          item.dueDate ?? item.createdAt,
+          item.endDateTime ?? item.createdAt,
           withYear: false,
           acronymMonth: true,
           withTime: false,
         );
         time =
-            '${item.dueDate?.hour.toString().padLeft(2, '0')}:${item.dueDate?.minute.toString().padLeft(2, '0')}';
+            '${item.endDateTime?.hour.toString().padLeft(2, '0')}:${item.endDateTime?.minute.toString().padLeft(2, '0')}';
         break;
+    }
+
+    Widget buildCourseLabel() {
+      final textStyle = textTheme.muted.copyWith(
+        color: colorScheme.mutedForeground,
+      );
+
+      if (item.courseId == null || item.courseId!.isEmpty) {
+        return Text(
+          'ไม่มีรายวิชา',
+          style: textStyle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        );
+      }
+
+      final courseAsync = ref.watch(courseNameProvider(item.courseId!));
+
+      return courseAsync.when(
+        data: (name) => Text(
+          name ?? '',
+          style: textStyle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        loading: () => const SizedBox(
+          height: 12,
+          width: 12,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+        error: (_, __) => Text(
+          'โหลดข้อมูลล้มเหลว',
+          style: textStyle.copyWith(color: colorScheme.destructive),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      );
     }
 
     return Container(
@@ -116,14 +152,7 @@ class RecentItemCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        label,
-                        style: textTheme.muted.copyWith(
-                          color: colorScheme.mutedForeground,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      buildCourseLabel(),
                       Row(
                         children: [
                           Text(
@@ -132,8 +161,7 @@ class RecentItemCard extends StatelessWidget {
                               color: colorScheme.foreground,
                             ),
                           ),
-                          if (showTime &&
-                              item.type == UtilityType.assignment) ...[
+                          if (showTime && item.type == UtilityType.toDo) ...[
                             const SizedBox(width: 2),
                             Text(
                               time,
