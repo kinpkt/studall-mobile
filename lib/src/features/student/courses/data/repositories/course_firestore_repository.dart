@@ -44,7 +44,7 @@ class CourseFirestoreRepository implements CourseRepository {
       builder: (data, docId) => CourseModel.fromFirestore(data, docId),
     );
 
-    return data ?? [];
+    return data;
   }
 
   @override

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/constants/constants.dart';
-import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
 import 'package:studall/src/features/student/home/presentation/widgets/recent_card.dart';
 import 'package:studall/src/features/student/tasks/presentation/widgets/task_tile.dart';
-import 'package:uuid/uuid.dart';
 import 'package:studall/src/features/student/home/data/models/schedule_model.dart';
 import 'package:studall/src/features/student/home/presentation/widgets/schedule.dart';
 

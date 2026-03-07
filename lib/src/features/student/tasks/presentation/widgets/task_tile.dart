@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/common_widgets/app_list_tile.dart';
-import 'package:studall/src/core/theme/theme_extension.dart';
 import 'package:studall/src/features/student/common_widgets/resource_icon.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
 

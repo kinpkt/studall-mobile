@@ -26,6 +26,6 @@ class UtlityFirestoreRepository {
       builder: (data, docId) => UtilityModel.fromFirestore(data, docId),
     );
 
-    return data ?? [];
+    return data;
   }
 }
