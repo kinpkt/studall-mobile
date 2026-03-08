@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/features/admin/approval/data/models/request_model.dart';
+import 'package:studall/src/features/admin/approval/data/repositories/request_firestore_repository.dart';
 import 'package:studall/src/features/auth/data/models/role.dart';
 import 'package:studall/src/features/auth/presentation/controllers/auth_state_provider.dart';
 import 'package:studall/src/features/auth/data/repositories/user_firestore_repository.dart';
@@ -133,20 +135,30 @@ class _RegisterPartnerScreenState extends ConsumerState<RegisterPartnerScreen> {
 
     setState(() => _isSaving = true);
 
-    final partner = PartnerModel(
-      id: userId,
-      name: storeName,
-      description: description,
-    );
+    try {
+      final partner = PartnerModel(
+        id: userId,
+        name: storeName,
+        description: description,
+      );
 
-    final partnerRepo = ref.read(partnerFirestoreRepositoryProvider);
-    await partnerRepo.addPartner(partner);
 
-    final userRepo = ref.read(userFirestoreRepositoryProvider);
-    await userRepo.addUserRole(userId, Role.partner);
-    await userRepo.updateUserLastActiveRole(userId, Role.partner);
+      final partnerRepo = ref.read(partnerFirestoreRepositoryProvider);
+      await partnerRepo.addPartner(partner);
 
-    if (mounted) context.go('/partner/home');
+      final userRepo = ref.read(userFirestoreRepositoryProvider);
+      await userRepo.addUserRole(userId, Role.partner);
+      await userRepo.updateUserLastActiveRole(userId, Role.partner);
+
+      final request = RequestModel(type: RequestType.store, requestedUserId: userId);
+      final requestRepo = ref.read(requestFirestoreRepositoryProvider);
+      await requestRepo.addRequest(request);
+
+      if (mounted) context.go('/partner/home');
+    }
+    catch (e) {
+      debugPrint('Caught an exception in _handleSaveStore: $e');
+    }
   }
 
   CommonAppbar _buildAppBar(BuildContext context) {

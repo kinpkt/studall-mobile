@@ -90,10 +90,14 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
     try {
       final partner = await FirebaseFirestore.instance.collection('partners').doc(currentUser.uid).get();
       final partnerName = partner.data()?['name'] as String;
+      final partnerDescription = partner.data()?['description'] as String;
+      final partnerIsPermitted = partner.data()?['isPermitted'] as bool;
 
       final BranchModel newBranch = BranchModel(
         id: widget.branch?.id,
         partnerName: partnerName,
+        partnerDescription: partnerDescription,
+        partnerIsPermitted: partnerIsPermitted,
         name: _nameController.text,
         location: GeoPoint(_selectedLocation!.latitude, _selectedLocation!.longitude),
         status: _selectedStatus!,

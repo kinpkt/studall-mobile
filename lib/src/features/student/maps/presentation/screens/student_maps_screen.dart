@@ -93,7 +93,7 @@ class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  branch.partnerName,
+                  '${branch.partnerName} (${branch.name})',
                   style: const TextStyle(
                     color: Colors.black,
                     fontSize: 12,
@@ -116,7 +116,14 @@ class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
       builder: (BuildContext context) {
         return ShadDialog(
           title: Text('${branch.partnerName}\n${branch.name}'),
-          description: Text(branch.status.thaiStatus, style: TextStyle(color: branch.status.getColor(ShadTheme.of(context))),),
+          description: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16,),
+              Text(branch.partnerDescription),
+              Text('สถานะร้าน: ${branch.status.thaiStatus}', style: TextStyle(color: branch.status.getColor(ShadTheme.of(context))),),
+            ],
+          ),
         );
       }
     );

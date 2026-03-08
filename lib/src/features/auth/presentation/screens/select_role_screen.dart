@@ -19,7 +19,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
   Role? _selectedRole = Role.student;
 
   void _handleRegister(BuildContext context) {
-    print('Selected Role: $_selectedRole'); // Debug print
+    debugPrint('Selected Role: $_selectedRole');
     if (_selectedRole == Role.student) {
       context.pushReplacementNamed('/student/home');
     } else if (_selectedRole == Role.partner) {
@@ -51,7 +51,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
                   Column(
                     children: [
                       Text(
-                        'เข้าสู่ระบบในฐานะ',
+                        'ลงทะเบียนบทบาทของคุณ',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.h3.copyWith(
                           color: colorScheme.foreground,
@@ -59,7 +59,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'เลือกบทบาทบัญชีเพื่อเข้าสู่ระบบ',
+                        'เลือกประเภทบัญชีเพื่อเริ่มต้นใช้งาน',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.muted.copyWith(
                           color: colorScheme.mutedForeground,
@@ -69,38 +69,37 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
                   ),
                   const SizedBox(height: 32),
 
+                  // Role Selection Cards
                   Column(
                     children: [
-                      Expanded(
-                        child: RadioCard<Role>(
-                          title: 'สำหรับนักเรียน / นักศึกษา',
-                          description:
-                              'จัดการตารางเรียน ติดตามการบ้าน \nรับการแจ้งเตือนเพื่อไม่พลาดทุกคลาสสำคัญ',
-                          value: Role.student,
-                          groupValue: _selectedRole,
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedRole = value;
-                            });
-                          },
-                          backgroundImage: 'assets/images/student.png',
-                        ),
+                      // Student Role Card
+                      RadioCard<Role>(
+                        title: 'สำหรับนักเรียน / นักศึกษา',
+                        description:
+                            'จัดการตารางเรียน ติดตามการบ้าน \nรับการแจ้งเตือนเพื่อไม่พลาดทุกคลาสสำคัญ',
+                        value: Role.student,
+                        groupValue: _selectedRole,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedRole = value;
+                          });
+                        },
+                        backgroundImage: 'assets/images/student.png',
                       ),
                       const SizedBox(height: 16),
-                      Expanded(
-                        child: RadioCard<Role>(
-                          title: 'สำหรับร้านค้าธุรกิจ',
-                          description:
-                              'เพิ่มยอดขายด้วยการเชื่อมต่อร้านค้าของคุณ \nเข้ากับคอมมูนิตี้ของนักเรียนโดยตรง',
-                          value: Role.partner,
-                          groupValue: _selectedRole,
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedRole = value;
-                            });
-                          },
-                          backgroundImage: 'assets/images/partner.png',
-                        ),
+                      // Partner Role Card
+                      RadioCard<Role>(
+                        title: 'สำหรับร้านค้าธุรกิจ',
+                        description:
+                            'เพิ่มยอดขายด้วยการเชื่อมต่อร้านค้าของคุณ \nเข้ากับคอมมูนิตี้ของนักเรียนโดยตรง',
+                        value: Role.partner,
+                        groupValue: _selectedRole,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedRole = value;
+                          });
+                        },
+                        backgroundImage: 'assets/images/partner.png',
                       ),
                     ],
                   ),

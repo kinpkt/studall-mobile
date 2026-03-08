@@ -37,6 +37,8 @@ extension BranchStatusExtension on BranchStatus {
 class BranchModel {
   final String id;
   final String partnerName;
+  final String partnerDescription;
+  final bool partnerIsPermitted;
   final String name;
   final GeoPoint location;
   final BranchStatus status;
@@ -44,17 +46,42 @@ class BranchModel {
   BranchModel({
     String? id,
     required this.partnerName,
+    required this.partnerDescription,
+    partnerIsPermitted,
     required this.name,
     required this.location,
     this.status = BranchStatus.available,
-  }) : id = id ?? const Uuid().v7();
+  }) :  id = id ?? const Uuid().v7(),
+        partnerIsPermitted = partnerIsPermitted ?? false;
 
   LatLng get leafletCoordinate => LatLng(location.latitude, location.longitude);
+
+  BranchModel copyWith({
+    String? id,
+    String? partnerName,
+    String? partnerDescription,
+    bool? partnerIsPermitted,
+    String? name,
+    GeoPoint? location,
+    BranchStatus? status,
+  }) {
+    return BranchModel(
+      id: id ?? this.id,
+      partnerName: partnerName ?? this.partnerName,
+      partnerDescription: partnerDescription ?? this.partnerDescription,
+      partnerIsPermitted: partnerIsPermitted ?? this.partnerIsPermitted,
+      name: name ?? this.name,
+      location: location ?? this.location,
+      status: status ?? this.status,
+    );
+  }
 
   factory BranchModel.fromFirestore(Map<String, dynamic> data, String docId) {
     return BranchModel(
       id: docId,
       partnerName: data['partnerName'] as String,
+      partnerDescription: data['partnerDescription'] as String,
+      partnerIsPermitted: data['partnerIsPermitted'] as bool?,
       name: data['name'] as String,
       location: data['location'] as GeoPoint,
       status: BranchStatus.values.firstWhere(
@@ -68,6 +95,8 @@ class BranchModel {
     return {
       'id': id,
       'partnerName': partnerName,
+      'partnerDescription': partnerDescription,
+      'partnerIsPermitted': partnerIsPermitted,
       'name': name,
       'location': location,
       'status': status.name,

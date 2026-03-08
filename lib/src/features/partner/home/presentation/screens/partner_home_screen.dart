@@ -51,19 +51,29 @@ class PartnerHomeScreen extends ConsumerWidget {
               error: (err, stack) => Text('ERROR', style: theme.textTheme.h4),
               data: (partner) => Text(partner?.description ?? '', style: theme.textTheme.h4),
             ),
-            footer: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            footer: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                branchesAsync.when(
-                  loading: () => Text('จำนวนสาขา: ...', style: theme.textTheme.p),
-                  error: (err, stack) => Text('จำนวนสาขา: -', style: theme.textTheme.p),
-                  data: (branches) => Text('จำนวนสาขา: ${branches.length} สาขา', style: theme.textTheme.p),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    branchesAsync.when(
+                      loading: () => Text('จำนวนสาขา: ...', style: theme.textTheme.p),
+                      error: (err, stack) => Text('จำนวนสาขา: -', style: theme.textTheme.p),
+                      data: (branches) => Text('จำนวนสาขา: ${branches.length} สาขา', style: theme.textTheme.p),
+                    ),
+                    advertisementsAsync.when(
+                      loading: () => Text('จำนวนโฆษณา: ...', style: theme.textTheme.p),
+                      error: (err, stack) => Text('จำนวนโฆษณา: -', style: theme.textTheme.p),
+                      data: (ads) => Text('จำนวนโฆษณา: ${ads.length} ชุด', style: theme.textTheme.p),
+                    ),
+                  ],
                 ),
-                advertisementsAsync.when(
-                  loading: () => Text('จำนวนโฆษณา: ...', style: theme.textTheme.p),
-                  error: (err, stack) => Text('จำนวนโฆษณา: -', style: theme.textTheme.p),
-                  data: (ads) => Text('จำนวนโฆษณา: ${ads.length} ชุด', style: theme.textTheme.p),
-                ),
+                partnerAsync.when(
+                  loading: () => Text('สถานะร้าน: ...', style: theme.textTheme.p),
+                  error: (err, stack) => Text('สถานะร้าน: -', style: theme.textTheme.p),
+                  data: (partner) => Text('สถานะร้าน: ${partner!.isPermitted ? 'ระบบอนุมัติแล้ว' : 'ระบบยังไม่อนุมัติ'}', style: theme.textTheme.p),
+                )
               ],
             ),
           ),
@@ -77,7 +87,7 @@ class PartnerHomeScreen extends ConsumerWidget {
             error: (err, stack) => Center(child: Text('เกิดข้อผิดพลาด: $err')),
             data: (branches) {
               if (branches.isEmpty) {
-                return const Center(child: Text('ไม่มีสาขา'));
+                return Center(child: Text('ไม่มีสาขา', style: theme.textTheme.h4));
               }
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -97,7 +107,7 @@ class PartnerHomeScreen extends ConsumerWidget {
             error: (err, stack) => Center(child: Text('เกิดข้อผิดพลาด: $err')),
             data: (ads) {
               if (ads.isEmpty) {
-                return const Center(child: Text('ไม่มีโฆษณา'));
+                return Center(child: Text('ไม่มีโฆษณา', style: theme.textTheme.h4));
               }
 
               return requestsAsync.when(
