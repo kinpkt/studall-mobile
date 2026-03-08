@@ -1,8 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studall/src/features/auth/data/repositories/auth_firebase_repository.dart';
 import 'package:studall/src/features/auth/data/repositories/user_firestore_repository.dart';
 import 'package:studall/src/features/auth/data/models/user_model.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 final authControllerProvider = AsyncNotifierProvider<AuthController, void>(() {
   return AuthController();
@@ -22,14 +25,19 @@ class AuthController extends AsyncNotifier<void> {
     state = await AsyncValue.guard(() async {
       final authRepository = ref.read(authFirebaseRepositoryProvider);
 
-      final user = await authRepository.signUpWithEmail(
-        email: email,
-        password: password,
-        displayName: displayName,
-      );
-
-      final userRepository = ref.read(userFirestoreRepositoryProvider);
-      await userRepository.createUserProfile(UserModel.fromFirebase(user));
+      await authRepository
+          .signUpWithEmail(
+            email: email,
+            password: password,
+            displayName: displayName,
+          )
+          .then((user) async {
+            final userRepository = ref.read(userFirestoreRepositoryProvider);
+            await userRepository.createUserProfile(
+              UserModel.fromFirebase(user),
+            );
+            return user;
+          });
     });
   }
 
@@ -50,24 +58,56 @@ class AuthController extends AsyncNotifier<void> {
       final authRepository = ref.read(authFirebaseRepositoryProvider);
       final user = await authRepository.signInWithGoogle();
 
-      // ทำงานขั้นตอนถัดไป
       final userRepository = ref.read(userFirestoreRepositoryProvider);
       await userRepository.createUserProfile(UserModel.fromFirebase(user));
 
-      // สำเร็จ! เปลี่ยนสถานะเป็น Data (หยุด Loading)
       state = const AsyncData(null);
     } catch (e, stack) {
-      // เกิด Error จริงๆ เปลี่ยนเป็น Error (หยุด Loading)
       state = AsyncError(e, stack);
     }
   }
 
-  Future<void> signOut() async {
+  Future<void> signOut(BuildContext context) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await Future.delayed(const Duration(seconds: 3));
       final authRepository = ref.read(authFirebaseRepositoryProvider);
-      await authRepository.signOut();
+      if (!context.mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) => Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ShadDialog.alert(
+            title: Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: const Text('คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?'),
+            ),
+            actions: [
+              ShadButton.secondary(
+                onPressed: () => ctx.pop(),
+                child: const Text('ยกเลิก'),
+              ),
+              ShadButton.destructive(
+                onPressed: () async {
+                  await authRepository.signOut();
+                  if (!ctx.mounted) return;
+                  ctx.pop();
+                },
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    return state.isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('ออกจากระบบ');
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     });
   }
 

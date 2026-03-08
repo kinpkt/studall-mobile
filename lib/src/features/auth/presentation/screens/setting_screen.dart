@@ -100,98 +100,114 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
               noRoles = Role.values
                   .where((r) => (!roles.contains(r) && r != Role.admin))
                   .toList();
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: colorScheme.muted,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  spacing: 16,
-                  children: [
-                    ...roles.map((Role role) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 16,
+                children: [
+                  if (roles.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.muted,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: 16,
+                        children: [
+                          ...roles.map((Role role) {
+                            final roleLabel = switch (role) {
+                              Role.student => 'นักเรียน',
+                              Role.partner => 'ร้านค้า',
+                              Role.admin => 'ผู้ดูแลระบบ',
+                            };
+                            final roleIcon = switch (role) {
+                              Role.student =>
+                                PhosphorIconsRegular.graduationCap,
+                              Role.partner => PhosphorIconsRegular.storefront,
+                              Role.admin => PhosphorIconsRegular.pipeWrench,
+                            };
+                            return AppListTile(
+                              padding: EdgeInsets.zero,
+                              title: roleLabel,
+                              titleStyle: textTheme.custom['medium']?.copyWith(
+                                color: colorScheme.foreground,
+                              ),
+                              description: user!.email,
+                              leading: SizedBox(
+                                width: 40,
+                                height: 40,
+                                child: Icon(
+                                  roleIcon,
+                                  size: 24,
+                                  color: colorScheme.foreground,
+                                ),
+                              ),
+                              trailing: [
+                                user.lastActiveRole == role
+                                    ? Text(
+                                        'ปัจจุบัน',
+                                        style: textTheme.small.copyWith(
+                                          color: colorScheme.custom['success'],
+                                        ),
+                                        maxLines: 1,
+                                      )
+                                    : GestureDetector(
+                                        onTap: () =>
+                                            _showSwitchRoleConfirmationDialog(
+                                              context,
+                                              user.id,
+                                              role,
+                                            ),
+                                        child: Text(
+                                          'สลับบทบาท',
+                                          style: textTheme.small.copyWith(
+                                            color: colorScheme.custom['info'],
+                                            decoration:
+                                                TextDecoration.underline,
+                                            decorationColor:
+                                                colorScheme.custom['info'],
+                                          ),
+                                        ),
+                                      ),
+                              ],
+                            );
+                          }),
+                        ],
+                      ),
+                    ),
+                  if (noRoles.isNotEmpty)
+                    ...noRoles.map((Role role) {
                       final roleLabel = switch (role) {
                         Role.student => 'นักเรียน',
                         Role.partner => 'ร้านค้า',
                         Role.admin => 'ผู้ดูแลระบบ',
                       };
-                      final roleIcon = switch (role) {
-                        Role.student => PhosphorIconsRegular.graduationCap,
-                        Role.partner => PhosphorIconsRegular.storefront,
-                        Role.admin => PhosphorIconsRegular.pipeWrench,
-                      };
-                      return AppListTile(
-                        padding: EdgeInsets.zero,
-                        title: roleLabel,
-                        titleStyle: textTheme.custom['medium']?.copyWith(
-                          color: colorScheme.foreground,
-                        ),
-                        description: user!.email,
-                        leading: SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: Icon(
-                            roleIcon,
-                            size: 24,
-                            color: colorScheme.foreground,
+                      return ShadButton.ghost(
+                        onPressed: () {
+                          if (role == Role.student) {
+                            context.push('/register-student');
+                          } else if (role == Role.partner) {
+                            context.push('/register-partner');
+                          }
+                        },
+                        child: Text(
+                          'เพิ่มบทบาท$roleLabel',
+                          style: textTheme.custom['medium']?.copyWith(
+                            color: colorScheme.custom['info'],
                           ),
                         ),
-                        trailing: [
-                          user.lastActiveRole == role
-                              ? Text(
-                                  'ปัจจุบัน',
-                                  style: textTheme.small.copyWith(
-                                    color: colorScheme.custom['success'],
-                                  ),
-                                  maxLines: 1,
-                                )
-                              : GestureDetector(
-                                  onTap: () =>
-                                      _showSwitchRoleConfirmationDialog(
-                                        context,
-                                        user.id,
-                                        role,
-                                      ),
-                                  child: Text(
-                                    'สลับบทบาท',
-                                    style: textTheme.small.copyWith(
-                                      color: colorScheme.custom['info'],
-                                      decoration: TextDecoration.underline,
-                                      decorationColor:
-                                          colorScheme.custom['info'],
-                                    ),
-                                  ),
-                                ),
-                        ],
                       );
                     }),
-                  ],
-                ),
+                ],
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Text('Error: $e'),
           ),
-          ...noRoles.map((Role role) {
-            final roleLabel = switch (role) {
-              Role.student => 'นักเรียน',
-              Role.partner => 'ร้านค้า',
-              Role.admin => 'ผู้ดูแลระบบ',
-            };
-            return ShadButton.ghost(
-              onPressed: null,
-              child: Text(
-                'เพิ่มบทบาท$roleLabel',
-                style: textTheme.custom['medium']?.copyWith(
-                  color: colorScheme.custom['info'],
-                ),
-              ),
-            );
-          }),
         ],
       ),
     );
@@ -295,7 +311,6 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
         ),
         studentSettingsAsync.when(
           data: (studentSettings) {
-            // Assuming 2000 is in meters. We convert it to km for display.
             final currentRadiusMeters = studentSettings?.radius ?? 2000.0;
             final displayRadiusKm = currentRadiusMeters / 1000;
 
@@ -349,7 +364,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ShadButton.ghost(
-            onPressed: () => _showLogOutConfirmationDialog(context),
+            onPressed: () async => await ref
+                .read(authControllerProvider.notifier)
+                .signOut(context),
             child: Text(
               'ออกจากระบบ',
               style: textTheme.custom['medium']?.copyWith(
@@ -379,7 +396,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             ),
             ShadButton.destructive(
               onPressed: () async {
-                await ref.read(authControllerProvider.notifier).signOut();
+                await ref
+                    .read(authControllerProvider.notifier)
+                    .signOut(context);
                 if (!ctx.mounted) return;
                 ctx.pop();
               },
@@ -434,7 +453,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                     .updateUserLastActiveRole(id, role);
 
                 if (!ctx.mounted) return;
-                ctx.pop();
+                // ctx.pop();
 
                 final route = switch (role) {
                   Role.student => '/student/home',

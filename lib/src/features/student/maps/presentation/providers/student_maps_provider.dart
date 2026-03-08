@@ -21,7 +21,7 @@ final nearbyBranchesProvider = FutureProvider.family<List<BranchModel>, ({LatLng
       branch.location.longitude,
     );
 
-    if (distance <= args.radius) {
+    if (distance <= args.radius && branch.partnerIsPermitted) {
       filteredBranches.add(branch);
     }
   }

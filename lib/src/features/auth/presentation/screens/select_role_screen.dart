@@ -19,7 +19,7 @@ class _SelectRoleScreenState extends State<SelectRoleScreen> {
   Role? _selectedRole = Role.student;
 
   void _handleRegister(BuildContext context) {
-    print('Selected Role: $_selectedRole'); // Debug print
+    debugPrint('Selected Role: $_selectedRole');
     if (_selectedRole == Role.student) {
       context.pushReplacementNamed('/student/home');
     } else if (_selectedRole == Role.partner) {

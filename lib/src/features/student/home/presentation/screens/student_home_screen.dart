@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
 import 'package:studall/src/features/student/home/presentation/providers/home_controller.dart';
 import 'package:studall/src/features/student/home/presentation/widgets/recent_card.dart';
@@ -74,12 +74,14 @@ class StudentHomeScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             utilitiesAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error loading items: $err')),
+              error: (err, stack) =>
+                  Center(child: Text('Error loading items: $err')),
               data: (utility) => _buildRecentContent(context, utility),
             ),
             tasksAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error loading items: $err')),
+              error: (err, stack) =>
+                  Center(child: Text('Error loading items: $err')),
               data: (task) => _buildTaskList(context, task),
             ),
             // _buildRecentContent(context, kDemoRecentItems),
@@ -124,18 +126,32 @@ class StudentHomeScreen extends ConsumerWidget {
                 child: Text(
                   'ทั้งหมด',
                   style: textTheme.muted.copyWith(
-                    color: colorScheme.mutedForeground,
+                    color: colorScheme.custom['info']!,
                     decoration: TextDecoration.underline,
-                    decorationColor: colorScheme.mutedForeground,
+                    decorationColor: colorScheme.custom['info']!,
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            height: 104,
-            child: ListView.separated(
+          if (items.isEmpty) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: colorScheme.card,
+                border: Border.all(color: colorScheme.border, width: 1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'ยังไม่มีรายการล่าสุด',
+                style: textTheme.p.copyWith(color: colorScheme.mutedForeground),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ] else ...[
+            ListView.separated(
               clipBehavior: Clip.none,
               scrollDirection: Axis.horizontal,
               itemCount: items.length,
@@ -144,7 +160,7 @@ class StudentHomeScreen extends ConsumerWidget {
                 return RecentItemCard(item: items[index]);
               },
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -158,7 +174,9 @@ class StudentHomeScreen extends ConsumerWidget {
     final today = DateTime.now();
     final nextWeek = today.add(const Duration(days: 7));
 
-    final thisWeekTasks = tasks.where((task) => task.endDateTime.isBefore(nextWeek)).toList();
+    final thisWeekTasks = tasks
+        .where((task) => task.endDateTime.isBefore(nextWeek))
+        .toList();
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -186,15 +204,13 @@ class StudentHomeScreen extends ConsumerWidget {
                     ),
                     const SizedBox(width: 12),
                     GestureDetector(
-                      onTap: () {
-                        // TODO: Navigate to full todo list
-                      },
+                      onTap: () => context.go('/student/tasks'),
                       child: Text(
                         'ทั้งหมด',
                         style: textTheme.muted.copyWith(
-                          color: colorScheme.mutedForeground,
+                          color: colorScheme.custom['info']!,
                           decoration: TextDecoration.underline,
-                          decorationColor: colorScheme.mutedForeground,
+                          decorationColor: colorScheme.custom['info']!,
                         ),
                       ),
                     ),
@@ -203,17 +219,36 @@ class StudentHomeScreen extends ConsumerWidget {
               ],
             ),
           ),
+          if (thisWeekTasks.isEmpty) ...[
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: colorScheme.card,
+                border: Border.all(color: colorScheme.border, width: 1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'ไม่มีงานที่ต้องทำในสัปดาห์นี้',
+                style: textTheme.p.copyWith(
+                  color: colorScheme.mutedForeground,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ] else ...[
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: thisWeekTasks.length,
+              itemBuilder: (context, index) {
+                final task = thisWeekTasks[index];
 
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: thisWeekTasks.length,
-            itemBuilder: (context, index) {
-              final task = thisWeekTasks[index];
-
-              return TaskTile(task: task);
-            },
-          ),
+                return TaskTile(task: task);
+              },
+            ),
+          ],
         ],
       ),
     );

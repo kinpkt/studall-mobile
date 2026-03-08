@@ -15,11 +15,11 @@ class BranchCardMinimal extends StatelessWidget {
       padding: const EdgeInsets.only(right: 16),
       child: GestureDetector(
         onTap: () {
-          showShadDialog(
+          showDialog(
             context: context,
             builder: (context) => ShadDialog(
               title: Text(branch.name),
-              description: const Text('รายละเอียดสาขา'),
+              // description: const Text('รายละเอียดสาขา'),
               actions: [
                 ShadButton.outline(
                   child: const Text('ปิด'),

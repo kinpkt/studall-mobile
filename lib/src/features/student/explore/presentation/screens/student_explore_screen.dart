@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/partner/advertisements/data/models/advertisement_model.dart';
 import 'package:studall/src/features/partner/advertisements/data/repositories/advertisement_firestore_repository.dart';
 import 'package:studall/src/features/student/explore/presentation/widgets/tools_item_card.dart';
-import 'package:studall/src/features/student/explore/presentation/widgets/working_space_item_card.dart';
 
 import '../../../../partner/home/presentation/widgets/advertisement_banner.dart';
 import '../../../maps/presentation/screens/student_maps_screen.dart';

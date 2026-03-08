@@ -14,7 +14,7 @@ class StudentCoursesScreen extends ConsumerWidget {
   const StudentCoursesScreen({super.key});
 
   void _showAddCourseModal(BuildContext context) {
-    showDialog(context: context, builder: (_) => const AddEditCourseModal());
+    showDialog(context: context, builder: (_) => const AddEditCourseModals());
   }
 
   Widget _iconButton(

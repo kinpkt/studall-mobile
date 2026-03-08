@@ -8,16 +8,19 @@ class NotesTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
-
+    final colorScheme = theme.colorScheme;
     return Container(
       margin: EdgeInsets.only(left: 16, right: 16),
       child: ShadInput(
         placeholder: Text('ค้นหาบันทึก'),
-        leading: const Padding(
+        leading: Padding(
           padding: EdgeInsets.all(4.0),
-          child: Icon(PhosphorIconsRegular.magnifyingGlass),
+          child: Icon(
+            PhosphorIconsRegular.magnifyingGlass,
+            color: colorScheme.foreground,
+          ),
         ),
-      )
+      ),
     );
   }
 }

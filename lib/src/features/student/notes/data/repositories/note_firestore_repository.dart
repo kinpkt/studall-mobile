@@ -26,7 +26,7 @@ class NoteFirestoreRepository {
       builder: (data, docId) => NoteModel.fromFirestore(data, docId),
     );
 
-    return data ?? [];
+    return data;
   }
 
   Future<void> updateNote(String userId, NoteModel note) async {

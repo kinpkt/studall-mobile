@@ -3,27 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/features/admin/approval/data/models/request_model.dart';
-import 'package:studall/src/features/admin/approval/presentation/screens/admin_approval_screen.dart';
-import 'package:studall/src/features/auth/data/models/user_model.dart';
-import 'package:studall/src/features/partner/advertisements/data/models/advertisement_model.dart';
 import 'package:studall/src/features/partner/advertisements/data/repositories/advertisement_firestore_repository.dart';
+import 'package:studall/src/features/partner/branches/data/repositories/branch_firestore_repository.dart';
 import 'package:studall/src/features/partner/home/presentation/widgets/advertisement_banner.dart';
 
+import '../../../../partner/branches/data/models/branch_model.dart';
 import '../../data/repositories/request_firestore_repository.dart';
-import 'package:studall/src/features/partner/data/repositories/partner_firestore_repository.dart';
 
-final partnerStoreNameProvider = StreamProvider.family<String, String>((ref, String userId) {
-  final repository = ref.watch(partnerFirestoreRepositoryProvider);
-  final stream = repository.getPartnerByUserId(userId);
-
-  return stream.map((partner) => partner?.name ?? 'ไม่ทราบชื่อร้าน');
-});
-
-final singleAdvertisementProvider = StreamProvider.family<AdvertisementModel?, String>((ref, adId) {
-  final repository = ref.watch(advertisementFirestoreRepositoryProvider);
-
-  return repository.getAdvertisementFromId(adId);
-});
+import '../providers/admin_requests_provider.dart';
 
 class RequestListTile extends ConsumerWidget {
   final RequestModel request;
@@ -43,6 +30,15 @@ class RequestListTile extends ConsumerWidget {
           await ref.read(advertisementFirestoreRepositoryProvider).updateAdvertisement(updatedAd);
         }
       }
+      else {
+        final branchRepo = ref.read(branchFirestoreRepositoryProvider);
+        final branches = await branchRepo.getBranchesByUserId(request.requestedUserId).first;
+
+        for (BranchModel branch in branches) {
+          final updatedBranch = branch.copyWith(partnerIsPermitted: true);
+          branchRepo.updateBranch(request.requestedUserId, updatedBranch);
+        }
+      }
 
       await ref.read(requestFirestoreRepositoryProvider).updateRequest(
         request.id,
@@ -57,18 +53,18 @@ class RequestListTile extends ConsumerWidget {
       );
     }
 
+    final partnerAsync = ref.watch(partnerStoreDataProvider(request.requestedUserId));
+
     return Material(
       child: ListTile(
         leading: Icon(request.type == RequestType.advertise ? PhosphorIconsRegular.newspaper : PhosphorIconsRegular.storefront),
         title: Text(request.type.thaiType, style: theme.textTheme.list),
         subtitle: Consumer(
           builder: (context, ref, child) {
-            final partnerAsync = ref.watch(partnerStoreNameProvider(request.requestedUserId ?? ''));
-
             return partnerAsync.when(
               loading: () => Text('กำลังโหลดชื่อร้าน...', style: theme.textTheme.muted),
               error: (err, stack) => Text('ส่งคำขอโดย ไม่ทราบชื่อร้าน', style: theme.textTheme.muted),
-              data: (storeName) => Text('ส่งคำขอโดย $storeName', style: theme.textTheme.muted),
+              data: (partner) => Text('ส่งคำขอโดย ${partner!.name}', style: theme.textTheme.muted),
             );
           },
         ),
@@ -77,14 +73,22 @@ class RequestListTile extends ConsumerWidget {
           children: [
             IconButton(
               onPressed: () {
-                showShadDialog(
+                showDialog(
                   context: context,
                   builder: (context) => ShadDialog(
                     title: Text(request.type.thaiType, style: theme.textTheme.h3),
                     description: Text('สถานะ: ${request.status.thaiStatus}', style: theme.textTheme.p),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (request.type == RequestType.store)
+                          partnerAsync.when(
+                            loading: () => Text('...'),
+                            error: (error, stack) => Text('-'),
+                            data: (partner) => Text('ชื่อร้าน: ${partner!.name}\nรายละเอียดร้าน: ${partner.description}'),
+                          ),
+
                         if (request.type == RequestType.advertise)
                           Consumer(
                             builder: (context, ref, child) {
@@ -119,10 +123,10 @@ class RequestListTile extends ConsumerWidget {
                             },
                           ),
 
-                        if (request.status == RequestStatus.declined && request.reason != null) ...[
-                          const SizedBox(height: 12),
+                        const SizedBox(height: 12),
+
+                        if (request.status == RequestStatus.declined && request.reason != null)
                           Text('สาเหตุการปฏิเสธ: ${request.reason}', style: theme.textTheme.p),
-                        ],
 
                         if (request.status == RequestStatus.pending)
                           Row(

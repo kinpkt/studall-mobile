@@ -165,6 +165,7 @@ class StudentTasksScreen extends ConsumerWidget {
               title,
               style: textTheme.custom['medium']?.copyWith(
                 color: colorScheme.foreground,
+                fontWeight: FontWeight.w400
               ),
             ),
             Text(

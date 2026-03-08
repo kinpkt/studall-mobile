@@ -20,8 +20,8 @@ class Schedule extends StatefulWidget {
 class _ScheduleState extends State<Schedule> {
   static const double minuteToPixelRatio = 2.0;
   static const int totalMinutesInDay = 24 * 60;
-  static const double totalWidth = totalMinutesInDay * minuteToPixelRatio; // 2880px
-  static const double headerHeight = 40.0;
+  static const double totalWidth = totalMinutesInDay * minuteToPixelRatio;
+  // static const double headerHeight = 40.0;
   
   @override
   Widget build(BuildContext context) {

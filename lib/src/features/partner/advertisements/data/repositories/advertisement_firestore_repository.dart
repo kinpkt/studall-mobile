@@ -57,7 +57,7 @@ class AdvertisementFirestoreRepository {
     );
   }
 
-  Future<void> deleteAdvertisement(AdvertisementModel ads) async {
-    await _service.delete(path: 'advertisements/${ads.id}');
+  Future<void> deleteAdvertisement(String adsId) async {
+    await _service.delete(path: 'advertisements/$adsId');
   }
 }
