@@ -126,12 +126,12 @@ class PartnerHomeScreen extends ConsumerWidget {
                             .where((req) => req.id == ad.id)
                             .firstOrNull;
 
-
                         return Padding(
                           padding: const EdgeInsets.only(right: 12),
                           child: AdvertisementBanner(
                             ads: ad,
                             status: matchingRequest?.status,
+                            isDeletable: true,
                           ),
                         );
                       },
