@@ -138,16 +138,20 @@ class StudentHomeScreen extends ConsumerWidget {
           if (items.isEmpty) ...[
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(24),
+              height: 104,
               decoration: BoxDecoration(
                 color: colorScheme.card,
                 border: Border.all(color: colorScheme.border, width: 1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                'ยังไม่มีรายการล่าสุด',
-                style: textTheme.p.copyWith(color: colorScheme.mutedForeground),
-                textAlign: TextAlign.center,
+              child: Center(
+                child: Text(
+                  'ยังไม่มีรายการล่าสุด',
+                  style: textTheme.p.copyWith(
+                    color: colorScheme.mutedForeground,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ] else ...[
@@ -222,19 +226,21 @@ class StudentHomeScreen extends ConsumerWidget {
           if (thisWeekTasks.isEmpty) ...[
             Container(
               width: double.infinity,
+              height: 68,
               margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: colorScheme.card,
                 border: Border.all(color: colorScheme.border, width: 1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                'ไม่มีงานที่ต้องทำในสัปดาห์นี้',
-                style: textTheme.p.copyWith(
-                  color: colorScheme.mutedForeground,
+              child: Center(
+                child: Text(
+                  'ไม่มีงานที่ต้องทำในสัปดาห์นี้',
+                  style: textTheme.p.copyWith(
+                    color: colorScheme.mutedForeground,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
             ),
           ] else ...[

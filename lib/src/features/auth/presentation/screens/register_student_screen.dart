@@ -86,11 +86,30 @@ class _RegisterStudentScreenState extends ConsumerState<RegisterStudentScreen> {
                     const SizedBox(height: 16),
                     Expanded(
                       child: (courses.isEmpty)
-                          ? Center(
-                              child: Text(
-                                'ยังไม่มีวิชา',
-                                style: theme.textTheme.p,
-                              ),
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'เริ่มต้นบันทึกรายวิชาของคุณ',
+                                  style: theme.textTheme.p.copyWith(
+                                    color: colorScheme.mutedForeground,
+                                  ),
+                                ),
+                                ShadButton.ghost(
+                                  onPressed: () => _showAddCourseModal(context),
+                                  child: Text(
+                                    'สร้างวิชาเรียนใหม่ที่นี่',
+                                    style: theme.textTheme.p.copyWith(
+                                      color: colorScheme.custom['info']!,
+                                      fontWeight: FontWeight.w500,
+                                      // decoration: TextDecoration.underline,
+                                      decorationColor:
+                                          colorScheme.custom['info']!,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             )
                           : SingleChildScrollView(
                               child: Column(
@@ -160,12 +179,14 @@ class _RegisterStudentScreenState extends ConsumerState<RegisterStudentScreen> {
     if (userId == null) return;
 
     final repoCourses = ref.read(courseFirestoreRepositoryProvider);
-    await Future.wait(courses.map((course) => repoCourses.addCourse(userId, course)));
+    await Future.wait(
+      courses.map((course) => repoCourses.addCourse(userId, course)),
+    );
     final repoUsers = ref.read(userFirestoreRepositoryProvider);
     await repoUsers.addUserRole(userId, Role.student);
     await repoUsers.updateUserLastActiveRole(userId, Role.student);
 
-    // if (context.mounted) context.go('/');
+    if (context.mounted) context.go('/student/home');
   }
 
   Widget _iconButton(

@@ -70,10 +70,6 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
     return null;
   }
 
-  void _navigateToLogin() {
-    context.go('/login');
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
@@ -137,7 +133,9 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
                     ShadInputFormField(
                       controller: _nameController,
                       id: 'displayName',
-                      label: const Text('ชื่อผู้ใช้ (ชื่อที่ต้องการให้แสดงในระบบ)'),
+                      label: const Text(
+                        'ชื่อผู้ใช้ (ชื่อที่ต้องการให้แสดงในระบบ)',
+                      ),
                       placeholder: const Text('นอนน้อย'),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: _validateUsername,
@@ -201,9 +199,7 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
-                            _navigateToLogin();
-                          },
+                          onTap: () => context.push('/login'),
                           child: Text(
                             'เข้าสู่ระบบ',
                             style: theme.textTheme.muted.copyWith(

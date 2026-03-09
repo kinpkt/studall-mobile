@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
@@ -18,7 +19,7 @@ class StudentNotesScreen extends ConsumerStatefulWidget {
 }
 
 class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
-  String? _selectedCourseId; // null = show all notes, non-null = filter by courseId
+  String? _selectedCourseId;
   Future<List<NoteModel>>? _ownedNotesFuture;
   Future<List<CourseModel>>? _ownedCoursesFuture;
 
@@ -33,12 +34,12 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
     if (currentUser != null) {
       setState(() {
         _ownedNotesFuture = ref
-          .read(noteFirestoreRepositoryProvider)
-          .getNotesByUserId(currentUser.uid);
+            .read(noteFirestoreRepositoryProvider)
+            .getNotesByUserId(currentUser.uid);
 
         _ownedCoursesFuture = ref
-          .read(courseFirestoreRepositoryProvider)
-          .getCoursesByUserId(currentUser.uid);
+            .read(courseFirestoreRepositoryProvider)
+            .getCoursesByUserId(currentUser.uid);
       });
     }
   }
@@ -90,21 +91,43 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
 
                   final notes = _selectedCourseId != null
                       ? allNotes
-                      .where((note) => note.courseId == _selectedCourseId)
-                      .toList()
+                            .where((note) => note.courseId == _selectedCourseId)
+                            .toList()
                       : allNotes;
 
                   if (notes.isEmpty) {
-                    return ListView(
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.3),
-                        Center(child: Text('ยังไม่มีโน้ต', style: theme.textTheme.h3)),
+                        Text(
+                          'เริ่มต้นบันทึกของคุณ',
+                          style: theme.textTheme.p.copyWith(
+                            color: colorScheme.mutedForeground,
+                          ),
+                        ),
+                        ShadButton.ghost(
+                          onPressed: () =>
+                              context.push('/student/notes/editor'),
+                          child: Text(
+                            'สร้างบันทึกใหม่ที่นี่',
+                            style: theme.textTheme.p.copyWith(
+                              color: colorScheme.custom['info']!,
+                              fontWeight: FontWeight.w500,
+                              decorationColor: colorScheme.custom['info']!,
+                            ),
+                          ),
+                        ),
                       ],
                     );
                   }
 
-                  final pinnedNotes = notes.where((note) => note.isPinned).toList();
-                  final unpinnedNotes = notes.where((note) => !note.isPinned).toList();
+                  final pinnedNotes = notes
+                      .where((note) => note.isPinned)
+                      .toList();
+                  final unpinnedNotes = notes
+                      .where((note) => !note.isPinned)
+                      .toList();
 
                   return ListView(
                     physics: const AlwaysScrollableScrollPhysics(),

@@ -142,7 +142,6 @@ class _RegisterPartnerScreenState extends ConsumerState<RegisterPartnerScreen> {
         description: description,
       );
 
-
       final partnerRepo = ref.read(partnerFirestoreRepositoryProvider);
       await partnerRepo.addPartner(partner);
 
@@ -150,13 +149,15 @@ class _RegisterPartnerScreenState extends ConsumerState<RegisterPartnerScreen> {
       await userRepo.addUserRole(userId, Role.partner);
       await userRepo.updateUserLastActiveRole(userId, Role.partner);
 
-      final request = RequestModel(type: RequestType.store, requestedUserId: userId);
+      final request = RequestModel(
+        type: RequestType.store,
+        requestedUserId: userId,
+      );
       final requestRepo = ref.read(requestFirestoreRepositoryProvider);
       await requestRepo.addRequest(request);
 
-      if (mounted) context.go('/partner/home');
-    }
-    catch (e) {
+      if (context.mounted) context.go('/partner/home');
+    } catch (e) {
       debugPrint('Caught an exception in _handleSaveStore: $e');
     }
   }
@@ -170,28 +171,6 @@ class _RegisterPartnerScreenState extends ConsumerState<RegisterPartnerScreen> {
         ShadIconButton.ghost(
           decoration: ShadDecoration(shape: BoxShape.circle),
           icon: const Icon(PhosphorIconsRegular.arrowLeft),
-          onPressed: () => context.pop(),
-        ),
-      ],
-      actions: [
-        ShadButton.ghost(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-          decoration: ShadDecoration(shape: BoxShape.circle),
-          child: Row(
-            spacing: 8,
-            children: [
-              Text(
-                'ข้ามไปก่อน',
-                style: theme.textTheme.p.copyWith(
-                  color: colorScheme.foreground,
-                ),
-              ),
-              Icon(
-                PhosphorIconsRegular.caretDoubleRight,
-                color: colorScheme.foreground,
-              ),
-            ],
-          ),
           onPressed: () => context.pop(),
         ),
       ],

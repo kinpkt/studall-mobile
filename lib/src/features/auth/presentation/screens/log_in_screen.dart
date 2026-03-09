@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/domain/auth_exceptions.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
@@ -188,14 +189,7 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SignUpScreen(),
-                              ),
-                            );
-                          },
+                          onTap: () => context.go('/register'),
                           child: Text(
                             'เริ่มสร้างบัญชี',
                             style: theme.textTheme.muted.copyWith(
