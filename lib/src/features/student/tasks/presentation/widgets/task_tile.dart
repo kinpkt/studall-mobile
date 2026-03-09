@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/common_widgets/app_list_tile.dart';
 import 'package:studall/src/core/utils/datetime_to_thai_string.dart';
@@ -30,7 +31,7 @@ class TaskTile extends ConsumerWidget {
       final courseAsync = ref.watch(courseNameProvider(task.courseId!));
 
       descriptionText = courseAsync.when(
-        data: (name) => name != null ? 'วิชา: ${name}' : '',
+        data: (name) => name != null ? 'วิชา: $name' : '',
         loading: () => 'กำลังโหลด...',
         error: (_, __) => 'โหลดข้อมูลล้มเหลว',
       );
@@ -46,14 +47,12 @@ class TaskTile extends ConsumerWidget {
               description: Text(
                 '$descriptionText'
                 '${task.description != null ? '\nรายละเอียด: ${task.description}' : ''}'
-                '\n${task.type == TaskType.toDo
-                ? 'กำหนดส่ง: ${dateTimeToThaiString(task.endDateTime, withTime: true, withDayOfWeek: true)}'
-                : 'ระยะเวลา: ${dateTimeToThaiString(task.startDateTime!, withTime: true, withDayOfWeek: true)} - ${dateTimeToThaiString(task.endDateTime, withTime: true, withDayOfWeek: true)}'}'
+                '\n${task.type == TaskType.toDo ? 'กำหนดส่ง: ${dateTimeToThaiString(task.endDateTime, withTime: true, withDayOfWeek: true)}' : 'ระยะเวลา: ${dateTimeToThaiString(task.startDateTime!, withTime: true, withDayOfWeek: true)} - ${dateTimeToThaiString(task.endDateTime, withTime: true, withDayOfWeek: true)}'}',
               ),
               actions: [
                 ShadButton.secondary(
                   child: const Text('ปิด'),
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => context.pop(),
                 ),
                 ShadButton.destructive(
                   child: const Text('ลบ'),
@@ -63,49 +62,55 @@ class TaskTile extends ConsumerWidget {
                       builder: (confirmContext) {
                         return ShadDialog(
                           title: const Text('ยืนยันการลบ'),
-                          description: const Text('คุณแน่ใจหรือไม่ว่าต้องการลบงานนี้? การกระทำนี้ไม่สามารถย้อนกลับได้'),
+                          description: const Text(
+                            'คุณแน่ใจหรือไม่ว่าต้องการลบงานนี้? การกระทำนี้ไม่สามารถย้อนกลับได้',
+                          ),
                           actions: [
                             ShadButton.secondary(
                               child: const Text('ยกเลิก'),
-                              onPressed: () => Navigator.of(confirmContext).pop(),
+                              onPressed: () =>
+                                  Navigator.of(confirmContext).pop(),
                             ),
                             ShadButton.destructive(
                               child: const Text('ยืนยัน'),
                               onPressed: () async {
                                 try {
-                                  final currentUser = FirebaseAuth.instance.currentUser;
+                                  final currentUser =
+                                      FirebaseAuth.instance.currentUser;
 
-                                  if (currentUser == null) throw Exception('ผู้ใช้ยังไม่ได้เข้าสู่ระบบ');
+                                  if (currentUser == null)
+                                    throw Exception(
+                                      'ผู้ใช้ยังไม่ได้เข้าสู่ระบบ',
+                                    );
 
-                                  await ref.read(taskFirestoreRepositoryProvider).deleteTask(currentUser.uid, task.id);
+                                  await ref
+                                      .read(taskFirestoreRepositoryProvider)
+                                      .deleteTask(currentUser.uid, task.id);
 
-                                  if (!confirmContext.mounted)
-                                    return;
+                                  if (!confirmContext.mounted) return;
                                   Navigator.of(confirmContext).pop();
 
-                                  if (!mainDialogContext.mounted)
-                                    return;
+                                  if (!mainDialogContext.mounted) return;
                                   Navigator.of(mainDialogContext).pop();
 
-                                  if (!context.mounted)
-                                    return;
+                                  if (!context.mounted) return;
                                   ShadToaster.of(context).show(
                                     const ShadToast(
                                       title: Text('สำเร็จ'),
                                       description: Text('ลบงานเรียบร้อยแล้ว'),
                                     ),
                                   );
-                                }
-                                catch (e) {
-                                  if (!confirmContext.mounted)
-                                    return;
+                                } catch (e) {
+                                  if (!confirmContext.mounted) return;
                                   Navigator.of(confirmContext).pop();
 
                                   if (!context.mounted) return;
                                   ShadToaster.of(context).show(
                                     ShadToast.destructive(
                                       title: const Text('เกิดข้อผิดพลาด'),
-                                      description: Text('ไม่สามารถลบข้อมูลได้: $e'),
+                                      description: Text(
+                                        'ไม่สามารถลบข้อมูลได้: $e',
+                                      ),
                                     ),
                                   );
                                 }
@@ -124,14 +129,18 @@ class TaskTile extends ConsumerWidget {
                       final updatedTask = task.copyWith(isDone: true);
                       final currentUser = FirebaseAuth.instance.currentUser;
 
-                      ref.read(taskFirestoreRepositoryProvider).updateTask(currentUser!.uid, updatedTask);
+                      ref
+                          .read(taskFirestoreRepositoryProvider)
+                          .updateTask(currentUser!.uid, updatedTask);
 
                       Navigator.of(context).pop();
 
                       ShadToaster.of(context).show(
                         const ShadToast(
                           title: Text('สำเร็จ'),
-                          description: Text('ปรับสถานะให้งานเสร็จสิ้นเรียบร้อยแล้ว'),
+                          description: Text(
+                            'ปรับสถานะให้งานเสร็จสิ้นเรียบร้อยแล้ว',
+                          ),
                         ),
                       );
                     },
@@ -143,21 +152,25 @@ class TaskTile extends ConsumerWidget {
                       final updatedTask = task.copyWith(isDone: false);
                       final currentUser = FirebaseAuth.instance.currentUser;
 
-                      ref.read(taskFirestoreRepositoryProvider).updateTask(currentUser!.uid, updatedTask);
+                      ref
+                          .read(taskFirestoreRepositoryProvider)
+                          .updateTask(currentUser!.uid, updatedTask);
 
                       Navigator.of(context).pop();
 
                       ShadToaster.of(context).show(
                         const ShadToast(
                           title: Text('สำเร็จ'),
-                          description: Text('ปรับสถานะให้งานไม่เสร็จเรียบร้อยแล้ว'),
+                          description: Text(
+                            'ปรับสถานะให้งานไม่เสร็จเรียบร้อยแล้ว',
+                          ),
                         ),
                       );
                     },
                   ),
               ],
             );
-          }
+          },
         );
       },
       child: AppListTile(
@@ -180,8 +193,8 @@ class TaskTile extends ConsumerWidget {
               ),
             ],
           ),
-        ]
-      )
+        ],
+      ),
     );
   }
 
@@ -189,16 +202,24 @@ class TaskTile extends ConsumerWidget {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
+    final thisWeek = today.add(const Duration(days: 7));
     final taskDate = DateTime(dueDate.year, dueDate.month, dueDate.day);
 
     if (taskDate == today) {
       return 'วันนี้';
     } else if (taskDate == tomorrow) {
       return 'พรุ่งนี้';
-    } else {
+    } else if (taskDate.isAfter(today) && taskDate.isBefore(thisWeek)) {
       final dayNames = ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.', 'อา.'];
       final dayName = dayNames[dueDate.weekday - 1];
       return 'วัน $dayName';
+    } else {
+      return dateTimeToThaiString(
+        dueDate,
+        withDayOfWeek: false,
+        acronymMonth: true,
+        withYear: false,
+      );
     }
   }
 }

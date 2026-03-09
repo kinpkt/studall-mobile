@@ -189,7 +189,7 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () => context.go('/register'),
+                          onTap: () => context.go('/signup'),
                           child: Text(
                             'เริ่มสร้างบัญชี',
                             style: theme.textTheme.muted.copyWith(

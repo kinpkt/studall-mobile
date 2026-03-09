@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/student/courses/data/models/course_model.dart';
@@ -125,7 +126,13 @@ class StudentCoursesScreen extends ConsumerWidget {
                   child: Column(
                     spacing: 16,
                     children: [
-                      ...courses.map((course) => CourseCard(course: course)),
+                      ...courses.map(
+                        (course) => GestureDetector(
+                          onTap: () =>
+                              context.push('/student/courses/${course.id}'),
+                          child: CourseCard(course: course),
+                        ),
+                      ),
                     ],
                   ),
                 );

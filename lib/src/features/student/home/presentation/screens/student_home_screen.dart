@@ -155,14 +155,17 @@ class StudentHomeScreen extends ConsumerWidget {
               ),
             ),
           ] else ...[
-            ListView.separated(
-              clipBehavior: Clip.none,
-              scrollDirection: Axis.horizontal,
-              itemCount: items.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 16),
-              itemBuilder: (context, index) {
-                return RecentItemCard(item: items[index]);
-              },
+            SizedBox(
+              height: 104,
+              child: ListView.separated(
+                clipBehavior: Clip.none,
+                scrollDirection: Axis.horizontal,
+                itemCount: items.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 16),
+                itemBuilder: (context, index) {
+                  return RecentItemCard(item: items[index]);
+                },
+              ),
             ),
           ],
         ],

@@ -131,6 +131,7 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
                     ),
                     const SizedBox(height: 16),
                     ShadInputFormField(
+                      
                       controller: _nameController,
                       id: 'displayName',
                       label: const Text(
@@ -175,6 +176,7 @@ class _SignupScreenState extends ConsumerState<SignUpScreen> {
                                       password: _passwordController.text,
                                       displayName: _nameController.text.trim(),
                                     );
+                                // context.go('/');
                               }
                             },
                       child: isLoading

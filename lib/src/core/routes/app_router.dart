@@ -27,7 +27,10 @@ import 'package:studall/src/features/student/courses/presentation/screens/course
 import 'package:studall/src/features/student/courses/presentation/screens/course_forums_screen.dart';
 import 'package:studall/src/features/student/courses/presentation/screens/course_tasks_screen.dart';
 import 'package:studall/src/features/student/courses/presentation/screens/course_notes_screen.dart';
-import 'package:studall/src/features/student/tasks/presentation/screens/student_tasks_screen.dart';
+import 'package:studall/src/features/student/tasks/presentation/screens/student_tasks_layout_screen.dart';
+import 'package:studall/src/features/student/tasks/presentation/screens/student_assigned_tasks_screen.dart';
+import 'package:studall/src/features/student/tasks/presentation/screens/student_overdue_tasks_screen.dart';
+import 'package:studall/src/features/student/tasks/presentation/screens/student_done_tasks_screen.dart';
 import 'package:studall/src/features/student/notes/presentation/screens/student_notes_screen.dart';
 import 'package:studall/src/features/student/explore/presentation/screens/student_explore_screen.dart';
 import 'package:studall/src/features/student/tools/presentation/gpa_calculator_screen.dart';
@@ -210,6 +213,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (_, _) => const PartnerAddAdvertisementScreen(),
       ),
+      GoRoute(
+        path: '/student/tasks/add-edit',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final taskToEdit = state.extra as TaskModel?;
+          return StudentAddEditTaskScreen(task: taskToEdit);
+        },
+      ),
 
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: _rootNavigatorKey,
@@ -234,7 +245,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: ':courseId',
                     redirect: (_, state) =>
-                      '/student/courses/${state.pathParameters['courseId']}/forums',
+                        '/student/courses/${state.pathParameters['courseId']}/forums',
                   ),
 
                   ShellRoute(
@@ -272,18 +283,32 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/student/tasks',
-                builder: (_, _) => const StudentTasksScreen(),
+                redirect: (_, state) {
+                  if (state.uri.path == '/student/tasks') {
+                    return '/student/tasks/assigned';
+                  }
+                  return null;
+                },
                 routes: [
-                  GoRoute(
-                    path: 'add-edit',
-                    parentNavigatorKey: _rootNavigatorKey,
-                    builder: (context, state) {
-                      final taskToEdit = state.extra as TaskModel?;
-
-                      return StudentAddEditTaskScreen(task: taskToEdit);
-                    },
+                  ShellRoute(
+                    builder: (context, state, child) =>
+                        StudentTasksLayoutScreen(child: child),
+                    routes: [
+                      GoRoute(
+                        path: 'assigned',
+                        builder: (_, _) => const StudentAssignedTasksScreen(),
+                      ),
+                      GoRoute(
+                        path: 'overdue',
+                        builder: (_, _) => const StudentOverdueTasksScreen(),
+                      ),
+                      GoRoute(
+                        path: 'done',
+                        builder: (_, _) => const StudentDoneTasksScreen(),
+                      ),
+                    ],
                   ),
-                ]
+                ],
               ),
             ],
           ),

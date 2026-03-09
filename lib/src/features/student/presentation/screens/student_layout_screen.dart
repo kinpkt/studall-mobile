@@ -41,8 +41,6 @@ class StudentLayoutScreen extends ConsumerWidget {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context, int currentIndex) {
-    final theme = ShadTheme.of(context);
-    final colorScheme = theme.colorScheme;
     const studentPageTitles = [null, 'รายวิชา', 'ที่ต้องทำ', 'บันทึก', 'สำรวจ'];
 
     final title = currentIndex < studentPageTitles.length
@@ -54,15 +52,6 @@ class StudentLayoutScreen extends ConsumerWidget {
       showSubtitle: currentIndex != 4,
       pageTitle: title,
       onProfileTap: () => context.push('/setting'),
-      actions: [
-        ShadIconButton.outline(
-          iconSize: 24,
-          foregroundColor: colorScheme.foreground,
-          decoration: ShadDecoration(shape: BoxShape.circle),
-          onPressed: () {},
-          icon: Icon(PhosphorIconsRegular.bell),
-        ),
-      ],
     );
   }
 
