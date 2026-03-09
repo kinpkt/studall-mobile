@@ -57,12 +57,10 @@ class RequestFirestoreRepository {
     );
   }
 
-  Future<void> updateRequest(String docId, RequestStatus newStatus) {
+  Future<void> updateRequest(String docId, RequestModel newRequest) {
     return _service.update(
       path: 'requests/$docId',
-      data: {
-        'status': newStatus.name,
-      }
+      data: newRequest.toFirestore(),
     );
   }
 

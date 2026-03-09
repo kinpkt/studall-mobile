@@ -12,13 +12,27 @@ import '../../data/repositories/request_firestore_repository.dart';
 
 import '../providers/admin_requests_provider.dart';
 
-class RequestListTile extends ConsumerWidget {
+class RequestListTile extends ConsumerStatefulWidget {
   final RequestModel request;
   const RequestListTile({super.key, required this.request});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RequestListTile> createState() => _RequestListTileState();
+}
+
+class _RequestListTileState extends ConsumerState<RequestListTile> {
+  final TextEditingController _reasonController = TextEditingController();
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
+    final request = widget.request;
 
     Future<void> handleApprove() async {
       if (request.type == RequestType.advertise) {
@@ -40,16 +54,57 @@ class RequestListTile extends ConsumerWidget {
         }
       }
 
-      await ref.read(requestFirestoreRepositoryProvider).updateRequest(
-        request.id,
-        RequestStatus.approved,
-      );
+      final updatedRequest = request.copyWith(status: RequestStatus.approved);
+
+      await ref.read(requestFirestoreRepositoryProvider).updateRequest(request.id, updatedRequest);
     }
 
-    Future<void> handleDecline() async {
-      await ref.read(requestFirestoreRepositoryProvider).updateRequest(
-        request.id,
-        RequestStatus.declined,
+    Future<void> handleDecline(String reason) async {
+      final updatedRequest = request.copyWith(status: RequestStatus.declined, reason: reason.isNotEmpty ? reason : null);
+
+      await ref.read(requestFirestoreRepositoryProvider).updateRequest(request.id, updatedRequest);
+    }
+
+    void showDeclineReasonDialog() {
+      _reasonController.clear();
+      showDialog(
+        context: context,
+        builder: (context) => ShadDialog(
+          title: Text('เหตุผลการปฏิเสธ', style: theme.textTheme.h3),
+          description: Text('กรุณาระบุเหตุผลที่ปฏิเสธคำขอนี้', style: theme.textTheme.p),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              ShadInput(
+                controller: _reasonController,
+                placeholder: const Text('ระบุเหตุผล...'),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ShadButton.outline(
+                    child: const Text('ยกเลิก'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  const SizedBox(width: 16),
+                  ShadButton.destructive(
+                    child: const Text('ยืนยัน'),
+                    onPressed: () async {
+                      await handleDecline(_reasonController.text);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       );
     }
 
@@ -122,12 +177,9 @@ class RequestListTile extends ConsumerWidget {
                               );
                             },
                           ),
-
                         const SizedBox(height: 12),
-
                         if (request.status == RequestStatus.declined && request.reason != null)
-                          Text('สาเหตุการปฏิเสธ: ${request.reason}', style: theme.textTheme.p),
-
+                          Text('สาเหตุการปฏิเสธ: ${request.reason}', style: theme.textTheme.p.copyWith(color: Colors.red, fontWeight: FontWeight.bold)),
                         if (request.status == RequestStatus.pending)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -135,9 +187,8 @@ class RequestListTile extends ConsumerWidget {
                               ShadButton.destructive(
                                 child: Text('ปฏิเสธ'),
                                 onPressed: () async {
-                                  await handleDecline();
-                                  if (context.mounted)
-                                    Navigator.of(context).pop();
+                                  Navigator.of(context).pop();
+                                  showDeclineReasonDialog();
                                 },
                               ),
                               SizedBox(width: 16,),
@@ -166,7 +217,7 @@ class RequestListTile extends ConsumerWidget {
               ),
             if (request.status == RequestStatus.pending)
               IconButton(
-                  onPressed: handleDecline,
+                  onPressed: showDeclineReasonDialog,
                   icon: Icon(PhosphorIconsRegular.x, color: theme.colorScheme.destructive)
               ),
           ],

@@ -59,18 +59,37 @@ class RequestModel {
   DateTime createdAt;
   DateTime updatedAt;
 
-  static const _uuid = Uuid();
-
   RequestModel({
     String? id,
     required this.type,
     required this.requestedUserId,
     this.status = RequestStatus.pending,
+    this.reason,
     createdAt,
     updatedAt,
-  }) :  id = id ?? _uuid.v7(),
+  }) :  id = id ?? const Uuid().v7(),
         createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
+
+  RequestModel copyWith({
+    String? id,
+    String? requestedUserId,
+    RequestType? type,
+    RequestStatus? status,
+    String? reason,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return RequestModel(
+      id: id ?? this.id,
+      requestedUserId: requestedUserId ?? this.requestedUserId,
+      type: type ?? this.type,
+      status: status ?? this.status,
+      reason: reason ?? this.reason,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 
   factory RequestModel.fromFirestore(Map<String, dynamic> data, String docId) {
     final String? requestTypeString = data['type'] as String?;
@@ -88,9 +107,10 @@ class RequestModel {
 
     return RequestModel(
       id: data['id'],
+      requestedUserId: data['requestedUserId'],
       type: parsedType,
       status: parsedStatus,
-      requestedUserId: data['requestedUserId'],
+      reason: data['reason'] as String?,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
     );
