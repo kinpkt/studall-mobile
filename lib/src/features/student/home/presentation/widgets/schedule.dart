@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
+import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
 import '../../data/models/schedule_model.dart';
 
 class Schedule extends StatefulWidget {
@@ -190,26 +191,12 @@ class _ScheduleState extends State<Schedule> {
                 
                 const SizedBox(height: 4),
                 
-                // Course ID
-                if (item.courseId != null)
-                  Text(
-                    item.courseId!,
-                    style: TextStyle(
-                      fontFamily: 'Google Sans',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: theme.colorScheme.mutedForeground,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                
                 const Spacer(),
                 
                 // Location and section
-                if (item.location != null || item.section != null)
+                if (item.location != null)
                   Text(
-                    [item.location, item.section]
+                    [item.location]
                         .where((s) => s != null && s.isNotEmpty)
                         .join(' • '),
                     style: TextStyle(
@@ -222,7 +209,6 @@ class _ScheduleState extends State<Schedule> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 
-                // Time display
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -254,19 +240,8 @@ class _ScheduleState extends State<Schedule> {
     );
   }
 
-  Color _getCourseColor(int dayOfWeek, ShadThemeData theme) {
-    // Map day of week to colors from your theme
-    final dayColors = {
-      1: theme.colorScheme.custom['monday'] ?? theme.colorScheme.primary, // Monday
-      2: theme.colorScheme.custom['tuesday'] ?? theme.colorScheme.secondary, // Tuesday  
-      3: theme.colorScheme.custom['wednesday'] ?? theme.colorScheme.custom['green'], // Wednesday
-      4: theme.colorScheme.custom['thursday'] ?? theme.colorScheme.custom['orange'], // Thursday
-      5: theme.colorScheme.custom['friday'] ?? theme.colorScheme.custom['blue'], // Friday
-      6: theme.colorScheme.custom['saturday'] ?? theme.colorScheme.custom['purple'], // Saturday
-      7: theme.colorScheme.custom['sunday'] ?? theme.colorScheme.destructive, // Sunday
-    };
-    
-    return dayColors[dayOfWeek] ?? theme.colorScheme.card;
+  Color _getCourseColor(DayOfWeek dayOfWeek, ShadThemeData theme) {
+    return theme.colorScheme.custom[dayOfWeek.name] ?? theme.colorScheme.card;
   }
 
   String _formatTime(TimeOfDay time) {
@@ -274,7 +249,6 @@ class _ScheduleState extends State<Schedule> {
   }
 
   void _onScheduleCellTap(ScheduleModel item) {
-    // Handle schedule cell tap - you can navigate to course details, etc.
     debugPrint('Tapped on: ${item.title}');
   }
 }

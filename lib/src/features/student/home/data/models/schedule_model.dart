@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
 
 class ScheduleModel {
-  String id;
-  String? courseId;
-  String title;
-  String? location;
-  String? section;
-  int dayOfWeek;
-  TimeOfDay startTime;
-  TimeOfDay endTime;
+  final String title;
+  final String? location;
+  final DayOfWeek dayOfWeek;
+  final TimeOfDay startTime;
+  final TimeOfDay endTime;
 
   ScheduleModel({
-    required this.id,
-    this.courseId,
     required this.title,
     this.location,
-    this.section,
     required this.dayOfWeek,
     required this.startTime,
     required this.endTime,
