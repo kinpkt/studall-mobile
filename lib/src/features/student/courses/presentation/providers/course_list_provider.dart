@@ -13,3 +13,14 @@ final userCoursesProvider = FutureProvider.autoDispose<List<CourseModel>>((ref) 
   final repository = ref.read(courseFirestoreRepositoryProvider);
   return repository.getCoursesByUserId(currentUser.uid);
 });
+
+final courseByIdProvider = FutureProvider.autoDispose.family<CourseModel?, String>((ref, courseId) async {
+  final currentUser = FirebaseAuth.instance.currentUser;
+
+  if (currentUser == null) {
+    return null;
+  }
+
+  final repository = ref.read(courseFirestoreRepositoryProvider);
+  return repository.getCourseById(currentUser.uid, courseId);
+});

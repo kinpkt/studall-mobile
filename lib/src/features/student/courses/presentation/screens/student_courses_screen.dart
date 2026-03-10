@@ -128,8 +128,9 @@ class StudentCoursesScreen extends ConsumerWidget {
                     children: [
                       ...courses.map(
                         (course) => GestureDetector(
-                          onTap: () =>
-                              context.push('/student/courses/${course.id}'),
+                          onTap: () => context.push(
+                            '/student/courses/${course.id}/forums',
+                          ),
                           child: CourseCard(course: course),
                         ),
                       ),

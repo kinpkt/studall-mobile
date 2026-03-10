@@ -18,9 +18,7 @@ List<TaskModel> filterThisWeekTasks(List<TaskModel> tasks) {
 List<TaskModel> filterNextWeekTasks(List<TaskModel> tasks) {
   final today = DateTime.now();
   final nextWeeks = today.add(const Duration(days: 7));
-  return tasks
-      .where((task) => task.endDateTime.isAfter(nextWeeks))
-      .toList();
+  return tasks.where((task) => task.endDateTime.isAfter(nextWeeks)).toList();
 }
 
 List<TaskModel> filterLaterTasks(List<TaskModel> tasks) {
@@ -60,14 +58,16 @@ List<TaskModel> filterDoneBeforeDueTasks(List<TaskModel> tasks) {
 Widget buildExpansionTaskList(
   BuildContext context,
   String title,
-  List<TaskModel> tasks,
-) {
+  List<TaskModel> tasks, {
+  bool? initiallyExpanded,
+}) {
   final theme = ShadTheme.of(context);
   final colorScheme = theme.colorScheme;
   final textTheme = theme.textTheme;
   return Padding(
     padding: const EdgeInsets.fromLTRB(0, 4, 0, 10),
     child: ExpansionTile(
+      initiallyExpanded: initiallyExpanded ?? false,
       minTileHeight: 24.0,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

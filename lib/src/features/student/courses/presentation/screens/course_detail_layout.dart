@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/features/student/courses/presentation/providers/course_list_provider.dart';
+import 'package:studall/src/features/student/courses/presentation/widgets/course_app_bar.dart';
 
-class CourseDetailLayout extends StatelessWidget {
+class CourseDetailLayout extends ConsumerStatefulWidget {
   final String courseId;
 
   final Widget child;
@@ -14,62 +16,65 @@ class CourseDetailLayout extends StatelessWidget {
     required this.child,
   });
 
-  int _tabIndexFromLocation(String location) {
-    if (location.endsWith('/tasks')) return 1;
-    if (location.endsWith('/notes')) return 2;
+  @override
+  ConsumerState<CourseDetailLayout> createState() => _CourseDetailLayoutState();
+}
+
+class _CourseDetailLayoutState extends ConsumerState<CourseDetailLayout>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  static const _paths = ['forums', 'tasks', 'notes'];
+
+  int _indexFromPath(String path) {
+    if (path.endsWith('/tasks')) return 1;
+    if (path.endsWith('/notes')) return 2;
     return 0;
   }
 
-  List<NavigationDestination> get _destinations {
-    return const [
-      NavigationDestination(
-        icon: Icon(PhosphorIconsRegular.chatCircle),
-        selectedIcon: Icon(PhosphorIconsFill.chatCircle),
-        label: 'ฟอรั่ม',
-      ),
-      NavigationDestination(
-        icon: Icon(PhosphorIconsRegular.listChecks),
-        selectedIcon: Icon(PhosphorIconsFill.listChecks),
-        label: 'งาน',
-      ),
-      NavigationDestination(
-        icon: Icon(PhosphorIconsRegular.notebook),
-        selectedIcon: Icon(PhosphorIconsFill.notebook),
-        label: 'บันทึก',
-      ),
-    ];
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final path = GoRouterState.of(context).uri.path;
+    final index = _indexFromPath(path);
+    if (_tabController.index != index) {
+      _tabController.index = index;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final location = GoRouterState.of(context).uri.path;
-    final currentIndex = _tabIndexFromLocation(location);
     final theme = ShadTheme.of(context);
+    final courseAsync = ref.watch(courseByIdProvider(widget.courseId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'รายวิชา $courseId',
-          style: theme.textTheme.large,
-        ),
-        leading: IconButton(
-          icon: const Icon(PhosphorIconsRegular.arrowLeft),
-          onPressed: () => context.go('/student/courses'),
-        ),
-      ),
-      body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          final tab = switch (index) {
-            0 => 'forums',
-            1 => 'tasks',
-            2 => 'notes',
-            _ => 'forums',
-          };
-          context.go('/student/courses/$courseId/$tab');
+      body: courseAsync.when(
+        data: (course) {
+          if (course == null) {
+            return Center(
+              child: Text('ไม่พบรายวิชา', style: theme.textTheme.large),
+            );
+          }
+          return Column(
+            children: [
+              CourseAppBar(
+                course: course,
+                tabController: _tabController,
+                tabPaths: _paths,
+              ),
+              Expanded(child: widget.child),
+            ],
+          );
         },
-        destinations: _destinations,
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, _) =>
+            Center(child: Text('เกิดข้อผิดพลาด', style: theme.textTheme.large)),
       ),
     );
   }

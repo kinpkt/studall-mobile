@@ -222,6 +222,35 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
+      // ── Course detail (full-screen, outside bottom nav) ──────────────
+      ShellRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state, child) => CourseDetailLayout(
+          courseId: state.pathParameters['courseId'] ?? '',
+          child: child,
+        ),
+        routes: [
+          GoRoute(
+            path: '/student/courses/:courseId/forums',
+            builder: (_, state) => CourseForumsScreen(
+              courseId: state.pathParameters['courseId'] ?? '',
+            ),
+          ),
+          GoRoute(
+            path: '/student/courses/:courseId/tasks',
+            builder: (_, state) => CourseTasksScreen(
+              courseId: state.pathParameters['courseId'] ?? '',
+            ),
+          ),
+          GoRoute(
+            path: '/student/courses/:courseId/notes',
+            builder: (_, state) => CourseNotesScreen(
+              courseId: state.pathParameters['courseId'] ?? '',
+            ),
+          ),
+        ],
+      ),
+
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state, navigationShell) =>
@@ -241,40 +270,6 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/student/courses',
                 builder: (_, _) => const StudentCoursesScreen(),
-                routes: [
-                  GoRoute(
-                    path: ':courseId',
-                    redirect: (_, state) =>
-                        '/student/courses/${state.pathParameters['courseId']}/forums',
-                  ),
-
-                  ShellRoute(
-                    builder: (context, state, child) => CourseDetailLayout(
-                      courseId: state.pathParameters['courseId'] ?? '',
-                      child: child,
-                    ),
-                    routes: [
-                      GoRoute(
-                        path: ':courseId/forums',
-                        builder: (_, state) => CourseForumsScreen(
-                          courseId: state.pathParameters['courseId'] ?? '',
-                        ),
-                      ),
-                      GoRoute(
-                        path: ':courseId/tasks',
-                        builder: (_, state) => CourseTasksScreen(
-                          courseId: state.pathParameters['courseId'] ?? '',
-                        ),
-                      ),
-                      GoRoute(
-                        path: ':courseId/notes',
-                        builder: (_, state) => CourseNotesScreen(
-                          courseId: state.pathParameters['courseId'] ?? '',
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ),
             ],
           ),

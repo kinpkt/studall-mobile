@@ -163,9 +163,6 @@ class _RegisterPartnerScreenState extends ConsumerState<RegisterPartnerScreen> {
   }
 
   CommonAppbar _buildAppBar(BuildContext context) {
-    final theme = ShadTheme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return CommonAppbar(
       leading: [
         ShadIconButton.ghost(

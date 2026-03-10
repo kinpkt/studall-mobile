@@ -16,19 +16,28 @@ class StudentAssignedTasksScreen extends ConsumerWidget {
       data: (tasks) {
         final today = DateTime.now();
         final assignedTasks = tasks
-            .where((task) =>
-                task.endDateTime.isAfter(today) && !task.isDone)
+            .where((task) => task.endDateTime.isAfter(today) && !task.isDone)
             .toList();
 
         return SingleChildScrollView(
           child: Column(
             children: [
               buildExpansionTaskList(
-                  context, 'สัปดาห์นี้', filterThisWeekTasks(assignedTasks)),
+                context,
+                'สัปดาห์นี้',
+                filterThisWeekTasks(assignedTasks),
+                initiallyExpanded: true,
+              ),
               buildExpansionTaskList(
-                  context, 'สัปดาห์ถัดไป', filterNextWeekTasks(assignedTasks)),
+                context,
+                'สัปดาห์ถัดไป',
+                filterNextWeekTasks(assignedTasks),
+              ),
               buildExpansionTaskList(
-                  context, 'ไว้ทีหลัง', filterLaterTasks(assignedTasks)),
+                context,
+                'ไว้ทีหลัง',
+                filterLaterTasks(assignedTasks),
+              ),
               const SizedBox(height: 56 * 2),
             ],
           ),

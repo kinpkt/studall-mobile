@@ -31,9 +31,9 @@ class TaskTile extends ConsumerWidget {
       final courseAsync = ref.watch(courseNameProvider(task.courseId!));
 
       descriptionText = courseAsync.when(
-        data: (name) => name != null ? 'วิชา: $name' : '',
+        data: (name) => name ?? '',
         loading: () => 'กำลังโหลด...',
-        error: (_, __) => 'โหลดข้อมูลล้มเหลว',
+        error: (_, _) => 'โหลดข้อมูลล้มเหลว',
       );
     }
 
@@ -174,7 +174,9 @@ class TaskTile extends ConsumerWidget {
         );
       },
       child: AppListTile(
-        leading: ResourceIcon(type: task.type),
+        leading: task.isDone
+            ? Opacity(opacity: 0.15, child: ResourceIcon(type: task.type))
+            : ResourceIcon(type: task.type),
         title: task.title,
         titleStyle: textTheme.list.copyWith(color: colorScheme.foreground),
         description: descriptionText,
@@ -182,17 +184,25 @@ class TaskTile extends ConsumerWidget {
           color: colorScheme.mutedForeground,
         ),
         trailing: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(_formatDueDate(task.endDateTime), style: dateStyle),
-              Text(
-                '${task.endDateTime.hour.toString().padLeft(2, '0')}:${task.endDateTime.minute.toString().padLeft(2, '0')}',
-                style: dateStyle,
+          if (task.isDone)
+            Text(
+              'เสร็จสิ้น',
+              style: textTheme.muted.copyWith(
+                color: colorScheme.mutedForeground,
               ),
-            ],
-          ),
+            )
+          else
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(_formatDueDate(task.endDateTime), style: dateStyle),
+                Text(
+                  '${task.endDateTime.hour.toString().padLeft(2, '0')}:${task.endDateTime.minute.toString().padLeft(2, '0')}',
+                  style: dateStyle,
+                ),
+              ],
+            ),
         ],
       ),
     );
