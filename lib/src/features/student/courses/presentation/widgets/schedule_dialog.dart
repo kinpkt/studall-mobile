@@ -131,9 +131,7 @@ class _ScheduleDialogState extends State<ScheduleDialog> {
                     id: 'location',
                     controller: _locationController,
                     label: const Text('สถานที่'),
-                    placeholder: const Text('เช่น ห้อง 101, ห้อง 202, SC1-301'),
-                    validator: (value) =>
-                        value.trim().isEmpty ? 'กรุณากรอกสถานที่เรียน' : null,
+                    placeholder: const Text('เช่น ห้อง COM4, ห้อง 921, SC45-803'),
                     onChanged: (val) => setState(() => _location = val),
                   ),
                 ],
