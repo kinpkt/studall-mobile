@@ -144,7 +144,7 @@ class CourseAppBar extends StatelessWidget implements PreferredSizeWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: course.schedule
+              children: (course.schedule..sort())
                   .map((sch) => _buildScheduleRow(sch, theme, colorScheme))
                   .toList(),
             ),
@@ -190,7 +190,14 @@ class CourseAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (schedule.location != null && schedule.location!.isNotEmpty) ...[
           Text(', ', style: textStyle),
           Text('ห้อง ', style: textStyle),
-          Text(schedule.location!, style: textStyle),
+          Expanded(
+            child: Text(
+              schedule.location!,
+              style: textStyle,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          )
         ],
       ],
     );

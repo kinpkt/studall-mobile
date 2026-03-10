@@ -11,7 +11,7 @@ enum DayOfWeek {
   sunday,
 }
 
-class CourseScheduleModel {
+class CourseScheduleModel implements Comparable<CourseScheduleModel> {
   DayOfWeek day;
   String? location;
   TimeOfDay? startTime;
@@ -56,5 +56,22 @@ class CourseScheduleModel {
       if (startTime != null) 'startTime': timeOfDayToMinute(startTime!),
       if (endTime != null) 'endTime': timeOfDayToMinute(endTime!),
     };
+  }
+
+  @override
+  int compareTo(CourseScheduleModel other) {
+    if (day.index != other.day.index)
+      return day.index.compareTo(other.day.index);
+
+    final int thisStart = startTime != null ? timeOfDayToMinute(startTime!) : 0;
+    final int otherStart = other.startTime != null ? timeOfDayToMinute(other.startTime!) : 0;
+
+    if (thisStart != otherStart)
+      return thisStart.compareTo(otherStart);
+
+    final int thisEnd = endTime != null ? timeOfDayToMinute(endTime!) : 0;
+    final int otherEnd = other.endTime != null ? timeOfDayToMinute(other.endTime!) : 0;
+
+    return thisEnd.compareTo(otherEnd);
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 TimeOfDay minuteToTimeOfDay(int minute) {
   int hour = minute ~/ 60;
-  TimeOfDay result = TimeOfDay(hour: hour, minute: hour*60-minute);
+  TimeOfDay result = TimeOfDay(hour: hour, minute: minute%60);
 
   return result;
 }
