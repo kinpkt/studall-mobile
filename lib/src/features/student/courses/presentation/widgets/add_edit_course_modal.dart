@@ -160,7 +160,7 @@ class _AddEditCourseModalState extends State<AddEditCourseModal> {
         children: [
           Expanded(
             child: Text(
-              '${dayName(schedule.day)} ${schedule.startTime!.format(context)} - ${schedule.endTime!.format(context)}, ${schedule.location ?? '-'}',
+              '${dayName(schedule.day)} ${schedule.startTime!.format(context)} - ${schedule.endTime!.format(context)}${schedule.location != null ? ', ${schedule.location}' : ''}',
               style: theme.textTheme.custom['medium']?.copyWith(
                 color: theme.colorScheme.foreground,
                 fontWeight: FontWeight.w400,

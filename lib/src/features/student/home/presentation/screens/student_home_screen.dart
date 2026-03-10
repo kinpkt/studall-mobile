@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
 import 'package:studall/src/features/student/home/presentation/providers/home_controller.dart';
 import 'package:studall/src/features/student/home/presentation/widgets/recent_card.dart';
@@ -20,41 +21,30 @@ class StudentHomeScreen extends ConsumerWidget {
 
     List<ScheduleModel> sampleSchedule = [
       ScheduleModel(
-        id: '1',
-        courseId: '01418342-65',
         title: 'Mobile Application Design and Development',
         location: 'SC1-202',
-        section: 'Sec 1',
-        dayOfWeek: 1, // Monday
+        dayOfWeek: DayOfWeek.monday,
         startTime: const TimeOfDay(hour: 9, minute: 0),
         endTime: const TimeOfDay(hour: 12, minute: 0),
       ),
       ScheduleModel(
-        id: '2',
-        courseId: '01418236-65',
         title: 'Operating Systems',
         location: 'SC1-104',
-        section: 'Sec 2',
-        dayOfWeek: 2, // Tuesday
+        dayOfWeek: DayOfWeek.tuesday, // Tuesday
         startTime: const TimeOfDay(hour: 13, minute: 0),
         endTime: const TimeOfDay(hour: 16, minute: 0),
       ),
       ScheduleModel(
-        id: '3',
-        courseId: '01418221-65',
         title: 'Database Systems',
         location: 'Online',
-        section: 'Sec 1',
-        dayOfWeek: 3, // Wednesday
+        dayOfWeek: DayOfWeek.wednesday, // Wednesday
         startTime: const TimeOfDay(hour: 10, minute: 30),
         endTime: const TimeOfDay(hour: 12, minute: 30),
       ),
       ScheduleModel(
-        id: '4',
-        courseId: '01418499-65',
         title: 'Senior Project',
         location: 'SC1-301',
-        dayOfWeek: 5, // Friday
+        dayOfWeek: DayOfWeek.friday,
         startTime: const TimeOfDay(hour: 14, minute: 0),
         endTime: const TimeOfDay(hour: 17, minute: 0),
       ),
