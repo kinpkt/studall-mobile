@@ -16,19 +16,25 @@ class StudentOverdueTasksScreen extends ConsumerWidget {
       data: (tasks) {
         final today = DateTime.now();
         final overdueTasks = tasks
-            .where((task) =>
-                task.endDateTime.isBefore(today) && !task.isDone)
+            .where((task) => task.endDateTime.isBefore(today) && !task.isDone)
             .toList();
 
         return SingleChildScrollView(
           child: Column(
             children: [
-              buildExpansionTaskList(
-                  context, 'สัปดาห์นี้', filterThisWeekTasks(overdueTasks)),
-              buildExpansionTaskList(context, 'สัปดาห์ที่ผ่านมา',
-                  filterLastWeekTasks(overdueTasks)),
-              buildExpansionTaskList(
-                  context, 'ก่อนหน้านี้', filterEarlierTasks(overdueTasks)),
+              ExpansionTaskList(
+                title: 'สัปดาห์นี้',
+                tasks: filterThisWeekTasks(overdueTasks),
+                initiallyExpanded: true,
+              ),
+              ExpansionTaskList(
+                title: 'สัปดาห์ที่ผ่านมา',
+                tasks: filterLastWeekTasks(overdueTasks),
+              ),
+              ExpansionTaskList(
+                title: 'ก่อนหน้านี้',
+                tasks: filterEarlierTasks(overdueTasks),
+              ),
               const SizedBox(height: 56 * 2),
             ],
           ),

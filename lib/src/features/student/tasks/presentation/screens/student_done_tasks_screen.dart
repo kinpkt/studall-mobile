@@ -19,14 +19,22 @@ class StudentDoneTasksScreen extends ConsumerWidget {
         return SingleChildScrollView(
           child: Column(
             children: [
-              buildExpansionTaskList(context, 'เสร็จก่อนกำหนด',
-                  filterDoneBeforeDueTasks(finishedTasks)),
-              buildExpansionTaskList(
-                  context, 'สัปดาห์นี้', filterThisWeekTasks(finishedTasks)),
-              buildExpansionTaskList(context, 'สัปดาห์ถัดไป',
-                  filterNextWeekTasks(finishedTasks)),
-              buildExpansionTaskList(
-                  context, 'ไว้ทีหลัง', filterLaterTasks(finishedTasks)),
+              ExpansionTaskList(
+                title: 'เสร็จก่อนกำหนด',
+                tasks: filterDoneBeforeDueTasks(finishedTasks),
+              ),
+              ExpansionTaskList(
+                title: 'สัปดาห์นี้',
+                tasks: filterThisWeekTasks(finishedTasks),
+              ),
+              ExpansionTaskList(
+                title: 'สัปดาห์ถัดไป',
+                tasks: filterNextWeekTasks(finishedTasks),
+              ),
+              ExpansionTaskList(
+                title: 'ไว้ทีหลัง',
+                tasks: filterLaterTasks(finishedTasks),
+              ),
               const SizedBox(height: 56 * 2),
             ],
           ),

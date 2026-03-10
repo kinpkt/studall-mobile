@@ -22,21 +22,18 @@ class StudentAssignedTasksScreen extends ConsumerWidget {
         return SingleChildScrollView(
           child: Column(
             children: [
-              buildExpansionTaskList(
-                context,
-                'สัปดาห์นี้',
-                filterThisWeekTasks(assignedTasks),
+              ExpansionTaskList(
+                title: 'สัปดาห์นี้',
+                tasks: filterThisWeekTasks(assignedTasks),
                 initiallyExpanded: true,
               ),
-              buildExpansionTaskList(
-                context,
-                'สัปดาห์ถัดไป',
-                filterNextWeekTasks(assignedTasks),
+              ExpansionTaskList(
+                title: 'สัปดาห์ถัดไป',
+                tasks: filterNextWeekTasks(assignedTasks),
               ),
-              buildExpansionTaskList(
-                context,
-                'ไว้ทีหลัง',
-                filterLaterTasks(assignedTasks),
+              ExpansionTaskList(
+                title: 'ไว้ทีหลัง',
+                tasks: filterLaterTasks(assignedTasks),
               ),
               const SizedBox(height: 56 * 2),
             ],

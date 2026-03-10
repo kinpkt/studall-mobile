@@ -163,7 +163,8 @@ class CourseAppBar extends StatelessWidget implements PreferredSizeWidget {
     final dayColorKey = _dayColorKeys[schedule.day] ?? 'thursday';
     final dotColor = colorScheme.custom[dayColorKey] ?? const Color(0xFFDB4D00);
     final textStyle = theme.textTheme.custom['medium']?.copyWith(
-      color: colorScheme.mutedForeground,    );
+      color: colorScheme.mutedForeground,
+    );
 
     final hasTime = schedule.startTime != null && schedule.endTime != null;
     final timeText = hasTime
@@ -198,8 +199,9 @@ class CourseAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildTabBar(BuildContext context, ShadColorScheme colorScheme) {
     return TabBar(
       controller: tabController,
-      onTap: (index) =>
-          context.go('/student/courses/${course.id}/${tabPaths[index]}'),
+      onTap: (index) => context.pushReplacement(
+        '/student/courses/${course.id}/${tabPaths[index]}',
+      ),
       labelColor: colorScheme.foreground,
       unselectedLabelColor: colorScheme.mutedForeground,
       indicatorColor: colorScheme.primary,

@@ -133,7 +133,7 @@ class TaskTile extends ConsumerWidget {
                           .read(taskFirestoreRepositoryProvider)
                           .updateTask(currentUser!.uid, updatedTask);
 
-                      Navigator.of(context).pop();
+                      context.pop();
 
                       ShadToaster.of(context).show(
                         const ShadToast(
