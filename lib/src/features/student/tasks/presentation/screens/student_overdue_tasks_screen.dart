@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/student_tasks_list_provider.dart';
@@ -8,7 +9,8 @@ class StudentOverdueTasksScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tasksAsync = ref.watch(studentTasksListProvider);
+    final String userId = FirebaseAuth.instance.currentUser!.uid;
+    final tasksAsync = ref.watch(studentTasksListProvider(userId));
 
     return tasksAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -19,21 +21,26 @@ class StudentOverdueTasksScreen extends ConsumerWidget {
             .where((task) => task.endDateTime.isBefore(today) && !task.isDone)
             .toList();
 
+        print('Total overdue tasks: ${overdueTasks.length}');
+        for (var task in overdueTasks) {
+          print('Overdue Task: ${task.title} - ${task.endDateTime} - isDone: ${task.isDone}');
+        }
+
         return SingleChildScrollView(
           child: Column(
             children: [
               ExpansionTaskList(
                 title: 'สัปดาห์นี้',
-                tasks: filterThisWeekTasks(overdueTasks),
+                tasks: filterPastThisWeekTasks(overdueTasks),
                 initiallyExpanded: true,
               ),
               ExpansionTaskList(
                 title: 'สัปดาห์ที่ผ่านมา',
-                tasks: filterLastWeekTasks(overdueTasks),
+                tasks: filterPastLastWeekTasks(overdueTasks),
               ),
               ExpansionTaskList(
                 title: 'ก่อนหน้านี้',
-                tasks: filterEarlierTasks(overdueTasks),
+                tasks: filterPastEarlierTasks(overdueTasks),
               ),
               const SizedBox(height: 56 * 2),
             ],

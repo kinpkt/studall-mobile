@@ -21,13 +21,13 @@ class TaskFirestoreRepository {
     );
   }
 
-  Future<List<TaskModel>> getTasksByUserId(String userId) async {
-    final data = await _service.getCollection<TaskModel>(
+  Stream<List<TaskModel>> getTasksByUserId(String userId) {
+    final data = _service.streamCollection<TaskModel>(
       path: 'students/$userId/tasks',
       builder: (data, docId) => TaskModel.fromFirestore(data, docId),
     );
 
-    return data ?? [];
+    return data;
   }
 
   Future<void> updateTask(String userId, TaskModel task) async {

@@ -4,7 +4,7 @@ import 'package:studall/src/core/services/firestore_service.dart';
 import 'package:studall/src/features/student/tasks/data/models/task_model.dart';
 import 'package:studall/src/features/student/tasks/data/repositories/task_firestore_repository.dart';
 
-final studentTasksListProvider = FutureProvider<List<TaskModel>>((ref) {
+final studentTasksListProvider = StreamProvider.family<List<TaskModel>, String>((ref, userId) {
   final currentUser = FirebaseAuth.instance.currentUser;
 
   if (currentUser == null) {

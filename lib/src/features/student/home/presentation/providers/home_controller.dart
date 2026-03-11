@@ -16,7 +16,7 @@ final ownedUtilitiesProvider = FutureProvider<List<UtilityModel>>((ref) {
   return repository.getUtilitiesByUserId(currentUser!.uid);
 });
 
-final ownedTasksProvider = FutureProvider<List<TaskModel>>((ref) {
+final ownedTasksProvider = StreamProvider<List<TaskModel>>((ref) {
   final currentUser = FirebaseAuth.instance.currentUser;
 
   if (currentUser?.uid == null)

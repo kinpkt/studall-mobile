@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/student_tasks_list_provider.dart';
@@ -8,7 +9,8 @@ class StudentAssignedTasksScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tasksAsync = ref.watch(studentTasksListProvider);
+    final String userId = FirebaseAuth.instance.currentUser!.uid;
+    final tasksAsync = ref.watch(studentTasksListProvider(userId));
 
     return tasksAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -24,16 +26,16 @@ class StudentAssignedTasksScreen extends ConsumerWidget {
             children: [
               ExpansionTaskList(
                 title: 'สัปดาห์นี้',
-                tasks: filterThisWeekTasks(assignedTasks),
+                tasks: filterFutureThisWeekTasks(assignedTasks),
                 initiallyExpanded: true,
               ),
               ExpansionTaskList(
                 title: 'สัปดาห์ถัดไป',
-                tasks: filterNextWeekTasks(assignedTasks),
+                tasks: filterFutureNextWeekTasks(assignedTasks),
               ),
               ExpansionTaskList(
                 title: 'ไว้ทีหลัง',
-                tasks: filterLaterTasks(assignedTasks),
+                tasks: filterFutureLaterTasks(assignedTasks),
               ),
               const SizedBox(height: 56 * 2),
             ],

@@ -11,7 +11,7 @@ import 'package:studall/src/features/student/courses/presentation/widgets/add_ed
 import '../../../../auth/presentation/screens/log_in_screen.dart';
 import '../widgets/course_card.dart';
 
-final userCoursesProvider = FutureProvider.family<List<CourseModel>, String>((
+final userCoursesProvider = StreamProvider.family<List<CourseModel>, String>((
   ref,
   userId,
 ) {

@@ -1,59 +1,75 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import '../../data/models/task_model.dart';
 import 'task_tile.dart';
 
-List<TaskModel> filterThisWeekTasks(List<TaskModel> tasks) {
+List<TaskModel> filterPastThisWeekTasks(List<TaskModel> tasks) {
+  final today = DateTime.now();
+  final sevenDaysAgo = today.subtract(const Duration(days: 7));
+
+  return tasks.where((task) =>
+  task.endDateTime.isBefore(today) &&
+      task.endDateTime.isAfter(sevenDaysAgo)
+  ).toList();
+}
+
+List<TaskModel> filterPastLastWeekTasks(List<TaskModel> tasks) {
+  final today = DateTime.now();
+  final sevenDaysAgo = today.subtract(const Duration(days: 7));
+  final fourteenDaysAgo = today.subtract(const Duration(days: 14));
+
+  return tasks.where((task) =>
+  (task.endDateTime.isBefore(sevenDaysAgo) || task.endDateTime.isAtSameMomentAs(sevenDaysAgo)) &&
+      task.endDateTime.isAfter(fourteenDaysAgo)
+  ).toList();
+}
+
+List<TaskModel> filterPastEarlierTasks(List<TaskModel> tasks) {
+  final today = DateTime.now();
+  final fourteenDaysAgo = today.subtract(const Duration(days: 14));
+
+  return tasks.where((task) =>
+  task.endDateTime.isBefore(fourteenDaysAgo) ||
+      task.endDateTime.isAtSameMomentAs(fourteenDaysAgo)
+  ).toList();
+}
+
+List<TaskModel> filterFutureThisWeekTasks(List<TaskModel> tasks) {
   final today = DateTime.now();
   final nextWeek = today.add(const Duration(days: 7));
-  return tasks
-      .where(
-        (task) =>
-            task.endDateTime.isAfter(today) &&
-            task.endDateTime.isBefore(nextWeek),
-      )
-      .toList();
+
+  return tasks.where((task) =>
+  (task.endDateTime.isAfter(today) || task.endDateTime.isAtSameMomentAs(today)) &&
+      task.endDateTime.isBefore(nextWeek)
+  ).toList();
 }
 
-List<TaskModel> filterNextWeekTasks(List<TaskModel> tasks) {
+List<TaskModel> filterFutureNextWeekTasks(List<TaskModel> tasks) {
   final today = DateTime.now();
-  final nextWeeks = today.add(const Duration(days: 7));
-  return tasks.where((task) => task.endDateTime.isAfter(nextWeeks)).toList();
+  final nextWeek = today.add(const Duration(days: 7));
+  final twoWeeks = today.add(const Duration(days: 14));
+
+  return tasks.where((task) =>
+  (task.endDateTime.isAfter(nextWeek) || task.endDateTime.isAtSameMomentAs(nextWeek)) &&
+      task.endDateTime.isBefore(twoWeeks)
+  ).toList();
 }
 
-List<TaskModel> filterLaterTasks(List<TaskModel> tasks) {
+List<TaskModel> filterFutureLaterTasks(List<TaskModel> tasks) {
   final today = DateTime.now();
-  final nextTwoWeeks = today.add(const Duration(days: 14));
-  return tasks.where((task) => task.endDateTime.isAfter(nextTwoWeeks)).toList();
-}
+  final twoWeeks = today.add(const Duration(days: 14));
 
-List<TaskModel> filterLastWeekTasks(List<TaskModel> tasks) {
-  final today = DateTime.now();
-  final lastWeek = today.subtract(const Duration(days: 7));
-  final lastTwoWeeks = today.subtract(const Duration(days: 14));
-  return tasks
-      .where(
-        (task) =>
-            task.endDateTime.isBefore(lastWeek) &&
-            task.endDateTime.isAfter(lastTwoWeeks),
-      )
-      .toList();
-}
-
-List<TaskModel> filterEarlierTasks(List<TaskModel> tasks) {
-  final today = DateTime.now();
-  final lastTwoWeeks = today.subtract(const Duration(days: 14));
-  return tasks
-      .where((task) => task.endDateTime.isBefore(lastTwoWeeks))
-      .toList();
+  return tasks.where((task) =>
+  task.endDateTime.isAfter(twoWeeks) ||
+      task.endDateTime.isAtSameMomentAs(twoWeeks)
+  ).toList();
 }
 
 List<TaskModel> filterDoneBeforeDueTasks(List<TaskModel> tasks) {
   final today = DateTime.now();
-  return tasks
-      .where((task) => task.endDateTime.isAfter(today) && task.isDone)
-      .toList();
+  return tasks.where((task) =>
+  task.endDateTime.isAfter(today) && task.isDone
+  ).toList();
 }
 
 class ExpansionTaskList extends StatefulWidget {

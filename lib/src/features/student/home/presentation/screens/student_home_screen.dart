@@ -108,20 +108,6 @@ class StudentHomeScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-
-              GestureDetector(
-                onTap: () {
-                  // TODO: Navigate to full recent items list
-                },
-                child: Text(
-                  'ทั้งหมด',
-                  style: textTheme.muted.copyWith(
-                    color: colorScheme.custom['info']!,
-                    decoration: TextDecoration.underline,
-                    decorationColor: colorScheme.custom['info']!,
-                  ),
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 16),
