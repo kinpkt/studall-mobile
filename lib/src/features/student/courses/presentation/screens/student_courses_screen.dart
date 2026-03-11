@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/student/courses/data/models/course_model.dart';
@@ -10,11 +11,30 @@ import 'package:studall/src/features/student/courses/presentation/widgets/add_ed
 import '../../../../auth/presentation/screens/log_in_screen.dart';
 import '../widgets/course_card.dart';
 
+final userCoursesProvider = StreamProvider.family<List<CourseModel>, String>((
+  ref,
+  userId,
+) {
+  final repo = ref.watch(courseFirestoreRepositoryProvider);
+  return repo.getCoursesByUserId(userId);
+});
+
 class StudentCoursesScreen extends ConsumerWidget {
   const StudentCoursesScreen({super.key});
 
-  void _showAddCourseModal(BuildContext context) {
-    showDialog(context: context, builder: (_) => const AddEditCourseModal());
+  void _showAddCourseModal(BuildContext context, WidgetRef ref) {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+    showDialog(
+      context: context,
+      builder: (_) => AddEditCourseModal(
+        onSave: (course) async {
+          final repo = ref.read(courseFirestoreRepositoryProvider);
+          await repo.addCourse(userId, course);
+          ref.invalidate(userCoursesProvider);
+        },
+      ),
+    );
   }
 
   Widget _iconButton(
@@ -45,9 +65,7 @@ class StudentCoursesScreen extends ConsumerWidget {
       return LogInScreen();
     }
 
-    final ownedCourses = ref
-        .watch(courseFirestoreRepositoryProvider)
-        .getCoursesByUserId(currentUser.uid);
+    final coursesAsync = ref.watch(userCoursesProvider(currentUser.uid));
 
     return Container(
       color: theme.colorScheme.background,
@@ -67,24 +85,40 @@ class StudentCoursesScreen extends ConsumerWidget {
               _iconButton(
                 context,
                 PhosphorIconsBold.plus,
-                () => _showAddCourseModal(context),
+                () => _showAddCourseModal(context, ref),
               ),
             ],
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: FutureBuilder<List<CourseModel>>(
-              future: ownedCourses,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                final courses = snapshot.data ?? [];
-
+            child: coursesAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) =>
+                  Center(child: Text('เกิดข้อผิดพลาด: $err')),
+              data: (courses) {
                 if (courses.isEmpty) {
-                  return Center(
-                    child: Text('ยังไม่มีวิชา', style: theme.textTheme.p),
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'เริ่มต้นบันทึกรายวิชาของคุณ',
+                        style: theme.textTheme.p.copyWith(
+                          color: colorScheme.mutedForeground,
+                        ),
+                      ),
+                      ShadButton.ghost(
+                        onPressed: () => _showAddCourseModal(context, ref),
+                        child: Text(
+                          'สร้างวิชาเรียนใหม่ที่นี่',
+                          style: theme.textTheme.p.copyWith(
+                            color: colorScheme.custom['info']!,
+                            fontWeight: FontWeight.w500,
+                            decorationColor: colorScheme.custom['info']!,
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 }
 
@@ -92,7 +126,14 @@ class StudentCoursesScreen extends ConsumerWidget {
                   child: Column(
                     spacing: 16,
                     children: [
-                      ...courses.map((course) => CourseCard(course: course)),
+                      ...courses.map(
+                        (course) => GestureDetector(
+                          onTap: () => context.push(
+                            '/student/courses/${course.id}/forums',
+                          ),
+                          child: CourseCard(course: course),
+                        ),
+                      ),
                     ],
                   ),
                 );

@@ -3,35 +3,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/features/admin/approval/data/models/request_model.dart';
-import 'package:studall/src/features/admin/approval/presentation/screens/admin_approval_screen.dart';
-import 'package:studall/src/features/auth/data/models/user_model.dart';
-import 'package:studall/src/features/partner/advertisements/data/models/advertisement_model.dart';
 import 'package:studall/src/features/partner/advertisements/data/repositories/advertisement_firestore_repository.dart';
+import 'package:studall/src/features/partner/branches/data/repositories/branch_firestore_repository.dart';
 import 'package:studall/src/features/partner/home/presentation/widgets/advertisement_banner.dart';
 
+import '../../../../partner/branches/data/models/branch_model.dart';
 import '../../data/repositories/request_firestore_repository.dart';
-import 'package:studall/src/features/partner/data/repositories/partner_firestore_repository.dart';
 
-final partnerStoreNameProvider = StreamProvider.family<String, String>((ref, String userId) {
-  final repository = ref.watch(partnerFirestoreRepositoryProvider);
-  final stream = repository.getPartnerByUserId(userId);
+import '../providers/admin_requests_provider.dart';
 
-  return stream.map((partner) => partner?.name ?? 'ไม่ทราบชื่อร้าน');
-});
-
-final singleAdvertisementProvider = StreamProvider.family<AdvertisementModel?, String>((ref, adId) {
-  final repository = ref.watch(advertisementFirestoreRepositoryProvider);
-
-  return repository.getAdvertisementFromId(adId);
-});
-
-class RequestListTile extends ConsumerWidget {
+class RequestListTile extends ConsumerStatefulWidget {
   final RequestModel request;
   const RequestListTile({super.key, required this.request});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RequestListTile> createState() => _RequestListTileState();
+}
+
+class _RequestListTileState extends ConsumerState<RequestListTile> {
+  final TextEditingController _reasonController = TextEditingController();
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
+    final request = widget.request;
 
     Future<void> handleApprove() async {
       if (request.type == RequestType.advertise) {
@@ -43,19 +44,71 @@ class RequestListTile extends ConsumerWidget {
           await ref.read(advertisementFirestoreRepositoryProvider).updateAdvertisement(updatedAd);
         }
       }
+      else {
+        final branchRepo = ref.read(branchFirestoreRepositoryProvider);
+        final branches = await branchRepo.getBranchesByUserId(request.requestedUserId).first;
 
-      await ref.read(requestFirestoreRepositoryProvider).updateRequest(
-        request.id,
-        RequestStatus.approved,
+        for (BranchModel branch in branches) {
+          final updatedBranch = branch.copyWith(partnerIsPermitted: true);
+          branchRepo.updateBranch(request.requestedUserId, updatedBranch);
+        }
+      }
+
+      final updatedRequest = request.copyWith(status: RequestStatus.approved);
+
+      await ref.read(requestFirestoreRepositoryProvider).updateRequest(request.id, updatedRequest);
+    }
+
+    Future<void> handleDecline(String reason) async {
+      final updatedRequest = request.copyWith(status: RequestStatus.declined, reason: reason.isNotEmpty ? reason : null);
+
+      await ref.read(requestFirestoreRepositoryProvider).updateRequest(request.id, updatedRequest);
+    }
+
+    void showDeclineReasonDialog() {
+      _reasonController.clear();
+      showDialog(
+        context: context,
+        builder: (context) => ShadDialog(
+          title: Text('เหตุผลการปฏิเสธ', style: theme.textTheme.h3),
+          description: Text('กรุณาระบุเหตุผลที่ปฏิเสธคำขอนี้', style: theme.textTheme.p),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              ShadInput(
+                controller: _reasonController,
+                placeholder: const Text('ระบุเหตุผล...'),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ShadButton.outline(
+                    child: const Text('ยกเลิก'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  const SizedBox(width: 16),
+                  ShadButton.destructive(
+                    child: const Text('ยืนยัน'),
+                    onPressed: () async {
+                      await handleDecline(_reasonController.text);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       );
     }
 
-    Future<void> handleDecline() async {
-      await ref.read(requestFirestoreRepositoryProvider).updateRequest(
-        request.id,
-        RequestStatus.declined,
-      );
-    }
+    final partnerAsync = ref.watch(partnerStoreDataProvider(request.requestedUserId));
 
     return Material(
       child: ListTile(
@@ -63,12 +116,10 @@ class RequestListTile extends ConsumerWidget {
         title: Text(request.type.thaiType, style: theme.textTheme.list),
         subtitle: Consumer(
           builder: (context, ref, child) {
-            final partnerAsync = ref.watch(partnerStoreNameProvider(request.requestedUserId ?? ''));
-
             return partnerAsync.when(
               loading: () => Text('กำลังโหลดชื่อร้าน...', style: theme.textTheme.muted),
               error: (err, stack) => Text('ส่งคำขอโดย ไม่ทราบชื่อร้าน', style: theme.textTheme.muted),
-              data: (storeName) => Text('ส่งคำขอโดย $storeName', style: theme.textTheme.muted),
+              data: (partner) => Text('ส่งคำขอโดย ${partner!.name}', style: theme.textTheme.muted),
             );
           },
         ),
@@ -77,14 +128,22 @@ class RequestListTile extends ConsumerWidget {
           children: [
             IconButton(
               onPressed: () {
-                showShadDialog(
+                showDialog(
                   context: context,
                   builder: (context) => ShadDialog(
                     title: Text(request.type.thaiType, style: theme.textTheme.h3),
                     description: Text('สถานะ: ${request.status.thaiStatus}', style: theme.textTheme.p),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (request.type == RequestType.store)
+                          partnerAsync.when(
+                            loading: () => Text('...'),
+                            error: (error, stack) => Text('-'),
+                            data: (partner) => Text('ชื่อร้าน: ${partner!.name}\nรายละเอียดร้าน: ${partner.description}'),
+                          ),
+
                         if (request.type == RequestType.advertise)
                           Consumer(
                             builder: (context, ref, child) {
@@ -118,12 +177,9 @@ class RequestListTile extends ConsumerWidget {
                               );
                             },
                           ),
-
-                        if (request.status == RequestStatus.declined && request.reason != null) ...[
-                          const SizedBox(height: 12),
-                          Text('สาเหตุการปฏิเสธ: ${request.reason}', style: theme.textTheme.p),
-                        ],
-
+                        const SizedBox(height: 12),
+                        if (request.status == RequestStatus.declined && request.reason != null)
+                          Text('สาเหตุการปฏิเสธ: ${request.reason}', style: theme.textTheme.p.copyWith(color: Colors.red, fontWeight: FontWeight.bold)),
                         if (request.status == RequestStatus.pending)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -131,9 +187,8 @@ class RequestListTile extends ConsumerWidget {
                               ShadButton.destructive(
                                 child: Text('ปฏิเสธ'),
                                 onPressed: () async {
-                                  await handleDecline();
-                                  if (context.mounted)
-                                    Navigator.of(context).pop();
+                                  Navigator.of(context).pop();
+                                  showDeclineReasonDialog();
                                 },
                               ),
                               SizedBox(width: 16,),
@@ -162,7 +217,7 @@ class RequestListTile extends ConsumerWidget {
               ),
             if (request.status == RequestStatus.pending)
               IconButton(
-                  onPressed: handleDecline,
+                  onPressed: showDeclineReasonDialog,
                   icon: Icon(PhosphorIconsRegular.x, color: theme.colorScheme.destructive)
               ),
           ],

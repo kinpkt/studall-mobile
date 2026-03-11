@@ -1,4 +1,5 @@
 import 'package:uuid/uuid.dart';
+import '../../../home/data/models/schedule_model.dart';
 import 'course_schedule_model.dart';
 
 class CourseModel {
@@ -26,6 +27,24 @@ class CourseModel {
         schedule = schedule ?? [],
         createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
+
+
+  List<ScheduleModel> get scheduleModelList {
+    List<ScheduleModel> scheduleModelList = [];
+
+    for (CourseScheduleModel sch in schedule) {
+      final schedule = ScheduleModel(
+        title: name,
+        day: sch.day,
+        startTime: sch.startTime!,
+        endTime: sch.endTime!,
+      );
+
+      scheduleModelList.add(schedule);
+    }
+
+      return scheduleModelList;
+  }
 
   factory CourseModel.fromFirestore(Map<String, dynamic> data, String docId) {
     return CourseModel(

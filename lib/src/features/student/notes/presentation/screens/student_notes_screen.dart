@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
@@ -18,37 +19,57 @@ class StudentNotesScreen extends ConsumerStatefulWidget {
 }
 
 class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
-  /// null = show all notes, non-null = filter by courseId
   String? _selectedCourseId;
+  Stream<List<NoteModel>>? _ownedNotesStream;
+  Stream<List<CourseModel>>? _ownedCoursesStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  void _fetchData() {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      setState(() {
+        _ownedNotesStream = ref
+            .read(noteFirestoreRepositoryProvider)
+            .getNotesByUserId(currentUser.uid);
+
+        _ownedCoursesStream = ref
+            .read(courseFirestoreRepositoryProvider)
+            .getCoursesByUserId(currentUser.uid);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
-
     final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) {
-      return LogInScreen();
+      return const LogInScreen();
     }
 
-    final ownedNotes = ref
-        .watch(noteFirestoreRepositoryProvider)
-        .getNotesByUserId(currentUser.uid);
-
-    final ownedCourses = ref
-        .watch(courseFirestoreRepositoryProvider)
-        .getCoursesByUserId(currentUser.uid);
+    // Ensure streams aren't null just in case build runs before initState finishes
+    if (_ownedNotesStream == null || _ownedCoursesStream == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return Container(
       color: colorScheme.background,
       child: Column(
         children: [
-          _buildSearchBar(context, ownedCourses),
-          if (_selectedCourseId != null) _buildActiveFilterText(context),
+          _buildSearchBar(context, _ownedCoursesStream!),
+          if (_selectedCourseId != null)
+            _buildActiveFilterText(context, _ownedCoursesStream!),
           Expanded(
-            child: FutureBuilder<List<NoteModel>>(
-              future: ownedNotes,
+            // Removed RefreshIndicator; StreamBuilder handles real-time updates
+            child: StreamBuilder<List<NoteModel>>(
+              stream: _ownedNotesStream,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -64,12 +85,35 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
 
                 final notes = _selectedCourseId != null
                     ? allNotes
-                          .where((note) => note.courseId == _selectedCourseId)
-                          .toList()
+                    .where((note) => note.courseId == _selectedCourseId)
+                    .toList()
                     : allNotes;
 
                 if (notes.isEmpty) {
-                  return const Center(child: Text('ยังไม่มีโน้ต'));
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'เริ่มต้นบันทึกของคุณ',
+                        style: theme.textTheme.p.copyWith(
+                          color: colorScheme.mutedForeground,
+                        ),
+                      ),
+                      ShadButton.ghost(
+                        onPressed: () =>
+                            context.push('/student/notes/editor'),
+                        child: Text(
+                          'สร้างบันทึกใหม่ที่นี่',
+                          style: theme.textTheme.p.copyWith(
+                            color: colorScheme.custom['info']!,
+                            fontWeight: FontWeight.w500,
+                            decorationColor: colorScheme.custom['info']!,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
                 }
 
                 final pinnedNotes = notes
@@ -79,30 +123,28 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
                     .where((note) => !note.isPinned)
                     .toList();
 
-                return SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (pinnedNotes.isNotEmpty) ...[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                            vertical: 8.0,
-                          ),
-                          child: Text('ปักหมุด', style: theme.textTheme.h4),
-                        ),
-                        ...pinnedNotes.map((note) => NotesListTile(note: note)),
-                      ],
+                return ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    if (pinnedNotes.isNotEmpty) ...[
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
                           vertical: 8.0,
                         ),
-                        child: Text('ทั่วไป', style: theme.textTheme.h4),
+                        child: Text('ปักหมุด', style: theme.textTheme.h4),
                       ),
-                      ...unpinnedNotes.map((note) => NotesListTile(note: note)),
+                      ...pinnedNotes.map((note) => NotesListTile(note: note)),
                     ],
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
+                      ),
+                      child: Text('ทั่วไป', style: theme.textTheme.h4),
+                    ),
+                    ...unpinnedNotes.map((note) => NotesListTile(note: note)),
+                  ],
                 );
               },
             ),
@@ -112,14 +154,15 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
     );
   }
 
-  Widget _buildActiveFilterText(BuildContext context) {
+  // Updated to accept the stream and use StreamBuilder
+  Widget _buildActiveFilterText(
+      BuildContext context,
+      Stream<List<CourseModel>> coursesStream,
+      ) {
     final theme = ShadTheme.of(context);
-    final currentUser = FirebaseAuth.instance.currentUser;
 
-    return FutureBuilder<List<CourseModel>>(
-      future: ref
-          .read(courseFirestoreRepositoryProvider)
-          .getCoursesByUserId(currentUser?.uid ?? ''),
+    return StreamBuilder<List<CourseModel>>(
+      stream: coursesStream,
       builder: (context, snapshot) {
         final courses = snapshot.data ?? [];
         final courseName = courses
@@ -163,10 +206,11 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
     );
   }
 
+  // Updated to use StreamBuilder
   Widget _buildSearchBar(
-    BuildContext context,
-    Future<List<CourseModel>> coursesFuture,
-  ) {
+      BuildContext context,
+      Stream<List<CourseModel>> coursesStream,
+      ) {
     final theme = ShadTheme.of(context);
     final textTheme = theme.textTheme;
 
@@ -178,8 +222,8 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
         ),
         placeholder: const Text('ค้นหาโน้ต'),
         leading: Icon(PhosphorIconsRegular.magnifyingGlass, size: 20),
-        trailing: FutureBuilder<List<CourseModel>>(
-          future: coursesFuture,
+        trailing: StreamBuilder<List<CourseModel>>(
+          stream: coursesStream,
           builder: (context, snapshot) {
             final courses = snapshot.data ?? [];
 
@@ -215,7 +259,7 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
                   );
                 }),
                 if (courses.isEmpty &&
-                    snapshot.connectionState == ConnectionState.done)
+                    snapshot.connectionState == ConnectionState.active)
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -231,15 +275,11 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
               ],
               builder: (context, controller, child) => GestureDetector(
                 onTap: () =>
-                    controller.isOpen ? controller.close() : controller.open(),
+                controller.isOpen ? controller.close() : controller.open(),
                 child: Icon(
-                  _selectedCourseId != null
-                      ? PhosphorIconsFill.funnel
-                      : PhosphorIconsRegular.sliders,
+                  PhosphorIconsRegular.sliders,
                   size: 20,
-                  color: _selectedCourseId != null
-                      ? theme.colorScheme.primary
-                      : null,
+                  color: theme.colorScheme.primary,
                 ),
               ),
             );

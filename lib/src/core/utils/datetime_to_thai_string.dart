@@ -34,7 +34,7 @@ String dateTimeToThaiString(DateTime datetime, {bool withDayOfWeek = false, bool
   result += '$day $month ${withYear ? useBE ? datetime.year + 543 : datetime.year : ''}';
 
   if (withTime)
-    result += '${datetime.hour.toString().padLeft(2, '0')}:${datetime.minute.toString().padLeft(2, '0')}';
+    result += ' เวลา ${datetime.hour.toString().padLeft(2, '0')}:${datetime.minute.toString().padLeft(2, '0')}';
 
   return result;
 }

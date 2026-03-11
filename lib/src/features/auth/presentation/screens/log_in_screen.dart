@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/domain/auth_exceptions.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
@@ -113,18 +114,18 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('รหัสผ่าน'),
-                          GestureDetector(
-                            onTap: () {
-                              // TODO: Implement forgot password functionality
-                            },
-                            child: Text(
-                              'ลืมรหัสผ่าน',
-                              style: theme.textTheme.muted.copyWith(
-                                color: theme.colorScheme.foreground,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
+                          // GestureDetector(
+                          //   onTap: () {
+                          //     // TODO: Implement forgot password functionality
+                          //   },
+                          //   child: Text(
+                          //     'ลืมรหัสผ่าน',
+                          //     style: theme.textTheme.muted.copyWith(
+                          //       color: theme.colorScheme.foreground,
+                          //       decoration: TextDecoration.underline,
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -188,14 +189,7 @@ class _LogInScreenState extends ConsumerState<LogInScreen> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SignUpScreen(),
-                              ),
-                            );
-                          },
+                          onTap: () => context.go('/signup'),
                           child: Text(
                             'เริ่มสร้างบัญชี',
                             style: theme.textTheme.muted.copyWith(

@@ -1,30 +1,36 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/student/courses/data/models/course_model.dart';
 import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
-import 'package:studall/src/features/student/courses/data/repositories/course_firestore_repository.dart';
 import 'package:studall/src/features/student/courses/presentation/widgets/schedule_dialog.dart';
 
-class AddEditCourseModal extends ConsumerStatefulWidget {
+class AddEditCourseModal extends StatefulWidget {
   final CourseModel? course;
+  final void Function(CourseModel) onSave;
 
-  const AddEditCourseModal({super.key, this.course});
+  const AddEditCourseModal({super.key, this.course, required this.onSave});
 
   @override
-  ConsumerState<AddEditCourseModal> createState() => _AddEditCourseModalState();
+  State<AddEditCourseModal> createState() => _AddEditCourseModalState();
 }
 
-class _AddEditCourseModalState extends ConsumerState<AddEditCourseModal> {
+class _AddEditCourseModalState extends State<AddEditCourseModal> {
   final _formKey = GlobalKey<ShadFormState>();
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _teacherController = TextEditingController();
+  late final _nameController = TextEditingController(
+    text: widget.course?.name ?? '',
+  );
+  late final _descriptionController = TextEditingController(
+    text: widget.course?.description ?? '',
+  );
+  late final _teacherController = TextEditingController(
+    text: widget.course?.teacherName ?? '',
+  );
 
-  final List<CourseScheduleModel> _schedules = [];
+  late final List<CourseScheduleModel> _schedules = [
+    ...?widget.course?.schedule,
+  ];
 
   @override
   void dispose() {
@@ -51,18 +57,8 @@ class _AddEditCourseModalState extends ConsumerState<AddEditCourseModal> {
     );
   }
 
-  Future<void> _saveCourse() async {
+  void _saveCourse() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('เกิดข้อผิดพลาด: ไม่พบข้อมูลผู้ใช้')),
-        );
-      }
-      return;
-    }
 
     final course = CourseModel(
       name: _nameController.text.trim(),
@@ -76,15 +72,8 @@ class _AddEditCourseModalState extends ConsumerState<AddEditCourseModal> {
       schedule: _schedules,
     );
 
-    final repo = ref.read(courseFirestoreRepositoryProvider);
-    if (widget.course == null) {
-      await repo.addCourse(userId, course);
-    } else {
-      await repo.updateCourse(userId, course);
-    }
-    ref.invalidate(courseFirestoreRepositoryProvider);
-
-    if (mounted) context.pop();
+    widget.onSave(course);
+    context.pop();
   }
 
   @override
@@ -171,7 +160,7 @@ class _AddEditCourseModalState extends ConsumerState<AddEditCourseModal> {
         children: [
           Expanded(
             child: Text(
-              '${dayName(schedule.day)} ${schedule.startTime!.format(context)} - ${schedule.endTime!.format(context)}, ${schedule.location ?? '-'}',
+              '${dayName(schedule.day)} ${schedule.startTime!.format(context)} - ${schedule.endTime!.format(context)}${schedule.location != null ? ', ${schedule.location}' : ''}',
               style: theme.textTheme.custom['medium']?.copyWith(
                 color: theme.colorScheme.foreground,
                 fontWeight: FontWeight.w400,

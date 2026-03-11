@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studall/src/features/auth/data/models/role.dart';
 import '../../../../core/services/firestore_service.dart';
@@ -43,9 +44,11 @@ class UserFirestoreRepository implements UserRepository {
     return _service.streamDocument(
       path: 'users/$id',
       builder: (data, id) {
-        final user = UserModel.fromFirestore(data, id);
-        user.debugPrint();
-        return user;
+        print('[UserFirestoreRepository] streamUserProfile data: $data');
+        // final user = UserModel.fromFirestore(data, id);
+        // user.debugPrint();
+        print('hello');
+        return UserModel.fromFirestore(data, id);
       },
     );
   }
@@ -82,6 +85,14 @@ class UserFirestoreRepository implements UserRepository {
   @override
   Future<void> updateUserBanStatus(String uid, bool isBanned) async {
     await _service.update(path: 'users/$uid', data: {'isBanned': isBanned});
+  }
+
+  @override
+  Future<void> addUserRole(String uid, Role role) async {
+    await _service.update(
+      path: 'users/$uid',
+      data: {'roles': FieldValue.arrayUnion([role.name])},
+    );
   }
 
   @override

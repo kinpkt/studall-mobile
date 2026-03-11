@@ -6,7 +6,6 @@ class NoteModel {
   final String title;
   final String content; // Stringified JSON from flutter_quill
   final String? courseId;
-  final String userId;
   final bool isPinned;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -16,7 +15,6 @@ class NoteModel {
     required this.title,
     required this.content,
     this.courseId,
-    required this.userId,
     isPinned,
     createdAt,
     updatedAt,
@@ -31,7 +29,6 @@ class NoteModel {
       title: data['title'] as String,
       content: data['content'] as String,
       courseId: data['courseId'] as String?,
-      userId: data['userId'] as String,
       isPinned: data['isPinned'] as bool,
       createdAt: data['createdAt'].toDate(),
       updatedAt: data['updatedAt'].toDate(),
@@ -44,7 +41,6 @@ class NoteModel {
       'title': title,
       'content': content,
       if (courseId != null) 'courseId': courseId,
-      'userId': userId,
       'isPinned': isPinned,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
@@ -90,7 +86,7 @@ class NoteModel {
       description: content,
       createdAt: createdAt,
       updatedAt: updatedAt,
-      isPined: isPinned,
+      isPinned: isPinned,
     );
   }
 }

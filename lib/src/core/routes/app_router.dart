@@ -1,3 +1,4 @@
+//ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,11 +6,16 @@ import 'package:go_router/go_router.dart';
 // ── Auth providers & models ──────────────────────────────────────────────────
 import 'package:studall/src/features/auth/presentation/controllers/auth_state_provider.dart';
 import 'package:studall/src/features/auth/presentation/controllers/user_profile_provider.dart';
+import 'package:studall/src/features/auth/data/repositories/user_firestore_repository.dart';
 import 'package:studall/src/features/auth/data/models/role.dart';
+import 'package:studall/src/features/auth/data/models/user_model.dart';
 
 // ── Auth screens ─────────────────────────────────────────────────────────────
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:studall/src/features/auth/presentation/screens/register_role_screen.dart';
+import 'package:studall/src/features/auth/presentation/screens/register_student_screen.dart';
+import 'package:studall/src/features/auth/presentation/screens/register_partner_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/select_role_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/setting_screen.dart';
 
@@ -21,7 +27,11 @@ import 'package:studall/src/features/student/courses/presentation/screens/course
 import 'package:studall/src/features/student/courses/presentation/screens/course_forums_screen.dart';
 import 'package:studall/src/features/student/courses/presentation/screens/course_tasks_screen.dart';
 import 'package:studall/src/features/student/courses/presentation/screens/course_notes_screen.dart';
-import 'package:studall/src/features/student/tasks/presentation/screens/student_tasks_screen.dart';
+import 'package:studall/src/features/student/courses/presentation/screens/course_setting_screen.dart';
+import 'package:studall/src/features/student/tasks/presentation/screens/student_tasks_layout_screen.dart';
+import 'package:studall/src/features/student/tasks/presentation/screens/student_assigned_tasks_screen.dart';
+import 'package:studall/src/features/student/tasks/presentation/screens/student_overdue_tasks_screen.dart';
+import 'package:studall/src/features/student/tasks/presentation/screens/student_done_tasks_screen.dart';
 import 'package:studall/src/features/student/notes/presentation/screens/student_notes_screen.dart';
 import 'package:studall/src/features/student/explore/presentation/screens/student_explore_screen.dart';
 import 'package:studall/src/features/student/tools/presentation/gpa_calculator_screen.dart';
@@ -41,14 +51,11 @@ import 'package:studall/src/features/admin/home/presentation/screens/admin_home_
 import 'package:studall/src/features/admin/users/presentation/screens/admin_users_screen.dart';
 import 'package:studall/src/features/admin/approval/presentation/screens/admin_approval_screen.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Navigator keys
-// ─────────────────────────────────────────────────────────────────────────────
+import '../../features/student/tasks/data/models/task_model.dart';
+import '../../features/student/tasks/presentation/screens/student_add_edit_task_screen.dart';
+
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
-// ─────────────────────────────────────────────────────────────────────────────
-// RouterNotifier – triggers GoRouter.redirect when auth / profile changes
-// ─────────────────────────────────────────────────────────────────────────────
 class _RouterNotifier extends ChangeNotifier {
   _RouterNotifier(this._ref) {
     _ref.listen(authStateProvider, (_, _) => notifyListeners());
@@ -67,12 +74,17 @@ final routerProvider = Provider<GoRouter>((ref) {
     debugLogDiagnostics: true,
     refreshListenable: notifier,
 
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final authState = ref.read(authStateProvider);
       final profileState = ref.read(userProfileProvider);
       final path = state.uri.path;
 
       if (authState.isLoading || profileState.isLoading) return null;
+
+      if (authState.hasError) {
+        if (path == '/login' || path == '/signup') return null;
+        return '/login';
+      }
 
       final firebaseUser = authState.value;
       if (firebaseUser == null) {
@@ -80,26 +92,76 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/login';
       }
 
-      final profile = profileState.value;
-      if (profile == null) return null;
-
-      if (profile.roles.isEmpty) {
-        return path == '/select-role' ? null : '/select-role';
+      if (profileState.hasError) {
+        try {
+          final userRepository = ref.read(userFirestoreRepositoryProvider);
+          await userRepository.createUserProfile(
+            UserModel.fromFirebase(firebaseUser),
+          );
+          ref.invalidate(userProfileProvider);
+          return path;
+        } catch (_) {
+          return '/login';
+        }
       }
 
-      final isAuthOrRoot =
-          path == '/' ||
-          path == '/login' ||
-          path == '/signup' ||
-          path == '/select-role';
+      final profile = profileState.value;
 
-      if (isAuthOrRoot) {
+      if (profile == null) {
+        if (path == '/login' || path == '/signup') return null;
+
+        try {
+          final userRepository = ref.read(userFirestoreRepositoryProvider);
+          await userRepository.createUserProfile(
+            UserModel.fromFirebase(firebaseUser),
+          );
+          ref.invalidate(userProfileProvider);
+          return path;
+        } catch (e) {
+          print('[Router] Failed to recreate profile: $e');
+          return '/login';
+        }
+      }
+
+      if (profile.isBanned) {
+        return '/login';
+      }
+
+      final isRegisteringPath =
+          path == '/register-role' ||
+          path == '/register-student' ||
+          path == '/register-partner' ||
+          path == '/setting';
+
+      if (profile.roles.isEmpty) {
+        return isRegisteringPath ? null : '/register-role';
+      }
+
+      const authPaths = {'/', '/login', '/signup', '/select-role'};
+      if (authPaths.contains(path)) {
         return switch (profile.lastActiveRole) {
           Role.student => '/student/home',
           Role.partner => '/partner/home',
           Role.admin => '/admin/home',
           null => '/select-role',
         };
+      }
+
+      final role = profile.lastActiveRole;
+      if (role != null) {
+        final rolePrefix = '/${role.name}/';
+        final isRolePath =
+            path.startsWith('/student/') ||
+            path.startsWith('/partner/') ||
+            path.startsWith('/admin/');
+
+        if (isRolePath && !path.startsWith(rolePrefix)) {
+          return switch (role) {
+            Role.student => '/student/home',
+            Role.partner => '/partner/home',
+            Role.admin => '/admin/home',
+          };
+        }
       }
 
       return null;
@@ -114,6 +176,18 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       GoRoute(path: '/login', builder: (_, _) => const LogInScreen()),
       GoRoute(path: '/signup', builder: (_, _) => const SignUpScreen()),
+      GoRoute(
+        path: '/register-role',
+        builder: (_, _) => const RegisterRoleScreen(),
+      ),
+      GoRoute(
+        path: '/register-student',
+        builder: (_, _) => const RegisterStudentScreen(),
+      ),
+      GoRoute(
+        path: '/register-partner',
+        builder: (_, _) => const RegisterPartnerScreen(),
+      ),
       GoRoute(
         path: '/select-role',
         builder: (_, _) => const SelectRoleScreen(),
@@ -140,6 +214,51 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (_, _) => const PartnerAddAdvertisementScreen(),
       ),
+      GoRoute(
+        path: '/student/tasks/add-edit',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final taskToEdit = state.extra as TaskModel?;
+          return StudentAddEditTaskScreen(task: taskToEdit);
+        },
+      ),
+
+      GoRoute(
+        path: '/student/courses/:courseId/settings',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, state) => CourseSettingScreen(
+          courseId: state.pathParameters['courseId'] ?? '',
+        ),
+      ),
+
+      // ── Course detail (full-screen, outside bottom nav) ──────────────
+      ShellRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state, child) => CourseDetailLayout(
+          courseId: state.pathParameters['courseId'] ?? '',
+          child: child,
+        ),
+        routes: [
+          GoRoute(
+            path: '/student/courses/:courseId/forums',
+            builder: (_, state) => CourseForumsScreen(
+              courseId: state.pathParameters['courseId'] ?? '',
+            ),
+          ),
+          GoRoute(
+            path: '/student/courses/:courseId/tasks',
+            builder: (_, state) => CourseTasksScreen(
+              courseId: state.pathParameters['courseId'] ?? '',
+            ),
+          ),
+          GoRoute(
+            path: '/student/courses/:courseId/notes',
+            builder: (_, state) => CourseNotesScreen(
+              courseId: state.pathParameters['courseId'] ?? '',
+            ),
+          ),
+        ],
+      ),
 
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: _rootNavigatorKey,
@@ -160,40 +279,6 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/student/courses',
                 builder: (_, _) => const StudentCoursesScreen(),
-                routes: [
-                  GoRoute(
-                    path: ':courseId',
-                    redirect: (_, state) =>
-                        '/student/courses/${state.pathParameters['courseId']}/forums',
-                  ),
-
-                  ShellRoute(
-                    builder: (context, state, child) => CourseDetailLayout(
-                      courseId: state.pathParameters['courseId'] ?? '',
-                      child: child,
-                    ),
-                    routes: [
-                      GoRoute(
-                        path: ':courseId/forums',
-                        builder: (_, state) => CourseForumsScreen(
-                          courseId: state.pathParameters['courseId'] ?? '',
-                        ),
-                      ),
-                      GoRoute(
-                        path: ':courseId/tasks',
-                        builder: (_, state) => CourseTasksScreen(
-                          courseId: state.pathParameters['courseId'] ?? '',
-                        ),
-                      ),
-                      GoRoute(
-                        path: ':courseId/notes',
-                        builder: (_, state) => CourseNotesScreen(
-                          courseId: state.pathParameters['courseId'] ?? '',
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ),
             ],
           ),
@@ -202,7 +287,32 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/student/tasks',
-                builder: (_, _) => const StudentTasksScreen(),
+                redirect: (_, state) {
+                  if (state.uri.path == '/student/tasks') {
+                    return '/student/tasks/assigned';
+                  }
+                  return null;
+                },
+                routes: [
+                  ShellRoute(
+                    builder: (context, state, child) =>
+                        StudentTasksLayoutScreen(child: child),
+                    routes: [
+                      GoRoute(
+                        path: 'assigned',
+                        builder: (_, _) => const StudentAssignedTasksScreen(),
+                      ),
+                      GoRoute(
+                        path: 'overdue',
+                        builder: (_, _) => const StudentOverdueTasksScreen(),
+                      ),
+                      GoRoute(
+                        path: 'done',
+                        builder: (_, _) => const StudentDoneTasksScreen(),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

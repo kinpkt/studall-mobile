@@ -50,6 +50,6 @@ class BranchFirestoreRepository {
   }
 
   Future<void> deleteBranch(String userId, BranchModel branch) async {
-    await _service.delete(path: 'partners/$userId/${branch.id}');
+    await _service.delete(path: 'partners/$userId/branches/${branch.id}');
   }
 }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/common_widgets/plain_text_app_bar.dart';
+import 'package:studall/src/features/partner/common_widgets/partner_app_bar.dart';
 
 class PartnerLayoutScreen extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -30,8 +31,13 @@ class PartnerLayoutScreen extends ConsumerWidget {
     ];
   }
 
-  PreferredSizeWidget _buildAppBar(int currentIndex) {
-    return PlainTextAppBar(text: 'Partner');
+  PreferredSizeWidget _buildAppBar(BuildContext context, int currentIndex) {
+    const partnerPageTitles = ['หน้าหลัก', 'สาขา', 'คำขอของฉัน'];
+
+    return PartnerAppBar(
+      pageTitle: partnerPageTitles[currentIndex],
+      onProfileTap: () => context.push('/setting'),
+    );
   }
 
   void _showAddOptions(BuildContext context) {
@@ -76,7 +82,7 @@ class PartnerLayoutScreen extends ConsumerWidget {
 
     return SafeArea(
       child: Scaffold(
-        appBar: _buildAppBar(currentIndex),
+        appBar: _buildAppBar(context, currentIndex),
         body: navigationShell,
         bottomNavigationBar: NavigationBar(
           selectedIndex: currentIndex,

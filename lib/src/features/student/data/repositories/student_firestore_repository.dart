@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studall/src/core/services/firestore_service.dart';
 import 'package:studall/src/features/student/data/models/student_model.dart';
 
+import '../../courses/data/models/course_schedule_model.dart';
+import '../../home/data/models/schedule_model.dart';
+
 final studentFirestoreRepositoryProvider = Provider<StudentFirestoreRepository>((ref) {
   final firestoreService = ref.watch(firestoreServiceProvider);
   return StudentFirestoreRepository(firestoreService);
@@ -17,13 +20,32 @@ class StudentFirestoreRepository {
 
   StudentFirestoreRepository(this._service);
 
-  Future<StudentModel?> getStudentSettings(String id) async {
-    final data = _service.get(
-      path: 'students/$id',
+  Future<StudentModel?> getStudentSettings(String userId) async {
+    final data = await _service.get(
+      path: 'students/$userId',
       builder: (data, docId) => StudentModel.fromFirestore(data, docId),
     );
 
     return data;
+  }
+
+  Future<List<ScheduleModel>> getAllSchedulesInAllCourses(String userId) async {
+    final listOfLists = await _service.getCollection<List<ScheduleModel>>(
+      path: 'students/$userId/courses',
+      builder: (data, docId) {
+        final courseTitle = data['name'] as String? ?? 'วิชาที่ไม่ทราบชื่อ';
+
+        final rawSchedules = data['schedules'] as List<dynamic>? ?? [];
+
+        return rawSchedules.map((scheduleData) {
+          final courseSchedule = CourseScheduleModel.fromFirestore(scheduleData as Map<String, dynamic>);
+
+          return ScheduleModel.fromCourseSchedule(courseSchedule, courseTitle);
+        }).toList();
+      },
+    );
+
+    return (listOfLists).expand((scheduleList) => scheduleList).toList();
   }
 
   Future<void> updateSearchRadius(String id, double radius) async {
