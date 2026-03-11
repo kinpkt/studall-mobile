@@ -2,18 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:studall/src/features/auth/data/models/user_model.dart';
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
-import 'package:studall/src/features/partner/advertisements/data/models/advertisement_model.dart';
-import 'package:studall/src/features/partner/advertisements/data/repositories/advertisement_firestore_repository.dart';
-import 'package:studall/src/features/partner/branches/data/models/branch_model.dart';
-import 'package:studall/src/features/partner/branches/data/repositories/branch_firestore_repository.dart';
-import 'package:studall/src/features/partner/data/repositories/partner_firestore_repository.dart';
 import 'package:studall/src/features/partner/home/presentation/widgets/advertisement_banner.dart';
 import 'package:studall/src/features/partner/home/presentation/widgets/branch_card_minimal.dart';
 
-import '../../../data/models/partner_model.dart';
 import '../providers/partner_home_provider.dart';
 
 class PartnerHomeScreen extends ConsumerWidget {
