@@ -55,6 +55,7 @@ class ResourceIcon extends StatelessWidget {
             iconColor: colorScheme.custom['greenForeground'] ?? Colors.white,
             iconData: PhosphorIconsRegular.notebook,
           );
+        case TaskType.appointment:
         case UtilityType.appointment:
           return ResourceIconStyle(
             backgroundColor: colorScheme.custom['purple'] ?? Colors.purple,

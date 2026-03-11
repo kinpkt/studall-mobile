@@ -26,13 +26,13 @@ class TaskTile extends ConsumerWidget {
     final dueDateColor = colorScheme.custom['success'] ?? Colors.green;
     final dateStyle = textTheme.muted.copyWith(color: dueDateColor);
 
-    String descriptionText = '';
+    String descriptionText = 'อื่น ๆ';
 
     if (task.courseId != null && task.courseId!.isNotEmpty) {
       final courseAsync = ref.watch(courseNameProvider(task.courseId!));
 
       descriptionText = courseAsync.when(
-        data: (name) => name ?? '',
+        data: (name) => name != null ? 'วิชา: $name' : 'อื่น ๆ',
         loading: () => 'กำลังโหลด...',
         error: (_, _) => 'โหลดข้อมูลล้มเหลว',
       );

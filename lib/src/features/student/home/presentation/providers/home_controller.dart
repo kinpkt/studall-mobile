@@ -8,7 +8,7 @@ import 'package:studall/src/features/student/home/data/models/schedule_model.dar
 import 'package:studall/src/features/student/tasks/data/models/task_model.dart';
 import 'package:studall/src/features/student/tasks/data/repositories/task_firestore_repository.dart';
 
-final ownedUtilitiesProvider = FutureProvider<List<UtilityModel>>((ref) {
+final ownedUtilitiesProvider = StreamProvider<List<UtilityModel>>((ref) {
   final currentUser = FirebaseAuth.instance.currentUser;
 
   if (currentUser?.uid == null)
