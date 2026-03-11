@@ -27,6 +27,16 @@ class UtilityFirestoreRepository {
 
     return data;
   }
+  
+  Future<List<UtilityModel>> getUtilitiesByUserIdAndCourseId(String userId, String courseId) async {
+    final data = await _service.getCollection(
+      path: 'students/$userId/utilities',
+      queryBuilder: (query) => query.where('courseId', isEqualTo: courseId).orderBy('createdAt', descending: true),
+      builder: (data, docId) => UtilityModel.fromFirestore(data, docId),
+    );
+    
+    return data;
+  }
 
   Future<void> updateUtility(String userId, UtilityModel utility) async {
     await _service.update(
