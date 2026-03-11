@@ -1,0 +1,72 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../../core/services/firestore_service.dart';
+import '../models/request_model.dart';
+
+final requestFirestoreRepositoryProvider = Provider<RequestFirestoreRepository>((ref) {
+  final firestoreService = ref.watch(firestoreServiceProvider);
+  return RequestFirestoreRepository(firestoreService);
+});
+
+class RequestFirestoreRepository {
+  final FirestoreService _service;
+
+  RequestFirestoreRepository(this._service);
+
+  Future<void> addRequest(RequestModel request) async {
+    await _service.set(
+      path: 'requests/${request.id}',
+      data: request.toFirestore()
+    );
+  }
+
+  Stream<List<RequestModel>> getAllRequests() {
+    return _service.streamCollection<RequestModel>(
+      path: 'requests/',
+      queryBuilder: (query) => query.orderBy('createdAt', descending: true),
+      builder: (data, docId) => RequestModel.fromFirestore(data, docId),
+    );
+  }
+
+  Stream<List<RequestModel>> getRequestsByUserId(String userId) {
+    return _service.streamCollection<RequestModel>(
+      path: 'requests/',
+      queryBuilder: (query) => query.where('requestedUserId', isEqualTo: userId).orderBy('createdAt', descending: true),
+      builder: (data, docId) => RequestModel.fromFirestore(data, docId),
+    );
+  }
+
+  Future<int> getRequestsCountByStatus(RequestStatus status) async {
+    return await _service.count(
+      collectionPath: 'requests',
+      queryBuilder: (query) => query.where('status', isEqualTo: status.name),
+    );
+  }
+
+  Future<int> getRequestsCountByType(RequestType type) async {
+    return await _service.count(
+      collectionPath: 'requests',
+      queryBuilder: (query) => query.where('type', isEqualTo: type.name),
+    );
+  }
+
+  Future<int> getRequestsCountByStatusAndType(RequestStatus status, RequestType type) async {
+    return await _service.count(
+      collectionPath: 'requests',
+      queryBuilder: (query) => query
+        .where('status', isEqualTo: status.name)
+        .where('type', isEqualTo: type.name),
+    );
+  }
+
+  Future<void> updateRequest(String docId, RequestModel newRequest) {
+    return _service.update(
+      path: 'requests/$docId',
+      data: newRequest.toFirestore(),
+    );
+  }
+
+  Future<void> deleteRequest(String docId) {
+    return _service.delete(path: 'requests/$docId');
+  }
+}
+

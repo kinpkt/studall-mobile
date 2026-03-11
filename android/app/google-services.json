@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "282022508089",
+    "project_id": "studall-mobile",
+    "storage_bucket": "studall-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:282022508089:android:c8c5294b79b4860d3b7fe8",
+        "android_client_info": {
+          "package_name": "com.example.studall"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "282022508089-tgoicu29nt978qdsd44gpcrq51h3uk2b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.studall",
+            "certificate_hash": "b269e646c00033b032fd4001907aface9145bb38"
+          }
+        },
+        {
+          "client_id": "282022508089-sq1aefvtc45801ehckcp2qkss291atht.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD69AHfBSMU-AMa-FKT-_OU3c7_rgv03vc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "282022508089-sq1aefvtc45801ehckcp2qkss291atht.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "282022508089-h04526iss3i1hfel3prhdmosh4s6tihf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.studall"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
