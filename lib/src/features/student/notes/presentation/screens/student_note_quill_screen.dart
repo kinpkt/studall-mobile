@@ -86,9 +86,9 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
     }
   }
 
-  Future<void> _pickAndInsertImage() async {
+  Future<void> _pickAndInsertImage(ImageSource source) async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(source: source);
 
     if (image != null) {
       showDialog(
@@ -287,7 +287,11 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
               customButtons: [
                 QuillToolbarCustomButtonOptions(
                   icon: const Icon(Icons.image),
-                  onPressed: _pickAndInsertImage,
+                  onPressed: () => _pickAndInsertImage(ImageSource.gallery),
+                ),
+                QuillToolbarCustomButtonOptions(
+                  icon: const Icon(Icons.camera_alt),
+                  onPressed: () => _pickAndInsertImage(ImageSource.camera),
                 ),
               ],
             ),
