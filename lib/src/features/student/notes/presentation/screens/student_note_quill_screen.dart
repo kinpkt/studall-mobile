@@ -114,9 +114,9 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
     }
   }
 
-  Future<void> _pickAndInsertImage() async {
+  Future<void> _pickAndInsertImage(ImageSource source) async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(source: source);
 
     if (image != null) {
       showDialog(
@@ -373,6 +373,7 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
                 _checkChanges();
               },
             ),
+// <<<<<<< HEAD
             const SizedBox(width: 8),
             if (widget.note != null)
               _buildIconButton(
@@ -399,6 +400,100 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
                   isDense: true,
+// =======
+//           ShadButton.ghost(
+//             onPressed: () async {
+//               final deltaJson = _quillController.document.toDelta().toJson();
+
+//               final contentString = jsonEncode(deltaJson);
+
+//               final newNote = NoteModel(
+//                 id: widget.note?.id,
+//                 title: _titleController.text == '' ? 'Untitled' : _titleController.text,
+//                 content: contentString,
+//                 courseId: _selectedCourseId,
+//                 isPinned: _isPinned,
+//               );
+
+//               final newUtility = UtilityModel.fromNoteModel(newNote);
+
+//               if (widget.note != null) {
+//                 await ref.read(noteFirestoreRepositoryProvider).updateNote(currentUser.uid, newNote);
+//                 await ref.read(utilityFirestoreRepositoryProvider).updateUtility(currentUser.uid, newUtility);
+//               }
+//               else {
+//                 await ref.read(noteFirestoreRepositoryProvider).addNote(currentUser.uid, newNote);
+//                 await ref.read(utilityFirestoreRepositoryProvider).addUtility(currentUser.uid, newUtility);
+//               }
+
+//               if (mounted)
+//                 Navigator.pop(context);
+//             },
+//             child: const Text('บันทึก'),
+//           ),
+//         ],
+//       ),
+//       body: Column(
+//         children: [
+//           ShadInput(
+//             placeholder: Text('ชื่อหัวเรื่อง...'),
+//             controller: _titleController,
+//           ),
+//           ownedCoursesAsyncValue.when(
+//             data: (courses) {
+//               return SizedBox(
+//                 width: double.infinity,
+//                 child: ShadSelect<String>(
+//                   placeholder: Text('เลือกวิชา'),
+//                   initialValue: _selectedCourseId,
+//                   allowDeselection: true,
+//                   onChanged: (value) {
+//                     if (value != null) {
+//                       setState(() {
+//                         _selectedCourseId = value;
+//                       });
+//                     }
+//                   },
+//                   options: courses.map((course) {
+//                     return ShadOption(
+//                       value: course.id,
+//                       child: Text(course.name),
+//                     );
+//                   }).toList(),
+//                   selectedOptionBuilder: (context, value) {
+//                     final selectedCourse = courses.firstWhere(
+//                       (c) => c.id == value,
+//                       orElse: () => courses.first,
+//                     );
+//                     return Text(selectedCourse.name);
+//                   },
+//                 )
+//               );
+//             },
+//             loading: () => const Padding(
+//               padding: EdgeInsets.all(16),
+//               child: Text('กำลังโหลดวิชา...'),
+//             ),
+//             error: (error, stackTrace) => Padding(
+//               padding: const EdgeInsets.all(16),
+//               child: Text('เกิดข้อผิดพลาด: $error'),
+//             ),
+//           ),
+//           QuillSimpleToolbar(
+//             controller: _quillController,
+//             config: QuillSimpleToolbarConfig(
+//               showDividers: true,
+//               showFontFamily: false,
+//               showSearchButton: false,
+//               customButtons: [
+//                 QuillToolbarCustomButtonOptions(
+//                   icon: const Icon(Icons.image),
+//                   onPressed: () => _pickAndInsertImage(ImageSource.gallery),
+//                 ),
+//                 QuillToolbarCustomButtonOptions(
+//                   icon: const Icon(Icons.camera_alt),
+//                   onPressed: () => _pickAndInsertImage(ImageSource.camera),
+// >>>>>>> 170fe58fd82b59d02c7640016297e56bc009dd06
                 ),
               ),
             ),
@@ -466,10 +561,13 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
                       showFontFamily: false,
                       showSearchButton: false,
                       customButtons: [
-                        QuillToolbarCustomButtonOptions(
-                          icon: const Icon(Icons.image),
-                          onPressed: _pickAndInsertImage,
-                        ),
+                                       QuillToolbarCustomButtonOptions(
+                  icon: const Icon(Icons.image),
+                  onPressed: () => _pickAndInsertImage(ImageSource.gallery),
+                ),
+                QuillToolbarCustomButtonOptions(
+                  icon: const Icon(Icons.camera_alt),
+                  onPressed: () => _pickAndInsertImage(ImageSource.camera),)
                       ],
                     ),
                   ),

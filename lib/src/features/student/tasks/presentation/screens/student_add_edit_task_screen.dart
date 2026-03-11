@@ -197,11 +197,13 @@ class _StudentAddEditTaskScreenState extends ConsumerState<StudentAddEditTaskScr
                 ],
               ),
               const SizedBox(height: 16),
-              ShadCheckboxFormField(
-                id: 'isShownInSchedule',
-                initialValue: false,
-                inputLabel: const Text('ต้องการให้แสดงผลบนตารางเรียนหรือไม่'),
-              ),
+              if (currentTaskType == TaskType.appointment) ...[
+                ShadCheckboxFormField(
+                  id: 'isShownInSchedule',
+                  initialValue: false,
+                  inputLabel: const Text('ต้องการให้แสดงผลบนตารางเรียนหรือไม่'),
+                ),
+              ],
               const SizedBox(height: 16),
               ShadButton(
                 onPressed: () {
