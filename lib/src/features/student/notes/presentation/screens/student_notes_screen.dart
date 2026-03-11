@@ -67,84 +67,105 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
           if (_selectedCourseId != null)
             _buildActiveFilterText(context, _ownedCoursesStream!),
           Expanded(
-            // Removed RefreshIndicator; StreamBuilder handles real-time updates
-            child: StreamBuilder<List<NoteModel>>(
-              stream: _ownedNotesStream,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            child: StreamBuilder<List<CourseModel>>(
+              stream: _ownedCoursesStream,
+              builder: (context, coursesSnapshot) {
+                final courses = coursesSnapshot.data ?? [];
+                final courseMap = {for (final c in courses) c.id: c.name};
 
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'),
-                  );
-                }
+                return StreamBuilder<List<NoteModel>>(
+                  stream: _ownedNotesStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                final allNotes = snapshot.data ?? [];
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'),
+                      );
+                    }
 
-                final notes = _selectedCourseId != null
-                    ? allNotes
-                    .where((note) => note.courseId == _selectedCourseId)
-                    .toList()
-                    : allNotes;
+                    final allNotes = snapshot.data ?? [];
 
-                if (notes.isEmpty) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'เริ่มต้นบันทึกของคุณ',
-                        style: theme.textTheme.p.copyWith(
-                          color: colorScheme.mutedForeground,
-                        ),
-                      ),
-                      ShadButton.ghost(
-                        onPressed: () =>
-                            context.push('/student/notes/editor'),
-                        child: Text(
-                          'สร้างบันทึกใหม่ที่นี่',
-                          style: theme.textTheme.p.copyWith(
-                            color: colorScheme.custom['info']!,
-                            fontWeight: FontWeight.w500,
-                            decorationColor: colorScheme.custom['info']!,
+                    final notes = _selectedCourseId != null
+                        ? allNotes
+                              .where(
+                                (note) => note.courseId == _selectedCourseId,
+                              )
+                              .toList()
+                        : allNotes;
+
+                    if (notes.isEmpty) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'เริ่มต้นบันทึกของคุณ',
+                            style: theme.textTheme.p.copyWith(
+                              color: colorScheme.mutedForeground,
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
-                  );
-                }
+                          ShadButton.ghost(
+                            onPressed: () =>
+                                context.push('/student/notes/editor'),
+                            child: Text(
+                              'สร้างบันทึกใหม่ที่นี่',
+                              style: theme.textTheme.p.copyWith(
+                                color: colorScheme.custom['info']!,
+                                fontWeight: FontWeight.w500,
+                                decorationColor: colorScheme.custom['info']!,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
 
-                final pinnedNotes = notes
-                    .where((note) => note.isPinned)
-                    .toList();
-                final unpinnedNotes = notes
-                    .where((note) => !note.isPinned)
-                    .toList();
+                    final pinnedNotes = notes
+                        .where((note) => note.isPinned)
+                        .toList();
+                    final unpinnedNotes = notes
+                        .where((note) => !note.isPinned)
+                        .toList();
 
-                return ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    if (pinnedNotes.isNotEmpty) ...[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 8.0,
-                        ),
-                        child: Text('ปักหมุด', style: theme.textTheme.h4),
-                      ),
-                      ...pinnedNotes.map((note) => NotesListTile(note: note)),
-                    ],
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 8.0,
-                      ),
-                      child: Text('ทั่วไป', style: theme.textTheme.h4),
-                    ),
-                    ...unpinnedNotes.map((note) => NotesListTile(note: note)),
-                  ],
+                    // Group unpinned notes by courseId
+                    final grouped = <String?, List<NoteModel>>{};
+                    for (final note in unpinnedNotes) {
+                      grouped.putIfAbsent(note.courseId, () => []).add(note);
+                    }
+
+                    // Sort: notes with courseId first, then null
+                    final sortedKeys = grouped.keys.toList()
+                      ..sort((a, b) {
+                        if (a == null) return 1;
+                        if (b == null) return -1;
+                        return (courseMap[a] ?? '').compareTo(
+                          courseMap[b] ?? '',
+                        );
+                      });
+
+                    return ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        if (pinnedNotes.isNotEmpty)
+                          _NotesSection(
+                            title: 'ปักหมุด',
+                            notes: pinnedNotes,
+                            courseMap: courseMap,
+                          ),
+                        for (final courseId in sortedKeys)
+                          _NotesSection(
+                            title: courseId != null
+                                ? (courseMap[courseId] ?? courseId)
+                                : 'ไม่มีรายวิชา',
+                            notes: grouped[courseId]!,
+                            courseMap: courseMap,
+                          ),
+                      ],
+                    );
+                  },
                 );
               },
             ),
@@ -156,9 +177,9 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
 
   // Updated to accept the stream and use StreamBuilder
   Widget _buildActiveFilterText(
-      BuildContext context,
-      Stream<List<CourseModel>> coursesStream,
-      ) {
+    BuildContext context,
+    Stream<List<CourseModel>> coursesStream,
+  ) {
     final theme = ShadTheme.of(context);
 
     return StreamBuilder<List<CourseModel>>(
@@ -208,9 +229,9 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
 
   // Updated to use StreamBuilder
   Widget _buildSearchBar(
-      BuildContext context,
-      Stream<List<CourseModel>> coursesStream,
-      ) {
+    BuildContext context,
+    Stream<List<CourseModel>> coursesStream,
+  ) {
     final theme = ShadTheme.of(context);
     final textTheme = theme.textTheme;
 
@@ -275,7 +296,7 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
               ],
               builder: (context, controller, child) => GestureDetector(
                 onTap: () =>
-                controller.isOpen ? controller.close() : controller.open(),
+                    controller.isOpen ? controller.close() : controller.open(),
                 child: Icon(
                   PhosphorIconsRegular.sliders,
                   size: 20,
@@ -286,6 +307,86 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
           },
         ),
       ),
+    );
+  }
+}
+
+class _NotesSection extends StatefulWidget {
+  final String title;
+  final List<NoteModel> notes;
+  final Map<String, String> courseMap;
+  final int previewCount;
+
+  const _NotesSection({
+    required this.title,
+    required this.notes,
+    required this.courseMap,
+    this.previewCount = 3,
+  });
+
+  @override
+  State<_NotesSection> createState() => _NotesSectionState();
+}
+
+class _NotesSectionState extends State<_NotesSection> {
+  bool _showAll = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final displayNotes = _showAll
+        ? widget.notes
+        : widget.notes.take(widget.previewCount).toList();
+    final hasMore = widget.notes.length > widget.previewCount;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  widget.title,
+                  style: theme.textTheme.custom['medium'],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                widget.notes.length.toString(),
+                style: theme.textTheme.custom['medium']?.copyWith(
+                  color: colorScheme.mutedForeground,
+                ),
+              ),
+            ],
+          ),
+        ),
+        ...displayNotes.map(
+          (note) => NotesListTile(
+            note: note,
+            courseName: note.courseId != null
+                ? widget.courseMap[note.courseId]
+                : null,
+          ),
+        ),
+        if (hasMore)
+          ShadButton.ghost(
+            onPressed: () => setState(() => _showAll = !_showAll),
+            child: Text(
+              _showAll ? 'ซ่อน' : 'ดูเพิ่ม',
+              style: theme.textTheme.small.copyWith(
+                color: colorScheme.mutedForeground,
+                decoration: TextDecoration.underline,
+                decorationColor: colorScheme.mutedForeground,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

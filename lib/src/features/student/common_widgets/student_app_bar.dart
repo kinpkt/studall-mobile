@@ -139,22 +139,20 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
   }
 
   String _getDisplayTitle(ScheduleModel? nextEvent) {
-    // Non-home pages: show pageTitle, animate subtitle to show next event
     if (!widget.showNextEvent) {
       if (nextEvent != null && _minutesUntilEvent(nextEvent) != null) {
         _updateAnimation(true);
       } else {
         _updateAnimation(false);
       }
-      return widget.pageTitle ?? 'ไม่มีกิจกรรมในวันนี้';
+      return widget.pageTitle ?? 'พักผ่อน';
     }
 
-    // Home page: countdown logic
     final minutes = _minutesUntilEvent(nextEvent);
 
     if (nextEvent == null || minutes == null) {
       _updateAnimation(false);
-      return 'ไม่มีกิจกรรมในวันนี้';
+      return 'พักผ่อนเถอะ';
     }
 
     if (minutes > 60) {
@@ -195,11 +193,11 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
     final textTheme = theme.textTheme;
     final user = ref.watch(userProfileProvider);
     final nextEvent = ScheduleModel(
-      title: 'Mobile Application Design and Development',
+      title: 'Mobile Application',
       location: 'SC1-202',
       day: DayOfWeek.monday,
-      startTime: const TimeOfDay(hour: 19, minute: 20),
-      endTime: const TimeOfDay(hour: 20, minute: 0),
+      startTime: const TimeOfDay(hour: 20, minute: 20),
+      endTime: const TimeOfDay(hour: 23, minute: 0),
     );
 
     return Container(

@@ -36,6 +36,7 @@ import 'package:studall/src/features/student/notes/presentation/screens/student_
 import 'package:studall/src/features/student/explore/presentation/screens/student_explore_screen.dart';
 import 'package:studall/src/features/student/tools/presentation/gpa_calculator_screen.dart';
 import 'package:studall/src/features/student/notes/presentation/screens/student_note_quill_screen.dart';
+import 'package:studall/src/features/student/notes/data/models/note_model.dart';
 
 // ── Partner layout & screens ─────────────────────────────────────────────────
 import 'package:studall/src/features/partner/presentation/screens/partner_layout_screen.dart';
@@ -202,7 +203,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/student/notes/editor',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (_, _) => NoteQuillScreen(),
+        builder: (_, state) => NoteQuillScreen(note: state.extra as NoteModel?),
       ),
       GoRoute(
         path: '/partner/add-branch',
