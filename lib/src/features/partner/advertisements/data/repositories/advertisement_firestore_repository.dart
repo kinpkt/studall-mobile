@@ -29,16 +29,15 @@ class AdvertisementFirestoreRepository {
   Stream<List<AdvertisementModel>> getAllPublishedAdvertisements() {
     return _service.streamCollection(
       path: 'advertisements/',
-      queryBuilder: (query) => query.where('isPublished', isEqualTo: true),
+      queryBuilder: (query) => query.where('isPublished', isEqualTo: true).orderBy('createdAt', descending: true),
       builder: (data, docId) => AdvertisementModel.fromFirestore(data, docId),
     );
   }
 
-
   Stream<List<AdvertisementModel>> getAdvertisementsFromUserId(String userId)  {
     return _service.streamCollection(
       path: 'advertisements/',
-      queryBuilder: (query) => query.where('userId', isEqualTo: userId),
+      queryBuilder: (query) => query.where('userId', isEqualTo: userId).orderBy('createdAt', descending: true),
       builder: (data, docId) => AdvertisementModel.fromFirestore(data, docId),
     );
   }

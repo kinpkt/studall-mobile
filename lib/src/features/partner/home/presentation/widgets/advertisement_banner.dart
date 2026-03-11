@@ -43,7 +43,7 @@ class AdvertisementBanner extends ConsumerWidget {
               title: Text(ads.topic, style: theme.textTheme.h3),
               description: Text(ads.description, style: theme.textTheme.p),
               actions: [
-                if (isDeletable)
+                if (isDeletable && ads.isPublished)
                   ShadButton.destructive(
                     onPressed: () {
                       final updatedAds = ads.copyWith(isPublished: false);
