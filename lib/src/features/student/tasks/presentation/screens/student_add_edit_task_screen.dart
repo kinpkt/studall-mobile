@@ -30,6 +30,14 @@ class _StudentAddEditTaskScreenState extends ConsumerState<StudentAddEditTaskScr
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(taskTypeProvider.notifier).state = widget.task?.type ?? TaskType.toDo;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
 
@@ -101,7 +109,7 @@ class _StudentAddEditTaskScreenState extends ConsumerState<StudentAddEditTaskScr
               ShadSelectFormField<TaskType>(
                 id: 'type',
                 label: const Text('ประเภทภาระงาน'),
-                initialValue: TaskType.toDo,
+                initialValue: currentTaskType,
                 placeholder: const Text('Select task type'),
                 selectedOptionBuilder: (context, value) {
                   return Text(value.thaiName);
@@ -226,7 +234,7 @@ class _StudentAddEditTaskScreenState extends ConsumerState<StudentAddEditTaskScr
                       );
 
                       final newTask = TaskModel(
-                        courseId: formData['courseId'] as String,
+                        courseId: formData['courseId'] as String?,
                         title: formData['title'] as String,
                         description: formData['description'] as String?,
                         type: formData['type'],
