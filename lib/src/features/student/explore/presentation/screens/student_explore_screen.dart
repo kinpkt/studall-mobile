@@ -26,10 +26,6 @@ class StudentExploreScreen extends ConsumerWidget {
         'path': '/student/note'
       },
       {
-        'name': 'รวมไฟล์ PDF',
-        'path': '/merge-pdf',
-      },
-      {
         'name': 'คำนวณเกรดเฉลี่ย',
         'path': '/student/tools/gpa-calculator',
       },
