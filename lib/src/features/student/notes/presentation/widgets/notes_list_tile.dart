@@ -78,6 +78,8 @@ class NotesListTile extends StatelessWidget {
                         style: textTheme.muted.copyWith(
                           color: colorScheme.mutedForeground,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

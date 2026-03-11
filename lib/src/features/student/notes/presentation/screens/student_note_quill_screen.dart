@@ -362,25 +362,57 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
             ),
           ],
           actions: [
-            _buildIconButton(
-              icon: _isPinned
-                  ? PhosphorIconsFill.pushPin
-                  : PhosphorIconsRegular.pushPin,
-              color: _isPinned ? colorScheme.primary : colorScheme.foreground,
-              borderColor: colorScheme.border,
-              onTap: () {
+            ShadIconButton.outline(
+              decoration: const ShadDecoration(shape: BoxShape.circle),
+              onPressed: () {
                 setState(() => _isPinned = !_isPinned);
                 _checkChanges();
               },
+              icon: Icon(
+                _isPinned
+                    ? PhosphorIconsFill.pushPin
+                    : PhosphorIconsRegular.pushPin,
+                color: _isPinned ? colorScheme.primary : colorScheme.foreground,
+              ),
+              height: 40,
             ),
-// <<<<<<< HEAD
             const SizedBox(width: 8),
-            if (widget.note != null)
-              _buildIconButton(
-                icon: PhosphorIconsRegular.trash,
-                color: colorScheme.destructive,
-                borderColor: colorScheme.border,
-                onTap: _deleteNote,
+            if (widget.note != null) ...[
+              ShadIconButton.outline(
+                decoration: const ShadDecoration(shape: BoxShape.circle),
+                onPressed: _deleteNote,
+                icon: Icon(
+                  PhosphorIconsRegular.trash,
+                  color: colorScheme.destructive,
+                ),
+                height: 40,
+              ),
+              const SizedBox(width: 8),
+            ],
+            if (_hasChanges)
+              ShadButton(
+                decoration: ShadDecoration(
+                  border: ShadBorder.all(
+                    radius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                ),
+                onPressed: () async {
+                  if (_selectedCourseId == null) {
+                    ShadToaster.of(context).show(
+                      ShadToast.destructive(
+                        title: const Text('กรุณาเลือกวิชา'),
+                        description: const Text(
+                          'คุณยังไม่ได้เลือกวิชาสำหรับบันทึกนี้',
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  await _saveNote();
+                  if (context.mounted) context.pop();
+                },
+                height: 40,
+                child: const Text('บันทึก'),
               ),
           ],
         ),
@@ -400,100 +432,6 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
                   isDense: true,
-// =======
-//           ShadButton.ghost(
-//             onPressed: () async {
-//               final deltaJson = _quillController.document.toDelta().toJson();
-
-//               final contentString = jsonEncode(deltaJson);
-
-//               final newNote = NoteModel(
-//                 id: widget.note?.id,
-//                 title: _titleController.text == '' ? 'Untitled' : _titleController.text,
-//                 content: contentString,
-//                 courseId: _selectedCourseId,
-//                 isPinned: _isPinned,
-//               );
-
-//               final newUtility = UtilityModel.fromNoteModel(newNote);
-
-//               if (widget.note != null) {
-//                 await ref.read(noteFirestoreRepositoryProvider).updateNote(currentUser.uid, newNote);
-//                 await ref.read(utilityFirestoreRepositoryProvider).updateUtility(currentUser.uid, newUtility);
-//               }
-//               else {
-//                 await ref.read(noteFirestoreRepositoryProvider).addNote(currentUser.uid, newNote);
-//                 await ref.read(utilityFirestoreRepositoryProvider).addUtility(currentUser.uid, newUtility);
-//               }
-
-//               if (mounted)
-//                 Navigator.pop(context);
-//             },
-//             child: const Text('บันทึก'),
-//           ),
-//         ],
-//       ),
-//       body: Column(
-//         children: [
-//           ShadInput(
-//             placeholder: Text('ชื่อหัวเรื่อง...'),
-//             controller: _titleController,
-//           ),
-//           ownedCoursesAsyncValue.when(
-//             data: (courses) {
-//               return SizedBox(
-//                 width: double.infinity,
-//                 child: ShadSelect<String>(
-//                   placeholder: Text('เลือกวิชา'),
-//                   initialValue: _selectedCourseId,
-//                   allowDeselection: true,
-//                   onChanged: (value) {
-//                     if (value != null) {
-//                       setState(() {
-//                         _selectedCourseId = value;
-//                       });
-//                     }
-//                   },
-//                   options: courses.map((course) {
-//                     return ShadOption(
-//                       value: course.id,
-//                       child: Text(course.name),
-//                     );
-//                   }).toList(),
-//                   selectedOptionBuilder: (context, value) {
-//                     final selectedCourse = courses.firstWhere(
-//                       (c) => c.id == value,
-//                       orElse: () => courses.first,
-//                     );
-//                     return Text(selectedCourse.name);
-//                   },
-//                 )
-//               );
-//             },
-//             loading: () => const Padding(
-//               padding: EdgeInsets.all(16),
-//               child: Text('กำลังโหลดวิชา...'),
-//             ),
-//             error: (error, stackTrace) => Padding(
-//               padding: const EdgeInsets.all(16),
-//               child: Text('เกิดข้อผิดพลาด: $error'),
-//             ),
-//           ),
-//           QuillSimpleToolbar(
-//             controller: _quillController,
-//             config: QuillSimpleToolbarConfig(
-//               showDividers: true,
-//               showFontFamily: false,
-//               showSearchButton: false,
-//               customButtons: [
-//                 QuillToolbarCustomButtonOptions(
-//                   icon: const Icon(Icons.image),
-//                   onPressed: () => _pickAndInsertImage(ImageSource.gallery),
-//                 ),
-//                 QuillToolbarCustomButtonOptions(
-//                   icon: const Icon(Icons.camera_alt),
-//                   onPressed: () => _pickAndInsertImage(ImageSource.camera),
-// >>>>>>> 170fe58fd82b59d02c7640016297e56bc009dd06
                 ),
               ),
             ),
@@ -561,13 +499,16 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
                       showFontFamily: false,
                       showSearchButton: false,
                       customButtons: [
-                                       QuillToolbarCustomButtonOptions(
-                  icon: const Icon(Icons.image),
-                  onPressed: () => _pickAndInsertImage(ImageSource.gallery),
-                ),
-                QuillToolbarCustomButtonOptions(
-                  icon: const Icon(Icons.camera_alt),
-                  onPressed: () => _pickAndInsertImage(ImageSource.camera),)
+                        QuillToolbarCustomButtonOptions(
+                          icon: const Icon(Icons.image),
+                          onPressed: () =>
+                              _pickAndInsertImage(ImageSource.gallery),
+                        ),
+                        QuillToolbarCustomButtonOptions(
+                          icon: const Icon(Icons.camera_alt),
+                          onPressed: () =>
+                              _pickAndInsertImage(ImageSource.camera),
+                        ),
                       ],
                     ),
                   ),
@@ -576,26 +517,6 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildIconButton({
-    required IconData icon,
-    required Color color,
-    required Color borderColor,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: borderColor, width: 1),
-        ),
-        child: Center(child: Icon(icon, color: color, size: 24)),
       ),
     );
   }
@@ -610,34 +531,36 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
         context: context,
         backgroundColor: theme.colorScheme.card,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         builder: (context) {
           return SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text('เลือกวิชา', style: theme.textTheme.h4),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('เลือกวิชา', style: theme.textTheme.h4),
+                    ...courses.cast<dynamic>().map((course) {
+                      return ListTile(
+                        leading: Icon(
+                          _selectedCourseId == course.id
+                              ? PhosphorIconsFill.checkCircle
+                              : PhosphorIconsRegular.circle,
+                          color: theme.colorScheme.primary,
+                        ),
+                        title: Text(course.name, style: theme.textTheme.p),
+                        onTap: () {
+                          setState(() => _selectedCourseId = course.id);
+                          _checkChanges();
+                          Navigator.pop(context);
+                        },
+                      );
+                    }),
+                  ],
                 ),
-                ...courses.cast<dynamic>().map((course) {
-                  return ListTile(
-                    leading: Icon(
-                      _selectedCourseId == course.id
-                          ? PhosphorIconsFill.checkCircle
-                          : PhosphorIconsRegular.circle,
-                      color: theme.colorScheme.primary,
-                    ),
-                    title: Text(course.name, style: theme.textTheme.p),
-                    onTap: () {
-                      setState(() => _selectedCourseId = course.id);
-                      _checkChanges();
-                      Navigator.pop(context);
-                    },
-                  );
-                }),
-              ],
+              ),
             ),
           );
         },
