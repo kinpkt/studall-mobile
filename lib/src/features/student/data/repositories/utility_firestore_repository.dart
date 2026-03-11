@@ -22,6 +22,7 @@ class UtilityFirestoreRepository {
   Stream<List<UtilityModel>> getUtilitiesByUserId(String userId) {
     final data = _service.streamCollection(
       path: 'students/$userId/utilities',
+      queryBuilder: (query) => query.orderBy('createdAt', descending: true),
       builder: (data, docId) => UtilityModel.fromFirestore(data, docId),
     );
 
