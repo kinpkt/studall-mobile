@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:studall/src/core/services/firestore_service.dart';
 import 'package:studall/src/features/student/tasks/data/models/task_model.dart';
 import 'package:studall/src/features/student/tasks/data/repositories/task_firestore_repository.dart';
 

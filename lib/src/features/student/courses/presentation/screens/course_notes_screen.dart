@@ -2,8 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
+import 'package:studall/src/features/student/courses/data/models/course_model.dart';
 import 'package:studall/src/features/student/notes/data/models/note_model.dart';
 import 'package:studall/src/features/student/notes/data/repositories/note_firestore_repository.dart';
 import 'package:studall/src/features/student/notes/presentation/widgets/notes_list_tile.dart';
@@ -44,61 +46,88 @@ class _CourseNotesScreenState extends ConsumerState<CourseNotesScreen> {
 
     return Container(
       color: colorScheme.background,
-      child: StreamBuilder<List<NoteModel>>(
-        stream: _notesStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      child: Column(
+        children: [
+          _buildSearchBar(context),
+          Expanded(
+            child: StreamBuilder<List<NoteModel>>(
+              stream: _notesStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'));
-          }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'),
+                  );
+                }
 
-          final allNotes = snapshot.data ?? [];
-          final notes = allNotes
-              .where((note) => note.courseId == widget.courseId)
-              .toList();
+                final allNotes = snapshot.data ?? [];
+                final notes = allNotes
+                    .where((note) => note.courseId == widget.courseId)
+                    .toList();
 
-          if (notes.isEmpty) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'ยังไม่มีบันทึกในรายวิชานี้',
-                  style: theme.textTheme.p.copyWith(
-                    color: colorScheme.mutedForeground,
-                  ),
-                ),
-                ShadButton.ghost(
-                  onPressed: () => context.push('/student/notes/editor'),
-                  child: Text(
-                    'สร้างบันทึกใหม่ที่นี่',
-                    style: theme.textTheme.p.copyWith(
-                      color: colorScheme.custom['info']!,
-                      fontWeight: FontWeight.w500,
-                      decorationColor: colorScheme.custom['info']!,
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }
+                if (notes.isEmpty) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'ยังไม่มีบันทึกในรายวิชานี้',
+                        style: theme.textTheme.p.copyWith(
+                          color: colorScheme.mutedForeground,
+                        ),
+                      ),
+                      ShadButton.ghost(
+                        onPressed: () => context.push('/student/notes/editor'),
+                        child: Text(
+                          'สร้างบันทึกใหม่ที่นี่',
+                          style: theme.textTheme.p.copyWith(
+                            color: colorScheme.custom['info']!,
+                            fontWeight: FontWeight.w500,
+                            decorationColor: colorScheme.custom['info']!,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
 
-          final pinnedNotes = notes.where((note) => note.isPinned).toList();
-          final unpinnedNotes = notes.where((note) => !note.isPinned).toList();
+                final pinnedNotes = notes
+                    .where((note) => note.isPinned)
+                    .toList();
+                final unpinnedNotes = notes
+                    .where((note) => !note.isPinned)
+                    .toList();
 
-          return ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              if (pinnedNotes.isNotEmpty)
-                _NotesSection(title: 'ปักหมุด', notes: pinnedNotes),
-              if (unpinnedNotes.isNotEmpty)
-                _NotesSection(title: 'บันทึก', notes: unpinnedNotes),
-            ],
-          );
-        },
+                return ListView(
+                  padding: EdgeInsets.zero,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    if (pinnedNotes.isNotEmpty)
+                      _NotesSection(title: 'ปักหมุด', notes: pinnedNotes),
+                    if (unpinnedNotes.isNotEmpty)
+                      _NotesSection(title: 'บันทึก', notes: unpinnedNotes),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: ShadInput(
+        decoration: const ShadDecoration(
+          secondaryFocusedBorder: ShadBorder.none,
+        ),
+        placeholder: const Text('ค้นหาโน้ต'),
+        leading: Icon(PhosphorIconsRegular.magnifyingGlass, size: 20),
       ),
     );
   }
@@ -145,10 +174,13 @@ class _NotesSectionState extends State<_NotesSection> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Text(
-                widget.notes.length.toString(),
-                style: theme.textTheme.custom['medium']?.copyWith(
-                  color: colorScheme.mutedForeground,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  widget.notes.length.toString(),
+                  style: theme.textTheme.custom['medium']?.copyWith(
+                    color: colorScheme.mutedForeground,
+                  ),
                 ),
               ),
             ],

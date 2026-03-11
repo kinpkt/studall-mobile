@@ -130,13 +130,11 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
                         .where((note) => !note.isPinned)
                         .toList();
 
-                    // Group unpinned notes by courseId
                     final grouped = <String?, List<NoteModel>>{};
                     for (final note in unpinnedNotes) {
                       grouped.putIfAbsent(note.courseId, () => []).add(note);
                     }
 
-                    // Sort: notes with courseId first, then null
                     final sortedKeys = grouped.keys.toList()
                       ..sort((a, b) {
                         if (a == null) return 1;
@@ -147,6 +145,8 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
                       });
 
                     return ListView(
+                      padding: EdgeInsets.zero,
+
                       physics: const AlwaysScrollableScrollPhysics(),
                       children: [
                         if (pinnedNotes.isNotEmpty)
@@ -227,7 +227,6 @@ class _StudentNotesScreenState extends ConsumerState<StudentNotesScreen> {
     );
   }
 
-  // Updated to use StreamBuilder
   Widget _buildSearchBar(
     BuildContext context,
     Stream<List<CourseModel>> coursesStream,
@@ -357,10 +356,13 @@ class _NotesSectionState extends State<_NotesSection> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Text(
-                widget.notes.length.toString(),
-                style: theme.textTheme.custom['medium']?.copyWith(
-                  color: colorScheme.mutedForeground,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  widget.notes.length.toString(),
+                  style: theme.textTheme.custom['medium']?.copyWith(
+                    color: colorScheme.mutedForeground,
+                  ),
                 ),
               ),
             ],

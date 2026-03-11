@@ -1,10 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/utils/time_conversion.dart';
-import 'package:studall/src/features/student/courses/data/repositories/course_firestore_repository.dart';
 import 'package:studall/src/features/student/courses/presentation/providers/course_list_provider.dart';
 
 import '../../data/models/task_model.dart';
