@@ -18,44 +18,7 @@ class StudentHomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final utilitiesAsync = ref.watch(ownedUtilitiesProvider);
     final tasksAsync = ref.watch(ownedTasksProvider);
-
-    List<ScheduleModel> sampleSchedule = [
-      ScheduleModel(
-        title: 'Mobile Application Design and Development',
-        location: 'SC1-202',
-        day: DayOfWeek.monday,
-        startTime: const TimeOfDay(hour: 9, minute: 0),
-        endTime: const TimeOfDay(hour: 12, minute: 0),
-      ),
-      ScheduleModel(
-        title: 'Operating Systems',
-        location: 'SC1-104',
-        day: DayOfWeek.tuesday, // Tuesday
-        startTime: const TimeOfDay(hour: 13, minute: 0),
-        endTime: const TimeOfDay(hour: 16, minute: 0),
-      ),
-      ScheduleModel(
-        title: 'Database Systems',
-        location: 'Online',
-        day: DayOfWeek.wednesday, // Wednesday
-        startTime: const TimeOfDay(hour: 10, minute: 30),
-        endTime: const TimeOfDay(hour: 10, minute: 30),
-      ),
-      ScheduleModel(
-        title: 'Senior Project',
-        location: 'SC1-301',
-        day: DayOfWeek.friday,
-        startTime: const TimeOfDay(hour: 14, minute: 0),
-        endTime: const TimeOfDay(hour: 17, minute: 0),
-      ),
-      ScheduleModel(
-        title: 'Senior Project',
-        location: 'SC1-301',
-        day: DayOfWeek.friday,
-        startTime: const TimeOfDay(hour: 14, minute: 0),
-        endTime: const TimeOfDay(hour: 17, minute: 0),
-      ),
-    ];
+    final schedulesAsync = ref.watch(scheduleProvider);
 
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
@@ -67,7 +30,17 @@ class StudentHomeScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            Schedule(scheduleItems: sampleSchedule, height: 208),
+            schedulesAsync.when(
+              loading: () => const SizedBox(
+                height: 208,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (err, stack) => SizedBox(
+                height: 208,
+                child: Center(child: Text('เกิดข้อผิดพลาดในระหว่างการแสดงผล: $err')),
+              ),
+              data: (schedules) => Schedule(scheduleItems: schedules, height: 208),
+            ),
             const SizedBox(height: 16),
             utilitiesAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),

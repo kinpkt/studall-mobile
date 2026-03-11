@@ -48,8 +48,10 @@ final scheduleProvider = FutureProvider<List<ScheduleModel>>((ref) async {
 
   final studentRepository = ref.watch(studentFirestoreRepositoryProvider);
   final taskRepository = ref.watch(taskFirestoreRepositoryProvider);
-  final schedulesFromCourses = await studentRepository.getAllSchedulesInAllCourses(currentUser!.uid);
-  final schedulesFromAppointments = await taskRepository.getAllSchedulesFromAllAppointments(currentUser.uid);
+  final schedulesFromCourses = await studentRepository.getTodaySchedulesInAllCourses(currentUser!.uid);
+  final schedulesFromAppointments = await taskRepository.getTodaySchedulesFromAllAppointments(currentUser.uid);
+
+  print('From courses: $schedulesFromCourses');
 
   final mergedSchedules = [...schedulesFromCourses, ...schedulesFromAppointments];
   mergedSchedules.sort();
