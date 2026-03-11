@@ -35,7 +35,7 @@ class ResourceIcon extends StatelessWidget {
           return ResourceIconStyle(
             backgroundColor: colorScheme.custom['blue'] ?? Colors.blue,
             iconColor: colorScheme.custom['blueForeground'] ?? Colors.white,
-            iconData: PhosphorIconsRegular.fileText,
+            iconData: PhosphorIconsRegular.clipboardText,
           );
         // case UtilityType.shortAnswerQuestion:
         //   return ResourceIconStyle(
@@ -51,9 +51,9 @@ class ResourceIcon extends StatelessWidget {
         //   );
         case UtilityType.note:
           return ResourceIconStyle(
-            backgroundColor: colorScheme.custom['gray'] ?? Colors.grey,
-            iconColor: colorScheme.custom['grayForeground'] ?? Colors.white,
-            iconData: PhosphorIconsRegular.fileText,
+            backgroundColor: colorScheme.custom['green'] ?? Colors.green,
+            iconColor: colorScheme.custom['greenForeground'] ?? Colors.white,
+            iconData: PhosphorIconsRegular.notebook,
           );
         case UtilityType.appointment:
           return ResourceIconStyle(

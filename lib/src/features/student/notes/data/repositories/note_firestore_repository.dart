@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/services/firestore_service.dart';
 import '../models/note_model.dart';
 
-final noteFirestoreRepositoryProvider = Provider<NoteFirestoreRepository>((ref) {
+final noteFirestoreRepositoryProvider = Provider<NoteFirestoreRepository>((
+  ref,
+) {
   final firestoreService = ref.watch(firestoreServiceProvider);
   return NoteFirestoreRepository(firestoreService);
 });
@@ -16,7 +18,7 @@ class NoteFirestoreRepository {
   Future<void> addNote(String userId, NoteModel note) async {
     await _service.set(
       path: 'students/$userId/notes/${note.id}',
-      data: note.toFirestore()
+      data: note.toFirestore(),
     );
   }
 
@@ -37,8 +39,17 @@ class NoteFirestoreRepository {
   }
 
   Future<void> deleteNote(String userId, String noteId) async {
-    await _service.delete(
-      path: 'students/$userId/notes/$noteId',
+    await _service.delete(path: 'students/$userId/notes/$noteId');
+  }
+
+  Future<void> deleteNotesByCourseId(String userId, String courseId) async {
+    final notes = await _service.getCollection<NoteModel>(
+      path: 'students/$userId/notes',
+      builder: (data, docId) => NoteModel.fromFirestore(data, docId),
+      queryBuilder: (query) => query.where('courseId', isEqualTo: courseId),
     );
+    for (final note in notes) {
+      await _service.delete(path: 'students/$userId/notes/${note.id}');
+    }
   }
 }

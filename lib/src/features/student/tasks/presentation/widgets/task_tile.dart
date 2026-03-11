@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/common_widgets/app_list_tile.dart';
 import 'package:studall/src/core/utils/datetime_to_thai_string.dart';
+import 'package:studall/src/features/student/common_widgets/confirm_delete_dialog.dart';
 import 'package:studall/src/features/student/common_widgets/resource_icon.dart';
 import 'package:studall/src/features/student/tasks/data/repositories/task_firestore_repository.dart';
 
@@ -42,133 +43,108 @@ class TaskTile extends ConsumerWidget {
         showDialog(
           context: context,
           builder: (mainDialogContext) {
-            return ShadDialog(
-              title: Text(task.title),
-              description: Text(
-                '$descriptionText'
-                '${task.description != null ? '\nรายละเอียด: ${task.description}' : ''}'
-                '\n${task.type == TaskType.toDo ? 'กำหนดส่ง: ${dateTimeToThaiString(task.endDateTime, withTime: true, withDayOfWeek: true)}' : 'ระยะเวลา: ${dateTimeToThaiString(task.startDateTime!, withTime: true, withDayOfWeek: true)} - ${dateTimeToThaiString(task.endDateTime, withTime: true, withDayOfWeek: true)}'}',
-              ),
-              actions: [
-                ShadButton.secondary(
-                  child: const Text('ปิด'),
-                  onPressed: () => context.pop(),
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ShadDialog(
+                title: Text(task.title),
+                description: Text(
+                  '$descriptionText'
+                  '${task.description != null ? '\nรายละเอียด: ${task.description}' : ''}'
+                  '\n${task.type == TaskType.toDo ? 'กำหนดส่ง: ${dateTimeToThaiString(task.endDateTime, withTime: true, withDayOfWeek: true)}' : 'ระยะเวลา: ${dateTimeToThaiString(task.startDateTime!, withTime: true, withDayOfWeek: true)} - ${dateTimeToThaiString(task.endDateTime, withTime: true, withDayOfWeek: true)}'}',
                 ),
-                ShadButton.destructive(
-                  child: const Text('ลบ'),
-                  onPressed: () {
-                    showDialog(
-                      context: mainDialogContext,
-                      builder: (confirmContext) {
-                        return ShadDialog(
-                          title: const Text('ยืนยันการลบ'),
-                          description: const Text(
+                actions: [
+                  ShadButton.secondary(
+                    child: const Text('ปิด'),
+                    onPressed: () => context.pop(),
+                  ),
+                  ShadButton.destructive(
+                    child: const Text('ลบ'),
+                    onPressed: () {
+                      showConfirmDeleteDialog(
+                        mainDialogContext,
+                        description:
                             'คุณแน่ใจหรือไม่ว่าต้องการลบงานนี้? การกระทำนี้ไม่สามารถย้อนกลับได้',
+                        onConfirm: () async {
+                          final currentUser = FirebaseAuth.instance.currentUser;
+                          if (currentUser == null) {
+                            throw Exception('ผู้ใช้ยังไม่ได้เข้าสู่ระบบ');
+                          }
+                          await ref
+                              .read(taskFirestoreRepositoryProvider)
+                              .deleteTask(currentUser.uid, task.id);
+                        },
+                        onSuccess: () {
+                          if (!mainDialogContext.mounted) return;
+                          Navigator.of(mainDialogContext).pop();
+
+                          if (!context.mounted) return;
+                          ShadToaster.of(context).show(
+                            const ShadToast(
+                              title: Text('สำเร็จ'),
+                              description: Text('ลบงานเรียบร้อยแล้ว'),
+                            ),
+                          );
+                        },
+                        onError: () {
+                          if (!context.mounted) return;
+                          ShadToaster.of(context).show(
+                            ShadToast.destructive(
+                              title: const Text('เกิดข้อผิดพลาด'),
+                              description: const Text('ไม่สามารถลบข้อมูลได้'),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  if (!task.isDone)
+                    ShadButton(
+                      child: const Text('เสร็จสิ้น'),
+                      onPressed: () {
+                        final updatedTask = task.copyWith(isDone: true);
+                        final currentUser = FirebaseAuth.instance.currentUser;
+
+                        ref
+                            .read(taskFirestoreRepositoryProvider)
+                            .updateTask(currentUser!.uid, updatedTask);
+
+                        context.pop();
+
+                        ShadToaster.of(context).show(
+                          const ShadToast(
+                            title: Text('สำเร็จ'),
+                            description: Text(
+                              'ปรับสถานะให้งานเสร็จสิ้นเรียบร้อยแล้ว',
+                            ),
                           ),
-                          actions: [
-                            ShadButton.secondary(
-                              child: const Text('ยกเลิก'),
-                              onPressed: () =>
-                                  Navigator.of(confirmContext).pop(),
-                            ),
-                            ShadButton.destructive(
-                              child: const Text('ยืนยัน'),
-                              onPressed: () async {
-                                try {
-                                  final currentUser =
-                                      FirebaseAuth.instance.currentUser;
-
-                                  if (currentUser == null)
-                                    throw Exception(
-                                      'ผู้ใช้ยังไม่ได้เข้าสู่ระบบ',
-                                    );
-
-                                  await ref
-                                      .read(taskFirestoreRepositoryProvider)
-                                      .deleteTask(currentUser.uid, task.id);
-
-                                  if (!confirmContext.mounted) return;
-                                  Navigator.of(confirmContext).pop();
-
-                                  if (!mainDialogContext.mounted) return;
-                                  Navigator.of(mainDialogContext).pop();
-
-                                  if (!context.mounted) return;
-                                  ShadToaster.of(context).show(
-                                    const ShadToast(
-                                      title: Text('สำเร็จ'),
-                                      description: Text('ลบงานเรียบร้อยแล้ว'),
-                                    ),
-                                  );
-                                } catch (e) {
-                                  if (!confirmContext.mounted) return;
-                                  Navigator.of(confirmContext).pop();
-
-                                  if (!context.mounted) return;
-                                  ShadToaster.of(context).show(
-                                    ShadToast.destructive(
-                                      title: const Text('เกิดข้อผิดพลาด'),
-                                      description: Text(
-                                        'ไม่สามารถลบข้อมูลได้: $e',
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ],
                         );
                       },
-                    );
-                  },
-                ),
-                if (!task.isDone)
-                  ShadButton(
-                    child: const Text('ทำงานเสร็จเรียบร้อยแล้ว'),
-                    onPressed: () {
-                      final updatedTask = task.copyWith(isDone: true);
-                      final currentUser = FirebaseAuth.instance.currentUser;
+                    ),
+                  if (task.isDone)
+                    ShadButton(
+                      child: const Text('ปรับให้งานยังไม่เสร็จ'),
+                      onPressed: () {
+                        final updatedTask = task.copyWith(isDone: false);
+                        final currentUser = FirebaseAuth.instance.currentUser;
 
-                      ref
-                          .read(taskFirestoreRepositoryProvider)
-                          .updateTask(currentUser!.uid, updatedTask);
+                        ref
+                            .read(taskFirestoreRepositoryProvider)
+                            .updateTask(currentUser!.uid, updatedTask);
 
-                      context.pop();
+                        Navigator.of(context).pop();
 
-                      ShadToaster.of(context).show(
-                        const ShadToast(
-                          title: Text('สำเร็จ'),
-                          description: Text(
-                            'ปรับสถานะให้งานเสร็จสิ้นเรียบร้อยแล้ว',
+                        ShadToaster.of(context).show(
+                          const ShadToast(
+                            title: Text('สำเร็จ'),
+                            description: Text(
+                              'ปรับสถานะให้งานไม่เสร็จเรียบร้อยแล้ว',
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                if (task.isDone)
-                  ShadButton(
-                    child: const Text('ปรับให้งานยังไม่เสร็จ'),
-                    onPressed: () {
-                      final updatedTask = task.copyWith(isDone: false);
-                      final currentUser = FirebaseAuth.instance.currentUser;
-
-                      ref
-                          .read(taskFirestoreRepositoryProvider)
-                          .updateTask(currentUser!.uid, updatedTask);
-
-                      Navigator.of(context).pop();
-
-                      ShadToaster.of(context).show(
-                        const ShadToast(
-                          title: Text('สำเร็จ'),
-                          description: Text(
-                            'ปรับสถานะให้งานไม่เสร็จเรียบร้อยแล้ว',
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-              ],
+                        );
+                      },
+                    ),
+                ],
+              ),
             );
           },
         );
