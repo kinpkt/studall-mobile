@@ -38,8 +38,8 @@ class CourseFirestoreRepository implements CourseRepository {
   }
 
   @override
-  Future<List<CourseModel>> getCoursesByUserId(String userId) async {
-    final data = await _service.getCollection<CourseModel>(
+  Stream<List<CourseModel>> getCoursesByUserId(String userId) {
+    final data = _service.streamCollection<CourseModel>(
       path: 'students/$userId/courses/',
       builder: (data, docId) => CourseModel.fromFirestore(data, docId),
     );

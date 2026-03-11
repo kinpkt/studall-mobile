@@ -20,8 +20,8 @@ class NoteFirestoreRepository {
     );
   }
 
-  Future<List<NoteModel>> getNotesByUserId(String userId) async {
-    final data = await _service.getCollection<NoteModel>(
+  Stream<List<NoteModel>> getNotesByUserId(String userId) {
+    final data = _service.streamCollection<NoteModel>(
       path: 'students/$userId/notes/',
       builder: (data, docId) => NoteModel.fromFirestore(data, docId),
     );

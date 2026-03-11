@@ -226,7 +226,6 @@ class _ScheduleState extends State<Schedule> {
 
     final leftPosition = startMinutes * minuteToPixelRatio;
     final cellWidth = durationMinutes * minuteToPixelRatio;
-
     final courseColor = theme.colorScheme.secondary;
 
     return Positioned(

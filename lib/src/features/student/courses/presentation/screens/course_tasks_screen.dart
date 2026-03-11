@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -8,12 +9,12 @@ import '../../../tasks/data/models/task_model.dart';
 
 class CourseTasksScreen extends ConsumerWidget {
   final String courseId;
-
   const CourseTasksScreen({super.key, required this.courseId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tasksAsync = ref.watch(studentTasksListProvider);
+    final String userId = FirebaseAuth.instance.currentUser!.uid;
+    final tasksAsync = ref.watch(studentTasksListProvider(userId));
 
     return tasksAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),

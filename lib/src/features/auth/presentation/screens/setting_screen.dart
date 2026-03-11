@@ -65,17 +65,6 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                     color: colorScheme.foreground,
                   ),
                 ),
-                trailing: [
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: Icon(
-                      PhosphorIconsRegular.pencilSimpleLine,
-                      size: 24,
-                      color: colorScheme.mutedForeground,
-                    ),
-                  ),
-                ],
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Text('Error: $e'),

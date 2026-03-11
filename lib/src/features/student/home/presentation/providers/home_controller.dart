@@ -2,7 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studall/src/features/student/courses/data/repositories/course_firestore_repository.dart';
 import 'package:studall/src/features/student/data/models/utility_model.dart';
+import 'package:studall/src/features/student/data/repositories/student_firestore_repository.dart';
 import 'package:studall/src/features/student/data/repositories/utility_firestore_repository.dart';
+import 'package:studall/src/features/student/home/data/models/schedule_model.dart';
 import 'package:studall/src/features/student/tasks/data/models/task_model.dart';
 import 'package:studall/src/features/student/tasks/data/repositories/task_firestore_repository.dart';
 
@@ -16,7 +18,7 @@ final ownedUtilitiesProvider = FutureProvider<List<UtilityModel>>((ref) {
   return repository.getUtilitiesByUserId(currentUser!.uid);
 });
 
-final ownedTasksProvider = FutureProvider<List<TaskModel>>((ref) {
+final ownedTasksProvider = StreamProvider<List<TaskModel>>((ref) {
   final currentUser = FirebaseAuth.instance.currentUser;
 
   if (currentUser?.uid == null)
@@ -36,4 +38,21 @@ final courseNameProvider = FutureProvider.family<String?, String>((ref, courseId
   final course = await repository.getCourseById(currentUser!.uid, courseId);
 
   return course?.name;
+});
+
+final scheduleProvider = FutureProvider<List<ScheduleModel>>((ref) async {
+  final currentUser = FirebaseAuth.instance.currentUser;
+
+  if (currentUser?.uid == null)
+    throw Exception('User not authenticated');
+
+  final studentRepository = ref.watch(studentFirestoreRepositoryProvider);
+  final taskRepository = ref.watch(taskFirestoreRepositoryProvider);
+  final schedulesFromCourses = await studentRepository.getAllSchedulesInAllCourses(currentUser!.uid);
+  final schedulesFromAppointments = await taskRepository.getAllSchedulesFromAllAppointments(currentUser.uid);
+
+  final mergedSchedules = [...schedulesFromCourses, ...schedulesFromAppointments];
+  mergedSchedules.sort();
+
+  return mergedSchedules;
 });

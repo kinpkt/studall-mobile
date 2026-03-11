@@ -35,7 +35,7 @@ class CourseModel {
     for (CourseScheduleModel sch in schedule) {
       final schedule = ScheduleModel(
         title: name,
-        dayOfWeek: sch.day,
+        day: sch.day,
         startTime: sch.startTime!,
         endTime: sch.endTime!,
       );

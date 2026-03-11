@@ -197,7 +197,7 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
     final nextEvent = ScheduleModel(
       title: 'Mobile Application Design and Development',
       location: 'SC1-202',
-      dayOfWeek: DayOfWeek.monday,
+      day: DayOfWeek.monday,
       startTime: const TimeOfDay(hour: 19, minute: 20),
       endTime: const TimeOfDay(hour: 20, minute: 0),
     );

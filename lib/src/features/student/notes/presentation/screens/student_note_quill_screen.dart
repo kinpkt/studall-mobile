@@ -210,7 +210,6 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
                 id: widget.note?.id,
                 title: _titleController.text == '' ? 'Untitled' : _titleController.text,
                 content: contentString,
-                userId: currentUser.uid,
                 courseId: _selectedCourseId,
                 isPinned: _isPinned,
               );
