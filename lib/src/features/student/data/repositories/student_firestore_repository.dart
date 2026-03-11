@@ -29,23 +29,33 @@ class StudentFirestoreRepository {
     return data;
   }
 
-  Future<List<ScheduleModel>> getAllSchedulesInAllCourses(String userId) async {
+  Future<List<ScheduleModel>> getTodaySchedulesInAllCourses(String userId) async {
     final listOfLists = await _service.getCollection<List<ScheduleModel>>(
       path: 'students/$userId/courses',
       builder: (data, docId) {
         final courseTitle = data['name'] as String? ?? 'วิชาที่ไม่ทราบชื่อ';
-
-        final rawSchedules = data['schedules'] as List<dynamic>? ?? [];
+        final rawSchedules = data['schedule'] as List<dynamic>? ?? [];
 
         return rawSchedules.map((scheduleData) {
           final courseSchedule = CourseScheduleModel.fromFirestore(scheduleData as Map<String, dynamic>);
+          final model = ScheduleModel.fromCourseSchedule(courseSchedule, courseTitle);
 
-          return ScheduleModel.fromCourseSchedule(courseSchedule, courseTitle);
+          return model;
         }).toList();
       },
     );
 
-    return (listOfLists).expand((scheduleList) => scheduleList).toList();
+    final todayWeekday = DateTime.now().weekday;
+    final currentDayOfWeek = DayOfWeek.values[todayWeekday - 1];
+
+    final allSchedules = listOfLists.expand((scheduleList) => scheduleList).toList();
+
+    print('Total schedules before filter: ${allSchedules.length}');
+    print('Filtering for: $currentDayOfWeek');
+
+    return allSchedules
+        .where((schedule) => schedule.day == currentDayOfWeek)
+        .toList();
   }
 
   Future<void> updateSearchRadius(String id, double radius) async {

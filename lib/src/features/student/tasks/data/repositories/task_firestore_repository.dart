@@ -31,16 +31,30 @@ class TaskFirestoreRepository {
     return data;
   }
 
-  Future<List<ScheduleModel>> getAllSchedulesFromAllAppointments(String userId) async {
+  Future<List<ScheduleModel>> getTodaySchedulesFromAllAppointments(String userId) async {
     final tasks = await _service.getCollection<TaskModel>(
       path: 'students/$userId/tasks',
       builder: (data, docId) => TaskModel.fromFirestore(data, docId),
     );
 
-    return (tasks)
-      .where((task) => task.type == 'appointment' && task.isShownInSchedule == true)
-      .map((task) => ScheduleModel.fromAppointment(task))
-      .toList();
+    final now = DateTime.now();
+
+    final startOfToday = DateTime(now.year, now.month, now.day);
+    final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
+
+    return tasks
+        .where((task) {
+      if (task.type != TaskType.appointment ||
+          task.isShownInSchedule != true ||
+          task.startDateTime == null) {
+        return false;
+      }
+
+      return task.startDateTime!.compareTo(endOfToday) <= 0 &&
+              task.endDateTime.compareTo(startOfToday) >= 0;
+        })
+        .map((task) => ScheduleModel.fromAppointment(task))
+        .toList();
   }
 
   Future<void> updateTask(String userId, TaskModel task) async {
