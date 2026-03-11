@@ -34,7 +34,6 @@ class AdvertisementFirestoreRepository {
     );
   }
 
-
   Stream<List<AdvertisementModel>> getAdvertisementsFromUserId(String userId)  {
     return _service.streamCollection(
       path: 'advertisements/',

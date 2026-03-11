@@ -185,10 +185,37 @@ class _StudentMapsScreenState extends ConsumerState<StudentMapsScreen> {
                       markers: [
                         Marker(
                           point: position!,
-                          child: Icon(
-                            PhosphorIconsFill.user,
-                            color: Colors.blue,
-                          )
+                          width: 100,
+                          height: 60,
+                          alignment: Alignment.topCenter,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                PhosphorIconsFill.user,
+                                color: Colors.blue,
+                                size: 30,
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withAlpha(204),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'คุณอยู่ที่นี่',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         )
                       ],
                     ),
