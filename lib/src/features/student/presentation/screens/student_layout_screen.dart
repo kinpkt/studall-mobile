@@ -154,6 +154,9 @@ class StudentLayoutScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     final coursesAsync = ref.watch(userCoursesProvider);
     final hasCourses =
         coursesAsync.whenOrNull(
@@ -176,9 +179,42 @@ class StudentLayoutScreen extends ConsumerWidget {
       child: Scaffold(
         appBar: _buildAppBar(context, currentIndex),
         body: navigationShell,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showAddOptions(context, ref, hasCourses),
-          child: const Icon(PhosphorIconsRegular.plus),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (currentIndex == 4)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: ShadButton(
+                      decoration: ShadDecoration(
+                        border: ShadBorder.all(
+                          width: 2,
+                          color: colorScheme.custom['orange']!,
+                          radius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      width: double.infinity,
+                      height: 52,
+                      child: Row(
+                        children: [
+                          Icon(PhosphorIconsRegular.mapTrifold),
+                          const SizedBox(width: 12),
+                          Text('ค้นหาร้านใกล้ฉัน', style: textTheme.h4),
+                        ],
+                      ),
+                      onPressed: () => context.push('/student/maps'),
+                    ),
+                  ),
+                ),
+              FloatingActionButton(
+                onPressed: () => _showAddOptions(context, ref, hasCourses),
+                child: const Icon(PhosphorIconsRegular.plus),
+              ),
+            ],
+          ),
         ),
         bottomNavigationBar: NavigationBar(
           selectedIndex: displayIndex,

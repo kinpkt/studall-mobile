@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 
 // ── Auth providers & models ──────────────────────────────────────────────────
 import 'package:studall/src/features/auth/presentation/controllers/auth_state_provider.dart';
@@ -37,6 +38,7 @@ import 'package:studall/src/features/student/explore/presentation/screens/studen
 import 'package:studall/src/features/student/tools/presentation/gpa_calculator_screen.dart';
 import 'package:studall/src/features/student/notes/presentation/screens/student_note_quill_screen.dart';
 import 'package:studall/src/features/student/notes/data/models/note_model.dart';
+import 'package:studall/src/features/student/maps/presentation/screens/student_maps_screen.dart';
 
 // ── Partner layout & screens ─────────────────────────────────────────────────
 import 'package:studall/src/features/partner/presentation/screens/partner_layout_screen.dart';
@@ -199,6 +201,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/student/tools/gpa-calculator',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (_, _) => const GPACalculatorScreen(),
+      ),
+      GoRoute(
+        path: '/student/maps',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, state) =>
+            StudentMapsScreen(focusLocation: state.extra as LatLng?),
       ),
       GoRoute(
         path: '/student/notes/editor',

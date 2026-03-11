@@ -207,7 +207,8 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
 
       try {
         nextCourse = schedules.firstWhere((schedule) {
-          final endMinutes = schedule.endTime.hour * 60 + schedule.endTime.minute;
+          final endMinutes =
+              schedule.endTime.hour * 60 + schedule.endTime.minute;
           return endMinutes > currentMinutes;
         });
       } catch (e) {
@@ -305,7 +306,7 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Text(
-                                    nextCourse!.title,
+                                    nextCourse?.title ?? 'ไม่มีตารางเรียน',
                                     style: textTheme.h4.copyWith(
                                       color: colorScheme.daily,
                                     ),

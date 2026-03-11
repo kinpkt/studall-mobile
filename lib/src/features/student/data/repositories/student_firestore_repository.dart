@@ -59,7 +59,7 @@ class StudentFirestoreRepository {
   }
 
   Future<void> updateSearchRadius(String id, double radius) async {
-    await _service.update(
+    await _service.set(
       path: 'students/$id',
       data: {'radius': radius},
     );
