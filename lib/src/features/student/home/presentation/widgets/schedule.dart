@@ -151,7 +151,7 @@ class _ScheduleState extends State<Schedule> {
     final cellWidth = durationMinutes * minuteToPixelRatio;
     
     // Get course color based on day of week or use default
-    final courseColor = _getCourseColor(item.dayOfWeek, theme);
+    final courseColor = _getCourseColor(item.day, theme);
     
     return Positioned(
       left: leftPosition,

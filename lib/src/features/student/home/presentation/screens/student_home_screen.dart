@@ -23,28 +23,28 @@ class StudentHomeScreen extends ConsumerWidget {
       ScheduleModel(
         title: 'Mobile Application Design and Development',
         location: 'SC1-202',
-        dayOfWeek: DayOfWeek.monday,
+        day: DayOfWeek.monday,
         startTime: const TimeOfDay(hour: 9, minute: 0),
         endTime: const TimeOfDay(hour: 12, minute: 0),
       ),
       ScheduleModel(
         title: 'Operating Systems',
         location: 'SC1-104',
-        dayOfWeek: DayOfWeek.tuesday, // Tuesday
+        day: DayOfWeek.tuesday, // Tuesday
         startTime: const TimeOfDay(hour: 13, minute: 0),
         endTime: const TimeOfDay(hour: 16, minute: 0),
       ),
       ScheduleModel(
         title: 'Database Systems',
         location: 'Online',
-        dayOfWeek: DayOfWeek.wednesday, // Wednesday
+        day: DayOfWeek.wednesday, // Wednesday
         startTime: const TimeOfDay(hour: 10, minute: 30),
         endTime: const TimeOfDay(hour: 12, minute: 30),
       ),
       ScheduleModel(
         title: 'Senior Project',
         location: 'SC1-301',
-        dayOfWeek: DayOfWeek.friday,
+        day: DayOfWeek.friday,
         startTime: const TimeOfDay(hour: 14, minute: 0),
         endTime: const TimeOfDay(hour: 17, minute: 0),
       ),

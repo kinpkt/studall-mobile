@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/services/firestore_service.dart';
 import '../../../data/models/utility_model.dart';
+import '../../../home/data/models/schedule_model.dart';
 import '../models/task_model.dart';
 
 final taskFirestoreRepositoryProvider = Provider<TaskFirestoreRepository>((ref) {
@@ -28,6 +29,18 @@ class TaskFirestoreRepository {
     );
 
     return data;
+  }
+
+  Future<List<ScheduleModel>> getAllSchedulesFromAllAppointments(String userId) async {
+    final tasks = await _service.getCollection<TaskModel>(
+      path: 'students/$userId/tasks',
+      builder: (data, docId) => TaskModel.fromFirestore(data, docId),
+    );
+
+    return (tasks)
+      .where((task) => task.type == 'appointment' && task.isShownInSchedule == true)
+      .map((task) => ScheduleModel.fromAppointment(task))
+      .toList();
   }
 
   Future<void> updateTask(String userId, TaskModel task) async {
