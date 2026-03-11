@@ -9,6 +9,8 @@ import 'package:studall/src/features/auth/presentation/controllers/user_profile_
 import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
 import 'package:studall/src/features/student/home/data/models/schedule_model.dart';
 
+import '../home/presentation/providers/home_controller.dart';
+
 class StudentAppbar extends ConsumerStatefulWidget
     implements PreferredSizeWidget {
   final String? pageTitle;
@@ -192,13 +194,26 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final user = ref.watch(userProfileProvider);
-    final nextEvent = ScheduleModel(
-      title: 'Mobile Application',
-      location: 'SC1-202',
-      day: DayOfWeek.monday,
-      startTime: const TimeOfDay(hour: 20, minute: 20),
-      endTime: const TimeOfDay(hour: 23, minute: 0),
-    );
+
+    final schedulesAsync = ref.watch(scheduleProvider);
+
+    final now = DateTime.now();
+    final currentMinutes = now.hour * 60 + now.minute;
+
+    ScheduleModel? nextCourse;
+
+    if (schedulesAsync.hasValue) {
+      final schedules = schedulesAsync.value!;
+
+      try {
+        nextCourse = schedules.firstWhere((schedule) {
+          final endMinutes = schedule.endTime.hour * 60 + schedule.endTime.minute;
+          return endMinutes > currentMinutes;
+        });
+      } catch (e) {
+        nextCourse = null;
+      }
+    }
 
     return Container(
       color: colorScheme.background,
@@ -216,7 +231,7 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
                   scrollDirection: Axis.horizontal,
 
                   child: Text(
-                    _getDisplayTitle(nextEvent),
+                    _getDisplayTitle(nextCourse),
                     style: textTheme.h2,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -290,7 +305,7 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Text(
-                                    nextEvent.title,
+                                    nextCourse!.title,
                                     style: textTheme.h4.copyWith(
                                       color: colorScheme.daily,
                                     ),
