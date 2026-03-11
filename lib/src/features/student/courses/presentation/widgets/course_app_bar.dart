@@ -102,7 +102,7 @@ class CourseAppBar extends StatelessWidget implements PreferredSizeWidget {
           ShadIconButton.outline(
             decoration: ShadDecoration(shape: BoxShape.circle),
             onPressed: () {
-              // TODO: course settings
+              context.push('/student/courses/${course.id}/settings');
             },
             icon: const Icon(PhosphorIconsRegular.gear),
             height: 40,

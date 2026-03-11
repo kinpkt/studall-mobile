@@ -38,9 +38,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             children: [
               Text(
                 'บัญชีของฉัน',
-                style: textTheme.custom['medium']?.copyWith(
-                  color: colorScheme.foreground,
-                ),
+                style: textTheme.small.copyWith(color: colorScheme.foreground),
               ),
             ],
           ),
@@ -88,9 +86,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             children: [
               Text(
                 'บทบาท',
-                style: textTheme.custom['medium']?.copyWith(
-                  color: colorScheme.foreground,
-                ),
+                style: textTheme.small.copyWith(color: colorScheme.foreground),
               ),
             ],
           ),
@@ -233,9 +229,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             children: [
               Text(
                 'ทั่วไป',
-                style: textTheme.custom['medium']?.copyWith(
-                  color: colorScheme.foreground,
-                ),
+                style: textTheme.small.copyWith(color: colorScheme.foreground),
               ),
             ],
           ),
@@ -369,9 +363,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                 .signOut(context),
             child: Text(
               'ออกจากระบบ',
-              style: textTheme.custom['medium']?.copyWith(
-                color: colorScheme.destructive,
-              ),
+              style: textTheme.small.copyWith(color: colorScheme.destructive),
             ),
           ),
         ],

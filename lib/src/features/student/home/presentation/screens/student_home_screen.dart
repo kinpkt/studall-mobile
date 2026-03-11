@@ -39,7 +39,14 @@ class StudentHomeScreen extends ConsumerWidget {
         location: 'Online',
         dayOfWeek: DayOfWeek.wednesday, // Wednesday
         startTime: const TimeOfDay(hour: 10, minute: 30),
-        endTime: const TimeOfDay(hour: 12, minute: 30),
+        endTime: const TimeOfDay(hour: 10, minute: 30),
+      ),
+      ScheduleModel(
+        title: 'Senior Project',
+        location: 'SC1-301',
+        dayOfWeek: DayOfWeek.friday,
+        startTime: const TimeOfDay(hour: 14, minute: 0),
+        endTime: const TimeOfDay(hour: 17, minute: 0),
       ),
       ScheduleModel(
         title: 'Senior Project',
@@ -74,8 +81,6 @@ class StudentHomeScreen extends ConsumerWidget {
                   Center(child: Text('Error loading items: $err')),
               data: (task) => _buildTaskList(context, task),
             ),
-            // _buildRecentContent(context, kDemoRecentItems),
-            // _buildTaskList(context, kDemoTaskTiles),
           ],
         ),
       ),

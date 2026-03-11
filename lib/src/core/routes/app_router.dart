@@ -27,6 +27,7 @@ import 'package:studall/src/features/student/courses/presentation/screens/course
 import 'package:studall/src/features/student/courses/presentation/screens/course_forums_screen.dart';
 import 'package:studall/src/features/student/courses/presentation/screens/course_tasks_screen.dart';
 import 'package:studall/src/features/student/courses/presentation/screens/course_notes_screen.dart';
+import 'package:studall/src/features/student/courses/presentation/screens/course_setting_screen.dart';
 import 'package:studall/src/features/student/tasks/presentation/screens/student_tasks_layout_screen.dart';
 import 'package:studall/src/features/student/tasks/presentation/screens/student_assigned_tasks_screen.dart';
 import 'package:studall/src/features/student/tasks/presentation/screens/student_overdue_tasks_screen.dart';
@@ -220,6 +221,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           final taskToEdit = state.extra as TaskModel?;
           return StudentAddEditTaskScreen(task: taskToEdit);
         },
+      ),
+
+      GoRoute(
+        path: '/student/courses/:courseId/settings',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (_, state) => CourseSettingScreen(
+          courseId: state.pathParameters['courseId'] ?? '',
+        ),
       ),
 
       // ── Course detail (full-screen, outside bottom nav) ──────────────

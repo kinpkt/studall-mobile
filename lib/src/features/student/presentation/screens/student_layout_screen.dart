@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:studall/src/features/student/common_widgets/student_app_bar.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
+import 'package:studall/src/features/student/home/data/models/schedule_model.dart';
 
 class StudentLayoutScreen extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -40,7 +42,10 @@ class StudentLayoutScreen extends ConsumerWidget {
     ];
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context, int currentIndex) {
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context,
+    int currentIndex,
+  ) {
     const studentPageTitles = [null, 'รายวิชา', 'ที่ต้องทำ', 'บันทึก', 'สำรวจ'];
 
     final title = currentIndex < studentPageTitles.length
@@ -94,6 +99,7 @@ class StudentLayoutScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     final currentIndex = navigationShell.currentIndex;
     return SafeArea(
       bottom: false,

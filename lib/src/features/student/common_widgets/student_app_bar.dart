@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/core/theme/theme_extension.dart';
 import 'package:studall/src/features/auth/presentation/controllers/user_profile_provider.dart';
+import 'package:studall/src/features/student/courses/data/models/course_schedule_model.dart';
+import 'package:studall/src/features/student/home/data/models/schedule_model.dart';
 
 class StudentAppbar extends ConsumerStatefulWidget
     implements PreferredSizeWidget {
@@ -46,6 +50,9 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
   late AnimationController _controller;
   late Animation<Offset> _dateSlideAnimation;
   late Animation<Offset> _classSlideAnimation;
+  Timer? _timer;
+  DateTime _now = DateTime.now();
+  bool _isShowingNextClass = false;
 
   @override
   void initState() {
@@ -64,12 +71,8 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
       begin: const Offset(0, 2.14),
       end: const Offset(0, 0),
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-  }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+    _scheduleNextMinuteUpdate();
   }
 
   void _toggleAnimation() {
@@ -79,6 +82,28 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
       _controller.reverse();
     }
     widget.onAnimationTap?.call();
+  }
+
+  void _scheduleNextMinuteUpdate() {
+    final now = DateTime.now();
+    final secondsUntilNextMinute = 60 - now.second;
+    _timer = Timer(Duration(seconds: secondsUntilNextMinute), () {
+      setState(() {
+        _now = DateTime.now();
+      });
+      _timer = Timer.periodic(const Duration(minutes: 1), (_) {
+        setState(() {
+          _now = DateTime.now();
+        });
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _controller.dispose();
+    super.dispose();
   }
 
   String _formatThaiDate(DateTime date) {
@@ -105,29 +130,62 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
     return '$dayName $day $monthName';
   }
 
-  String _getNextEventTime() {
-    final now = DateTime.now();
-    final hour = now.hour;
+  int? _minutesUntilEvent(ScheduleModel? event) {
+    if (event == null) return null;
+    final nowMinutes = _now.hour * 60 + _now.minute;
+    final eventMinutes = event.startTime.hour * 60 + event.startTime.minute;
+    final diff = eventMinutes - nowMinutes;
+    return diff > 0 ? diff : null;
+  }
 
-    if (hour < 12) {
-      return 'ถัดไปอีก 1 ชม. ครึ่ง';
-    } else if (hour < 18) {
-      return 'ถัดไปอีก 30 นาที';
+  String _getDisplayTitle(ScheduleModel? nextEvent) {
+    // Non-home pages: show pageTitle, animate subtitle to show next event
+    if (!widget.showNextEvent) {
+      if (nextEvent != null && _minutesUntilEvent(nextEvent) != null) {
+        _updateAnimation(true);
+      } else {
+        _updateAnimation(false);
+      }
+      return widget.pageTitle ?? 'ไม่มีกิจกรรมในวันนี้';
+    }
+
+    // Home page: countdown logic
+    final minutes = _minutesUntilEvent(nextEvent);
+
+    if (nextEvent == null || minutes == null) {
+      _updateAnimation(false);
+      return 'ไม่มีกิจกรรมในวันนี้';
+    }
+
+    if (minutes > 60) {
+      _updateAnimation(false);
+      return nextEvent.title;
+    }
+
+    _updateAnimation(true);
+
+    if (minutes > 45) {
+      return 'อีก 1 ชม';
+    } else if (minutes > 30) {
+      return 'อีก 45 นาที';
+    } else if (minutes > 15) {
+      return 'อีก 30 นาที';
     } else {
-      return 'ไม่มีวิชาวันนี้แล้ว';
+      return 'อีก $minutes นาที';
     }
   }
 
-  String _getDisplayTitle() {
-    if (widget.showNextEvent) {
-      _toggleAnimation();
-      return _getNextEventTime();
-    } else if (widget.pageTitle != null) {
-      _toggleAnimation();
-      return widget.pageTitle!;
-    } else {
-      return 'สวัสดีครับ';
-    }
+  void _updateAnimation(bool showNextClass) {
+    if (showNextClass == _isShowingNextClass) return;
+    _isShowingNextClass = showNextClass;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (showNextClass) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    });
   }
 
   @override
@@ -136,6 +194,14 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final user = ref.watch(userProfileProvider);
+    final nextEvent = ScheduleModel(
+      title: 'Mobile Application Design and Development',
+      location: 'SC1-202',
+      dayOfWeek: DayOfWeek.monday,
+      startTime: const TimeOfDay(hour: 19, minute: 20),
+      endTime: const TimeOfDay(hour: 20, minute: 0),
+    );
+
     return Container(
       color: colorScheme.background,
       constraints: const BoxConstraints(minHeight: 64),
@@ -148,11 +214,15 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: Text(
-                  _getDisplayTitle(),
-                  style: textTheme.h2,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+
+                  child: Text(
+                    _getDisplayTitle(nextEvent),
+                    style: textTheme.h2,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
               const SizedBox(width: 24),
@@ -201,7 +271,7 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
                         SlideTransition(
                           position: _dateSlideAnimation,
                           child: Text(
-                            widget.dateText ?? _formatThaiDate(DateTime.now()),
+                            widget.dateText ?? _formatThaiDate(_now),
                             style: textTheme.h4.copyWith(
                               color: colorScheme.daily,
                             ),
@@ -218,11 +288,15 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
                                   color: colorScheme.daily,
                                 ),
                               ),
-                              Text(
-                                widget.nextClassName ??
-                                    'Mobile Application Design',
-                                style: textTheme.h4.copyWith(
-                                  color: colorScheme.daily,
+                              Flexible(
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Text(
+                                    nextEvent.title,
+                                    style: textTheme.h4.copyWith(
+                                      color: colorScheme.daily,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
