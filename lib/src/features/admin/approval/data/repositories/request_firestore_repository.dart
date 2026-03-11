@@ -22,6 +22,7 @@ class RequestFirestoreRepository {
   Stream<List<RequestModel>> getAllRequests() {
     return _service.streamCollection<RequestModel>(
       path: 'requests/',
+      queryBuilder: (query) => query.orderBy('createdAt', descending: true),
       builder: (data, docId) => RequestModel.fromFirestore(data, docId),
     );
   }
@@ -29,7 +30,7 @@ class RequestFirestoreRepository {
   Stream<List<RequestModel>> getRequestsByUserId(String userId) {
     return _service.streamCollection<RequestModel>(
       path: 'requests/',
-      queryBuilder: (query) => query.where('requestedUserId', isEqualTo: userId),
+      queryBuilder: (query) => query.where('requestedUserId', isEqualTo: userId).orderBy('createdAt', descending: true),
       builder: (data, docId) => RequestModel.fromFirestore(data, docId),
     );
   }
