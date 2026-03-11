@@ -41,6 +41,7 @@ class StudentAddEditTaskController extends AsyncNotifier<void> {
     }
     catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);
+      rethrow;
     }
   }
 }

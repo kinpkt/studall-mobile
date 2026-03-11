@@ -23,7 +23,8 @@ import '../providers/student_note_quill_provider.dart';
 
 class NoteQuillScreen extends ConsumerStatefulWidget {
   final NoteModel? note;
-  const NoteQuillScreen({super.key, this.note});
+  final String? initialCourseId;
+  const NoteQuillScreen({super.key, this.note, this.initialCourseId});
 
   @override
   ConsumerState<NoteQuillScreen> createState() => _NoteQuillScreenState();
@@ -49,8 +50,8 @@ class _NoteQuillScreenState extends ConsumerState<NoteQuillScreen> {
     _titleController = TextEditingController(text: widget.note?.title ?? '');
     _initialTitle = widget.note?.title ?? '';
 
-    _selectedCourseId = widget.note?.courseId;
-    _initialCourseId = widget.note?.courseId;
+    _selectedCourseId = widget.note?.courseId ?? widget.initialCourseId;
+    _initialCourseId = widget.note?.courseId ?? widget.initialCourseId;
     _isPinned = widget.note?.isPinned ?? false;
     _initialIsPinned = widget.note?.isPinned ?? false;
 

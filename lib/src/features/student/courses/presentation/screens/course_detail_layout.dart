@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/student/courses/presentation/providers/course_list_provider.dart';
 import 'package:studall/src/features/student/courses/presentation/widgets/course_app_bar.dart';
@@ -48,12 +49,66 @@ class _CourseDetailLayoutState extends ConsumerState<CourseDetailLayout>
     }
   }
 
+  void _showAddOptions(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    final courseId = widget.courseId;
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(PhosphorIconsRegular.listChecks),
+                  title: Text('เพิ่มสิ่งที่ต้องทำ', style: theme.textTheme.p),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    context.push(
+                      Uri(
+                        path: '/student/tasks/add-edit',
+                        queryParameters: {'courseId': courseId},
+                      ).toString(),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(PhosphorIconsRegular.notebook),
+                  title: Text('เพิ่มการจดบันทึก', style: theme.textTheme.p),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    context.push(
+                      Uri(
+                        path: '/student/notes/editor',
+                        queryParameters: {'courseId': courseId},
+                      ).toString(),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
     final courseAsync = ref.watch(courseByIdProvider(widget.courseId));
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddOptions(context),
+        child: const Icon(PhosphorIconsRegular.plus),
+      ),
       body: courseAsync.when(
         data: (course) {
           if (course == null) {

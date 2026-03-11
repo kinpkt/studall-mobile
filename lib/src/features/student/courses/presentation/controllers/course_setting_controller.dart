@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studall/src/features/student/courses/data/models/course_model.dart';
 import 'package:studall/src/features/student/courses/data/repositories/course_firestore_repository.dart';
+import 'package:studall/src/features/student/data/repositories/utility_firestore_repository.dart';
 import 'package:studall/src/features/student/notes/data/repositories/note_firestore_repository.dart';
 import 'package:studall/src/features/student/tasks/data/repositories/task_firestore_repository.dart';
 
@@ -72,9 +73,11 @@ class CourseSettingController extends AsyncNotifier<void> {
       final courseRepo = ref.read(courseFirestoreRepositoryProvider);
       final noteRepo = ref.read(noteFirestoreRepositoryProvider);
       final taskRepo = ref.read(taskFirestoreRepositoryProvider);
+      final utilityRepo = ref.read(utilityFirestoreRepositoryProvider);
 
       await noteRepo.deleteNotesByCourseId(currentUser.uid, courseId);
       await taskRepo.deleteTasksByCourseId(currentUser.uid, courseId);
+      await utilityRepo.deleteUtilitiesByCourseId(currentUser.uid, courseId);
       await courseRepo.deleteCourse(currentUser.uid, courseId);
     });
   }

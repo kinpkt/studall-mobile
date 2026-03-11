@@ -34,6 +34,7 @@ class CommonAppbar extends StatelessWidget implements PreferredSizeWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
+                  flex: 1,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -43,6 +44,7 @@ class CommonAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 if (title != null)
                   Expanded(
+                    flex: 2,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -57,6 +59,7 @@ class CommonAppbar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                 Expanded(
+                  flex: 1,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.end,

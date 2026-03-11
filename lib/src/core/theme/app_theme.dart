@@ -14,6 +14,7 @@ final appThemeLight = ShadThemeData(
   primaryDialogTheme: appDialogTheme,
   alertDialogTheme: appDialogTheme,
   selectTheme: appSelectTheme,
+  datePickerTheme: appDatePickerTheme,
 );
 
 final appThemeDark = ShadThemeData(
@@ -28,6 +29,7 @@ final appThemeDark = ShadThemeData(
   primaryDialogTheme: appDialogDarkTheme,
   alertDialogTheme: appDialogDarkTheme,
   selectTheme: appSelectDarkTheme,
+  datePickerTheme: appDatePickerTheme,
 );
 
 final appTextStyle = ShadTextTheme(
@@ -74,7 +76,6 @@ final appInputTheme = ShadInputTheme(
     fontWeight: FontWeight.w400,
   ),
 );
-
 
 final appInputDarkTheme = appInputTheme.copyWith(
   style: appTextStyle.custom['medium']?.copyWith(
@@ -141,7 +142,6 @@ final appSelectTheme = ShadSelectTheme(
     color: AppColorScheme.lightScheme.mutedForeground,
     fontWeight: FontWeight.w400,
   ),
-  
 );
 
 final appSelectDarkTheme = appSelectTheme.copyWith(
@@ -150,3 +150,5 @@ final appSelectDarkTheme = appSelectTheme.copyWith(
     fontWeight: FontWeight.w400,
   ),
 );
+
+final appDatePickerTheme = ShadDatePickerTheme(navigationButtonIconSize: 24);

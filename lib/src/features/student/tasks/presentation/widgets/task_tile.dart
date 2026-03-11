@@ -7,6 +7,7 @@ import 'package:studall/src/common_widgets/app_list_tile.dart';
 import 'package:studall/src/core/utils/datetime_to_thai_string.dart';
 import 'package:studall/src/features/student/common_widgets/confirm_delete_dialog.dart';
 import 'package:studall/src/features/student/common_widgets/resource_icon.dart';
+import 'package:studall/src/features/student/data/repositories/utility_firestore_repository.dart';
 import 'package:studall/src/features/student/tasks/data/repositories/task_firestore_repository.dart';
 
 import '../../../home/presentation/providers/home_controller.dart';
@@ -72,6 +73,9 @@ class TaskTile extends ConsumerWidget {
                           await ref
                               .read(taskFirestoreRepositoryProvider)
                               .deleteTask(currentUser.uid, task.id);
+                          await ref
+                              .read(utilityFirestoreRepositoryProvider)
+                              .deleteUtility(currentUser.uid, task.id);
                         },
                         onSuccess: () {
                           if (!mainDialogContext.mounted) return;
@@ -84,6 +88,7 @@ class TaskTile extends ConsumerWidget {
                               description: Text('ลบงานเรียบร้อยแล้ว'),
                             ),
                           );
+                          context.pop();
                         },
                         onError: () {
                           if (!context.mounted) return;
@@ -103,10 +108,11 @@ class TaskTile extends ConsumerWidget {
                       onPressed: () {
                         final updatedTask = task.copyWith(isDone: true);
                         final currentUser = FirebaseAuth.instance.currentUser;
+                        if (currentUser == null) return;
 
                         ref
                             .read(taskFirestoreRepositoryProvider)
-                            .updateTask(currentUser!.uid, updatedTask);
+                            .updateTask(currentUser.uid, updatedTask);
 
                         context.pop();
 
@@ -126,10 +132,11 @@ class TaskTile extends ConsumerWidget {
                       onPressed: () {
                         final updatedTask = task.copyWith(isDone: false);
                         final currentUser = FirebaseAuth.instance.currentUser;
+                        if (currentUser == null) return;
 
                         ref
                             .read(taskFirestoreRepositoryProvider)
-                            .updateTask(currentUser!.uid, updatedTask);
+                            .updateTask(currentUser.uid, updatedTask);
 
                         Navigator.of(context).pop();
 

@@ -49,4 +49,15 @@ class UtilityFirestoreRepository {
   Future<void> deleteUtility(String userId, String utilityId) async {
     await _service.delete(path: 'students/$userId/utilities/$utilityId');
   }
+
+  Future<void> deleteUtilitiesByCourseId(String userId, String courseId) async {
+    final utilities = await _service.getCollection<UtilityModel>(
+      path: 'students/$userId/utilities',
+      builder: (data, docId) => UtilityModel.fromFirestore(data, docId),
+      queryBuilder: (query) => query.where('courseId', isEqualTo: courseId),
+    );
+    for (final utility in utilities) {
+      await _service.delete(path: 'students/$userId/utilities/${utility.id}');
+    }
+  }
 }

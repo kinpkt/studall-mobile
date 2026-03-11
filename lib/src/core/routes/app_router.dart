@@ -203,7 +203,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/student/notes/editor',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (_, state) => NoteQuillScreen(note: state.extra as NoteModel?),
+        builder: (_, state) => NoteQuillScreen(
+          note: state.extra as NoteModel?,
+          initialCourseId: state.uri.queryParameters['courseId'],
+        ),
       ),
       GoRoute(
         path: '/partner/add-branch',
@@ -220,7 +223,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) {
           final taskToEdit = state.extra as TaskModel?;
-          return StudentAddEditTaskScreen(task: taskToEdit);
+          return StudentAddEditTaskScreen(
+            task: taskToEdit,
+            initialCourseId: state.uri.queryParameters['courseId'],
+          );
         },
       ),
 
