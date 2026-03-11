@@ -27,7 +27,7 @@ class StudentAssignedTasksScreen extends ConsumerWidget {
               ExpansionTaskList(
                 title: 'สัปดาห์นี้',
                 tasks: filterFutureThisWeekTasks(assignedTasks),
-                initiallyExpanded: true,
+                initiallyExpanded: assignedTasks.isNotEmpty,
               ),
               ExpansionTaskList(
                 title: 'สัปดาห์ถัดไป',

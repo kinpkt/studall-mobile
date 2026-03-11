@@ -30,6 +30,28 @@ class _CourseSettingScreenState extends ConsumerState<CourseSettingScreen> {
 
   CourseModel? _originalCourse;
   bool _initialized = false;
+  bool _nameEnabled = false;
+  bool _descriptionEnabled = false;
+
+  bool get _hasChanges {
+    if (_originalCourse == null) return false;
+    final o = _originalCourse!;
+    return _nameController.text.trim() != o.name ||
+        _descriptionController.text.trim() != (o.description ?? '') ||
+        _teacherController.text.trim() != (o.teacherName ?? '') ||
+        !_schedulesEqual(_schedules, o.schedule);
+  }
+
+  bool _schedulesEqual(
+    List<CourseScheduleModel> a,
+    List<CourseScheduleModel> b,
+  ) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
 
   void _initFromCourse(CourseModel course) {
     if (_initialized) return;
@@ -41,6 +63,9 @@ class _CourseSettingScreenState extends ConsumerState<CourseSettingScreen> {
     );
     _teacherController = TextEditingController(text: course.teacherName ?? '');
     _schedules = [...course.schedule];
+
+    _nameController.addListener(() => setState(() {}));
+    _descriptionController.addListener(() => setState(() {}));
   }
 
   @override
@@ -128,7 +153,39 @@ class _CourseSettingScreenState extends ConsumerState<CourseSettingScreen> {
     );
   }
 
-  // ── UI Sections ──────────────────────────────────────────────────────
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ShadDialog.alert(
+          title: const Padding(
+            padding: EdgeInsets.only(bottom: 16.0),
+            child: Text('ต้องการลบวิชานี้หรือไม่?'),
+          ),
+          description: const Text(
+            'วิชาและข้อมูลทั้งหมดจะถูกลบอย่างถาวร การกระทำนี้ไม่สามารถย้อนกลับได้',
+          ),
+          actions: [
+            ShadButton.secondary(
+              onPressed: () => ctx.pop(),
+              child: const Text('ยกเลิก'),
+            ),
+            ShadButton.destructive(
+              onPressed: () {
+                ctx.pop();
+                ref
+                    .read(courseSettingControllerProvider.notifier)
+                    .deleteCourse(widget.courseId);
+                context.go('/student/courses');
+              },
+              child: const Text('ลบวิชา'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildTeacherProfileSettingSection(BuildContext context) {
     final theme = ShadTheme.of(context);
@@ -173,17 +230,6 @@ class _CourseSettingScreenState extends ConsumerState<CourseSettingScreen> {
                   color: colorScheme.foreground,
                 ),
               ),
-              trailing: [
-                SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: Icon(
-                    PhosphorIconsRegular.pencilSimpleLine,
-                    size: 24,
-                    color: colorScheme.mutedForeground,
-                  ),
-                ),
-              ],
             ),
           ),
         ],
@@ -194,7 +240,6 @@ class _CourseSettingScreenState extends ConsumerState<CourseSettingScreen> {
   Widget _buildFormSection(BuildContext context) {
     final theme = ShadTheme.of(context);
     final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -204,21 +249,40 @@ class _CourseSettingScreenState extends ConsumerState<CourseSettingScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ShadInputFormField(
+              // enabled: _nameEnabled,
               id: 'courseName',
               controller: _nameController,
               label: const Text('ชื่อวิชา'),
               placeholder: const Text('เช่น สังคมศึกษา, ระบบปฏิบัติการ'),
               validator: (value) =>
                   value.trim().isEmpty ? 'กรุณากรอกชื่อวิชา' : null,
+              trailing: GestureDetector(
+                onTap: () => setState(() => _nameEnabled = !_nameEnabled),
+                child: Icon(
+                  PhosphorIconsRegular.pencilSimpleLine,
+                  size: 24,
+                  color: colorScheme.mutedForeground,
+                ),
+              ),
             ),
             const SizedBox(height: 16),
 
             ShadInputFormField(
+              // enabled: _descriptionEnabled,
               id: 'description',
               controller: _descriptionController,
               label: const Text('คำอธิบาย'),
               placeholder: const Text(
                 'เช่น หมู่ 11, ห้อง 125, อาคาร 10 ชั้น 3',
+              ),
+              trailing: GestureDetector(
+                onTap: () =>
+                    setState(() => _descriptionEnabled = !_descriptionEnabled),
+                child: Icon(
+                  PhosphorIconsRegular.pencilSimpleLine,
+                  size: 24,
+                  color: colorScheme.mutedForeground,
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -258,40 +322,49 @@ class _CourseSettingScreenState extends ConsumerState<CourseSettingScreen> {
     final theme = ShadTheme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 8.0),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      decoration: BoxDecoration(
-        border: Border.all(color: theme.colorScheme.border),
-        borderRadius: BorderRadius.circular(6),
-      ),
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              '${dayName(schedule.day)} '
-              '${schedule.startTime?.format(context) ?? ''} - '
-              '${schedule.endTime?.format(context) ?? ''}'
-              '${schedule.location != null ? ', ${schedule.location}' : ''}',
-              style: theme.textTheme.custom['medium']?.copyWith(
-                color: theme.colorScheme.foreground,
-                fontWeight: FontWeight.w400,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: theme.colorScheme.border),
+                borderRadius: BorderRadius.circular(6),
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${dayName(schedule.day)} '
+                      '${schedule.startTime?.format(context) ?? ''} - '
+                      '${schedule.endTime?.format(context) ?? ''}'
+                      '${schedule.location != null ? ', ${schedule.location}' : ''}',
+                      style: theme.textTheme.custom['medium']?.copyWith(
+                        color: theme.colorScheme.foreground,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => _openEditScheduleDialog(index, schedule),
+                    child: Icon(
+                      PhosphorIconsRegular.pencilSimpleLine,
+                      size: 24,
+                      color: theme.colorScheme.mutedForeground,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () => _openEditScheduleDialog(index, schedule),
-            child: Icon(
-              PhosphorIconsRegular.pencilSimpleLine,
-              size: 24,
-              color: theme.colorScheme.mutedForeground,
-            ),
-          ),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () => _removeSchedule(index),
-            child: Icon(
+          ShadIconButton.ghost(
+            width: 44,
+            height: 44,
+            onPressed: () => _removeSchedule(index),
+            icon: Icon(
               PhosphorIconsRegular.trash,
               size: 24,
               color: theme.colorScheme.destructive,
@@ -310,23 +383,33 @@ class _CourseSettingScreenState extends ConsumerState<CourseSettingScreen> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        spacing: 16,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ShadButton(
-            onPressed: isLoading ? null : _saveCourse,
-            child: isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('บันทึกการเปลี่ยนแปลง'),
-          ),
-          const SizedBox(height: 16),
+          if (_hasChanges)
+            ShadButton(
+              onPressed: isLoading ? null : _saveCourse,
+              child: isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('บันทึกการเปลี่ยนแปลง'),
+            ),
           ShadButton.ghost(
             onPressed: isLoading ? null : _showArchiveConfirmationDialog,
             child: Text(
-              'จัดเก็บวิชา',
+              'จัดเก็บวิชาเรียน',
+              style: theme.textTheme.small.copyWith(
+                color: theme.colorScheme.destructive,
+              ),
+            ),
+          ),
+          ShadButton.ghost(
+            onPressed: isLoading ? null : _showDeleteConfirmationDialog,
+            child: Text(
+              'ลบวิชาเรียน',
               style: theme.textTheme.small.copyWith(
                 color: theme.colorScheme.destructive,
               ),
@@ -363,9 +446,23 @@ class _CourseSettingScreenState extends ConsumerState<CourseSettingScreen> {
         );
       }
       if (prev?.isLoading == true && next.hasValue && !next.isLoading) {
+        setState(() {
+          _originalCourse = CourseModel(
+            id: _originalCourse!.id,
+            name: _nameController.text.trim(),
+            description: _descriptionController.text.trim().isEmpty
+                ? null
+                : _descriptionController.text.trim(),
+            teacherName: _teacherController.text.trim().isEmpty
+                ? null
+                : _teacherController.text.trim(),
+            schedule: [..._schedules],
+            createdAt: _originalCourse!.createdAt,
+            isActive: _originalCourse!.isActive,
+          );
+        });
         ref.invalidate(courseByIdProvider(widget.courseId));
         ref.invalidate(userCoursesProvider);
-        // if (context.mounted) context.pop();
       }
     });
 

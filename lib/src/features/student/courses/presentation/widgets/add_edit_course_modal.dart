@@ -151,37 +151,49 @@ class _AddEditCourseModalState extends State<AddEditCourseModal> {
     final theme = ShadTheme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 8.0),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      decoration: BoxDecoration(
-        border: Border.all(color: theme.colorScheme.border),
-        borderRadius: BorderRadius.circular(6),
-      ),
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              '${dayName(schedule.day)} ${schedule.startTime!.format(context)} - ${schedule.endTime!.format(context)}${schedule.location != null ? ', ${schedule.location}' : ''}',
-              style: theme.textTheme.custom['medium']?.copyWith(
-                color: theme.colorScheme.foreground,
-                fontWeight: FontWeight.w400,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: theme.colorScheme.border),
+                borderRadius: BorderRadius.circular(6),
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${dayName(schedule.day)} '
+                      '${schedule.startTime?.format(context) ?? ''} - '
+                      '${schedule.endTime?.format(context) ?? ''}'
+                      '${schedule.location != null ? ', ${schedule.location}' : ''}',
+                      style: theme.textTheme.custom['medium']?.copyWith(
+                        color: theme.colorScheme.foreground,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => _openEditScheduleDialog(index, schedule),
+                    child: Icon(
+                      PhosphorIconsRegular.pencilSimpleLine,
+                      size: 24,
+                      color: theme.colorScheme.mutedForeground,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () => _openEditScheduleDialog(index, schedule),
-            child: Icon(
-              PhosphorIconsRegular.pencilSimpleLine,
-              size: 24,
-              color: theme.colorScheme.mutedForeground,
-            ),
-          ),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () => _removeSchedule(index),
-            child: Icon(
+          ShadIconButton.ghost(
+            width: 44,
+            height: 44,
+            onPressed: () => _removeSchedule(index),
+            icon: Icon(
               PhosphorIconsRegular.trash,
               size: 24,
               color: theme.colorScheme.destructive,

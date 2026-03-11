@@ -23,7 +23,9 @@ class StudentOverdueTasksScreen extends ConsumerWidget {
 
         print('Total overdue tasks: ${overdueTasks.length}');
         for (var task in overdueTasks) {
-          print('Overdue Task: ${task.title} - ${task.endDateTime} - isDone: ${task.isDone}');
+          print(
+            'Overdue Task: ${task.title} - ${task.endDateTime} - isDone: ${task.isDone}',
+          );
         }
 
         return SingleChildScrollView(
@@ -32,7 +34,6 @@ class StudentOverdueTasksScreen extends ConsumerWidget {
               ExpansionTaskList(
                 title: 'สัปดาห์นี้',
                 tasks: filterPastThisWeekTasks(overdueTasks),
-                initiallyExpanded: true,
               ),
               ExpansionTaskList(
                 title: 'สัปดาห์ที่ผ่านมา',

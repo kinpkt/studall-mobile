@@ -34,10 +34,10 @@ class NotesListTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: theme.shadows.sm,
               ),
-              child: const Center(
+              child: Center(
                 child: Icon(
                   PhosphorIconsRegular.notebook,
-                  color: Colors.white,
+                  color: colorScheme.custom['greenForeground'],
                   size: 24,
                 ),
               ),

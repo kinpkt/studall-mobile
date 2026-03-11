@@ -18,7 +18,7 @@ class TaskFirestoreRepository {
   Future<void> addTask(String userId, TaskModel task) async {
     await _service.set(
       path: 'students/$userId/tasks/${task.id}',
-      data: task.toFirestore()
+      data: task.toFirestore(),
     );
   }
 
@@ -65,8 +65,17 @@ class TaskFirestoreRepository {
   }
 
   Future<void> deleteTask(String userId, String taskId) async {
-    await _service.delete(
-      path: 'students/$userId/tasks/$taskId',
+    await _service.delete(path: 'students/$userId/tasks/$taskId');
+  }
+
+  Future<void> deleteTasksByCourseId(String userId, String courseId) async {
+    final tasks = await _service.getCollection<TaskModel>(
+      path: 'students/$userId/tasks',
+      builder: (data, docId) => TaskModel.fromFirestore(data, docId),
+      queryBuilder: (query) => query.where('courseId', isEqualTo: courseId),
     );
+    for (final task in tasks) {
+      await _service.delete(path: 'students/$userId/tasks/${task.id}');
+    }
   }
 }
