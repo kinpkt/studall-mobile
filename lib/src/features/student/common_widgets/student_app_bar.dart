@@ -133,11 +133,11 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
   }
 
   int? _minutesUntilEvent(ScheduleModel? event) {
-    if (event == null) return null;
+    if (event == null)
+      return null;
     final nowMinutes = _now.hour * 60 + _now.minute;
     final eventMinutes = event.startTime.hour * 60 + event.startTime.minute;
-    final diff = eventMinutes - nowMinutes;
-    return diff > 0 ? diff : null;
+    return eventMinutes - nowMinutes;
   }
 
   String _getDisplayTitle(ScheduleModel? nextEvent) {
