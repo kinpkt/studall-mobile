@@ -46,6 +46,7 @@ import 'package:studall/src/features/partner/home/presentation/screens/partner_h
 import 'package:studall/src/features/partner/branches/presentation/screens/partner_branches_screen.dart';
 import 'package:studall/src/features/partner/requests/presentation/screens/partner_requests_screen.dart';
 import 'package:studall/src/features/partner/branches/presentation/screens/partner_add_edit_branch_screen.dart';
+import 'package:studall/src/features/partner/branches/data/models/branch_model.dart';
 import 'package:studall/src/features/partner/advertisements/presentation/screens/partner_add_advertisement_screen.dart';
 
 // ── Admin layout & screens ───────────────────────────────────────────────────
@@ -219,7 +220,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/partner/add-branch',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (_, _) => const PartnerAddEditBranchScreen(),
+        builder: (_, state) {
+          final branch = state.extra as BranchModel?;
+          return PartnerAddEditBranchScreen(branch: branch);
+        },
       ),
       GoRoute(
         path: '/partner/add-advertisement',

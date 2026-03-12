@@ -3,8 +3,11 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/common_widgets/common_app_bar.dart';
 import 'package:studall/src/core/services/r2_service.dart';
 import 'package:studall/src/features/partner/advertisements/data/models/advertisement_model.dart';
 import 'package:studall/src/features/partner/advertisements/data/repositories/advertisement_firestore_repository.dart';
@@ -161,8 +164,15 @@ class _PartnerAddAdvertisementScreenState extends ConsumerState<PartnerAddAdvert
     final theme = ShadTheme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('เพิ่มโฆษณาใหม่', style: theme.textTheme.h2,),
+      appBar: CommonAppbar(
+        title: 'เพิ่มโฆษณาใหม่',
+        leading: [
+          ShadIconButton.ghost(
+            decoration: ShadDecoration(shape: BoxShape.circle),
+            icon: const Icon(PhosphorIconsRegular.arrowLeft),
+            onPressed: () => context.pop(),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

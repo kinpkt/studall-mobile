@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:studall/src/common_widgets/common_app_bar.dart';
 
 class PartnerMapSelectionScreen extends StatefulWidget {
   final LatLng? initialLocation;
 
-  const PartnerMapSelectionScreen({
-    super.key,
-    this.initialLocation,
-  });
+  const PartnerMapSelectionScreen({super.key, this.initialLocation});
 
   @override
-  State<PartnerMapSelectionScreen> createState() => _PartnerMapSelectionScreenState();
+  State<PartnerMapSelectionScreen> createState() =>
+      _PartnerMapSelectionScreenState();
 }
 
 class _PartnerMapSelectionScreenState extends State<PartnerMapSelectionScreen> {
@@ -26,8 +27,7 @@ class _PartnerMapSelectionScreenState extends State<PartnerMapSelectionScreen> {
     super.initState();
     if (widget.initialLocation != null) {
       _selectedLocation = widget.initialLocation;
-    }
-    else {
+    } else {
       _selectedLocation = const LatLng(13.9883, 100.6171);
       _getCurrentLocation();
     }
@@ -98,12 +98,15 @@ class _PartnerMapSelectionScreenState extends State<PartnerMapSelectionScreen> {
     final theme = ShadTheme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('เลือกตำแหน่งที่ตั้ง', style: theme.textTheme.h2,),
-        leading: ShadButton.ghost(
-          leading: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+      appBar: CommonAppbar(
+        title: 'เลือกตำแหน่งที่ตั้ง',
+        leading: [
+          ShadIconButton.ghost(
+            decoration: ShadDecoration(shape: BoxShape.circle),
+            icon: const Icon(PhosphorIconsRegular.arrowLeft),
+            onPressed: () => context.pop(),
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -140,7 +143,7 @@ class _PartnerMapSelectionScreenState extends State<PartnerMapSelectionScreen> {
             ],
           ),
           Positioned(
-            bottom: 24,
+            bottom: 56,
             left: 16,
             right: 16,
             child: Container(
@@ -162,9 +165,9 @@ class _PartnerMapSelectionScreenState extends State<PartnerMapSelectionScreen> {
                 children: [
                   Text(
                     'พิกัดที่เลือก:',
-                    style: ShadTheme.of(context).textTheme.small.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: ShadTheme.of(
+                      context,
+                    ).textTheme.small.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -177,7 +180,9 @@ class _PartnerMapSelectionScreenState extends State<PartnerMapSelectionScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ShadButton(
-                      onPressed: _selectedLocation == null ? null : _confirmLocation,
+                      onPressed: _selectedLocation == null
+                          ? null
+                          : _confirmLocation,
                       child: const Text('ยืนยันตำแหน่ง'),
                     ),
                   ),

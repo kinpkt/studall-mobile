@@ -1,10 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:studall/src/features/auth/presentation/screens/log_in_screen.dart';
+import 'package:studall/src/features/partner/advertisements/data/models/advertisement_model.dart';
+import 'package:studall/src/features/partner/branches/data/models/branch_model.dart';
+import 'package:studall/src/features/partner/common_widgets/branch_list_tile.dart';
+import 'package:studall/src/features/partner/data/models/partner_model.dart';
 import 'package:studall/src/features/partner/home/presentation/widgets/advertisement_banner.dart';
 import 'package:studall/src/features/partner/home/presentation/widgets/branch_card_minimal.dart';
+import 'package:studall/src/features/admin/approval/data/models/request_model.dart';
 
 import '../providers/partner_home_provider.dart';
 
@@ -13,8 +19,6 @@ class PartnerHomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = ShadTheme.of(context);
-
     final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) {
@@ -26,113 +30,277 @@ class PartnerHomeScreen extends ConsumerWidget {
     final advertisementsAsync = ref.watch(advertisementsProvider);
     final requestsAsync = ref.watch(requestsProvider);
 
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return SingleChildScrollView(
+      child: Container(
+        color: colorScheme.background,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            partnerAsync.when(
+              loading: () => const SizedBox(
+                height: 120,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (err, stack) => SizedBox(
+                height: 120,
+                child: Center(
+                  child: Text('เกิดข้อผิดพลาดในระหว่างการแสดงผล: $err'),
+                ),
+              ),
+              data: (partner) => _buildPartnerInfo(
+                context,
+                partner,
+                ref.watch(branchesProvider).asData?.value ?? [],
+                ref.watch(advertisementsProvider).asData?.value ?? [],
+              ),
+            ),
+            const SizedBox(height: 16),
+            branchesAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) =>
+                  Center(child: Text('Error loading items: $err')),
+              data: (branches) => _buildBranchList(context, branches),
+            ),
+            advertisementsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) =>
+                  Center(child: Text('Error loading items: $err')),
+              data: (ads) => _buildAdvertisementList(
+                context,
+                ads,
+                requestsAsync.asData?.value ?? [],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPartnerInfo(
+    BuildContext context,
+    PartnerModel? partner,
+    List<BranchModel> branches,
+    List<AdvertisementModel> ads,
+  ) {
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.card,
+        border: Border.all(color: colorScheme.border, width: 1),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ShadCard(
-            width: 480,
-            title: partnerAsync.when(
-              loading: () => Text('Loading...', style: theme.textTheme.h2),
-              error: (err, stack) => Text('ERROR', style: theme.textTheme.h2),
-              data: (partner) => Text(partner?.name ?? '', style: theme.textTheme.h2),
+          Text(
+            partner?.name ?? '',
+            style: textTheme.custom['medium']?.copyWith(
+              color: colorScheme.foreground,
+              fontSize: 18,
             ),
-            description: partnerAsync.when(
-              loading: () => Text('Loading...', style: theme.textTheme.h4),
-              error: (err, stack) => Text('ERROR', style: theme.textTheme.h4),
-              data: (partner) => Text(partner?.description ?? '', style: theme.textTheme.h4),
-            ),
-            footer: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    branchesAsync.when(
-                      loading: () => Text('จำนวนสาขา: ...', style: theme.textTheme.p),
-                      error: (err, stack) => Text('จำนวนสาขา: -', style: theme.textTheme.p),
-                      data: (branches) => Text('จำนวนสาขา: ${branches.length} สาขา', style: theme.textTheme.p),
-                    ),
-                    advertisementsAsync.when(
-                      loading: () => Text('จำนวนโฆษณา: ...', style: theme.textTheme.p),
-                      error: (err, stack) => Text('จำนวนโฆษณา: -', style: theme.textTheme.p),
-                      data: (ads) => Text('จำนวนโฆษณา: ${ads.length} ชุด', style: theme.textTheme.p),
-                    ),
-                  ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            partner?.description ?? '',
+            style: textTheme.p.copyWith(color: colorScheme.mutedForeground),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'จำนวนสาขา: ${branches.length} สาขา',
+                style: textTheme.muted.copyWith(
+                  color: colorScheme.mutedForeground,
                 ),
-                partnerAsync.when(
-                  loading: () => Text('สถานะร้าน: ...', style: theme.textTheme.p),
-                  error: (err, stack) => Text('สถานะร้าน: -', style: theme.textTheme.p),
-                  data: (partner) => Text('สถานะร้าน: ${partner!.isPermitted ? 'ระบบอนุมัติแล้ว' : 'ระบบยังไม่อนุมัติ'}', style: theme.textTheme.p),
-                )
+              ),
+              Text(
+                'จำนวนโฆษณา: ${ads.length} ชุด',
+                style: textTheme.muted.copyWith(
+                  color: colorScheme.mutedForeground,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Text(
+                'สถานะร้าน: ',
+                style: textTheme.muted.copyWith(
+                  color: colorScheme.mutedForeground,
+                ),
+              ),
+              ShadBadge(
+                child: Text(
+                  partner?.isPermitted == true
+                      ? 'ระบบอนุมัติแล้ว'
+                      : 'ระบบยังไม่อนุมัติ',
+                  style: textTheme.custom['small'],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBranchList(BuildContext context, List<BranchModel> branches) {
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Container(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'สาขาของร้าน',
+                  style: textTheme.custom['medium']?.copyWith(
+                    color: colorScheme.foreground,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                GestureDetector(
+                  onTap: () => context.go('/partner/branches'),
+                  child: Text(
+                    'ทั้งหมด',
+                    style: textTheme.muted.copyWith(
+                      color: colorScheme.custom['info']!,
+                      decoration: TextDecoration.underline,
+                      decorationColor: colorScheme.custom['info']!,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-
-          const SizedBox(height: 16.0),
-          Text('สาขาของร้าน', style: theme.textTheme.h2),
-          const SizedBox(height: 16.0),
-
-          branchesAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Center(child: Text('เกิดข้อผิดพลาด: $err')),
-            data: (branches) {
-              if (branches.isEmpty) {
-                return Center(child: Text('ไม่มีสาขา', style: theme.textTheme.h4));
-              }
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: branches.map((branch) => BranchCardMinimal(branch: branch)).toList(),
+          if (branches.isEmpty) ...[
+            Container(
+              width: double.infinity,
+              height: 136,
+              decoration: BoxDecoration(
+                color: colorScheme.card,
+                border: Border.all(color: colorScheme.border, width: 1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  'ยังไม่มีสาขา',
+                  style: textTheme.p.copyWith(
+                    color: colorScheme.mutedForeground,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-              );
-            },
+              ),
+            ),
+          ] else ...[
+            SizedBox(
+              height: 136,
+              child: ListView.separated(
+                clipBehavior: Clip.none,
+                scrollDirection: Axis.vertical,
+                itemCount: branches.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 16),
+                itemBuilder: (context, index) {
+                  return BranchListTile(branch: branches[index]);
+                },
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdvertisementList(
+    BuildContext context,
+    List<AdvertisementModel> ads,
+    List<RequestModel> requests,
+  ) {
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'โฆษณาของร้าน',
+                  style: textTheme.custom['medium']?.copyWith(
+                    color: colorScheme.foreground,
+                  ),
+                ),
+              ],
+            ),
           ),
+          if (ads.isEmpty) ...[
+            Container(
+              width: double.infinity,
+              height: 68,
+              margin: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colorScheme.card,
+                border: Border.all(color: colorScheme.border, width: 1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  'ไม่มีโฆษณา',
+                  style: textTheme.p.copyWith(
+                    color: colorScheme.mutedForeground,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ] else ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 150,
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                clipBehavior: Clip.none,
+                scrollDirection: Axis.horizontal,
+                itemCount: ads.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  final ad = ads[index];
+                  final matchingRequest = requests
+                      .where((req) => req.id == ad.id)
+                      .firstOrNull;
 
-          const SizedBox(height: 16.0),
-          Text('โฆษณาของร้าน', style: theme.textTheme.h2),
-          const SizedBox(height: 16.0),
-
-          advertisementsAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Center(child: Text('เกิดข้อผิดพลาด: $err')),
-            data: (ads) {
-              if (ads.isEmpty) {
-                return Center(child: Text('ไม่มีโฆษณา', style: theme.textTheme.h4));
-              }
-
-              return requestsAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) => Center(child: Text('เกิดข้อผิดพลาด: $err')),
-                data: (requests) {
-                  return SizedBox(
-                    height: 150,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: ads.length,
-                      itemBuilder: (context, index) {
-                        final ad = ads[index];
-
-                        final matchingRequest = requests
-                            .where((req) => req.id == ad.id)
-                            .firstOrNull;
-
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 12),
-                          child: AdvertisementBanner(
-                            ads: ad,
-                            status: matchingRequest?.status,
-                            isDeletable: true,
-                          ),
-                        );
-                      },
-                    ),
+                  return AdvertisementBanner(
+                    ads: ad,
+                    status: matchingRequest?.status,
+                    isDeletable: true,
                   );
                 },
-              );
-            },
-          ),
+              ),
+            ),
+          ],
         ],
       ),
     );

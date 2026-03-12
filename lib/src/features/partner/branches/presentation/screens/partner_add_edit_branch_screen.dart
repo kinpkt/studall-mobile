@@ -3,8 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:studall/src/common_widgets/common_app_bar.dart';
 import 'package:studall/src/features/partner/branches/data/models/branch_model.dart';
 import 'package:studall/src/features/partner/branches/data/repositories/branch_firestore_repository.dart';
 import 'package:studall/src/features/partner/branches/presentation/screens/partner_map_selection_screen.dart';
@@ -14,10 +17,12 @@ class PartnerAddEditBranchScreen extends ConsumerStatefulWidget {
   const PartnerAddEditBranchScreen({super.key, this.branch});
 
   @override
-  ConsumerState<PartnerAddEditBranchScreen> createState() => _PartnerAddEditBranchScreenState();
+  ConsumerState<PartnerAddEditBranchScreen> createState() =>
+      _PartnerAddEditBranchScreenState();
 }
 
-class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranchScreen> {
+class _PartnerAddEditBranchScreenState
+    extends ConsumerState<PartnerAddEditBranchScreen> {
   final _formKey = GlobalKey<ShadFormState>();
   final _nameController = TextEditingController();
   final _locationController = TextEditingController();
@@ -36,7 +41,8 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
 
       _nameController.text = branch.name;
       _selectedLocation = branch.leafletCoordinate;
-      _locationController.text = '${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}';
+      _locationController.text =
+          '${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}';
 
       _selectedStatus = branch.status;
     }
@@ -52,17 +58,76 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
   void _pickLocation() async {
     final selectedLatLng = await Navigator.of(context).push<LatLng>(
       MaterialPageRoute(
-        builder: (context) => PartnerMapSelectionScreen(
-          initialLocation: _selectedLocation,
-        ),
+        builder: (context) =>
+            PartnerMapSelectionScreen(initialLocation: _selectedLocation),
       ),
     );
 
     if (selectedLatLng != null) {
       setState(() {
         _selectedLocation = selectedLatLng;
-        _locationController.text = '${selectedLatLng.latitude.toStringAsFixed(6)}, ${selectedLatLng.longitude.toStringAsFixed(6)}';
+        _locationController.text =
+            '${selectedLatLng.latitude.toStringAsFixed(6)}, ${selectedLatLng.longitude.toStringAsFixed(6)}';
       });
+    }
+  }
+
+  void _confirmDelete() async {
+    final confirmed = await showShadDialog<bool>(
+      context: context,
+      builder: (context) => ShadDialog.alert(
+        title: const Text('ยืนยันการลบสาขา'),
+        description: const Text(
+          'คุณแน่ใจหรือไม่ว่าต้องการลบสาขานี้? การดำเนินการนี้ไม่สามารถย้อนกลับได้',
+        ),
+        actions: [
+          ShadButton.outline(
+            child: const Text('ยกเลิก'),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          ShadButton.destructive(
+            child: const Text('ลบ'),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      await ref
+          .read(branchFirestoreRepositoryProvider)
+          .deleteBranch(currentUser.uid, widget.branch!);
+
+      if (!mounted) return;
+
+      ShadToaster.of(context).show(
+        const ShadToast(
+          title: Text('สำเร็จ'),
+          description: Text('ลบสาขาเรียบร้อยแล้ว'),
+        ),
+      );
+
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+
+      ShadToaster.of(context).show(
+        ShadToast.destructive(
+          title: const Text('เกิดข้อผิดพลาด'),
+          description: Text(e.toString()),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -79,16 +144,17 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
       return;
     }
 
-    if (!(_formKey.currentState?.validate() ?? false))
-      return;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    if (_selectedLocation == null)
-      return;
+    if (_selectedLocation == null) return;
 
     setState(() => _isLoading = true);
 
     try {
-      final partner = await FirebaseFirestore.instance.collection('partners').doc(currentUser.uid).get();
+      final partner = await FirebaseFirestore.instance
+          .collection('partners')
+          .doc(currentUser.uid)
+          .get();
       final partnerName = partner.data()?['name'] as String;
       final partnerDescription = partner.data()?['description'] as String;
       final partnerIsPermitted = partner.data()?['isPermitted'] as bool;
@@ -99,36 +165,38 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
         partnerDescription: partnerDescription,
         partnerIsPermitted: partnerIsPermitted,
         name: _nameController.text,
-        location: GeoPoint(_selectedLocation!.latitude, _selectedLocation!.longitude),
+        location: GeoPoint(
+          _selectedLocation!.latitude,
+          _selectedLocation!.longitude,
+        ),
         status: _selectedStatus!,
       );
 
       if (widget.branch != null) {
-        await ref.read(branchFirestoreRepositoryProvider).updateBranch(
-          currentUser.uid,
-          newBranch,
-        );
-      }
-      else {
-        await ref.read(branchFirestoreRepositoryProvider).addBranch(
-          currentUser.uid,
-          newBranch,
-        );
+        await ref
+            .read(branchFirestoreRepositoryProvider)
+            .updateBranch(currentUser.uid, newBranch);
+      } else {
+        await ref
+            .read(branchFirestoreRepositoryProvider)
+            .addBranch(currentUser.uid, newBranch);
       }
 
-      if (!mounted)
-        return;
+      if (!mounted) return;
 
       ShadToaster.of(context).show(
         ShadToast(
           title: Text('สำเร็จ'),
-          description: Text(widget.branch != null ? 'อัปเดตสาขาเรียบร้อยแล้ว' : 'เพิ่มสาขาใหม่เรียบร้อยแล้ว'),
+          description: Text(
+            widget.branch != null
+                ? 'อัปเดตสาขาเรียบร้อยแล้ว'
+                : 'เพิ่มสาขาใหม่เรียบร้อยแล้ว',
+          ),
         ),
       );
 
       Navigator.of(context).pop();
-    }
-    catch (e) {
+    } catch (e) {
       if (!mounted) return;
 
       ShadToaster.of(context).show(
@@ -137,8 +205,7 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
           description: Text(e.toString()),
         ),
       );
-    }
-    finally {
+    } finally {
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -148,10 +215,18 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
-
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('เพิ่มสาขาใหม่', style: theme.textTheme.h2,),
+      appBar: CommonAppbar(
+        title: widget.branch != null ? 'แก้ไขสาขา' : 'เพิ่มสาขาใหม่',
+        leading: [
+          ShadIconButton.ghost(
+            decoration: ShadDecoration(shape: BoxShape.circle),
+            icon: const Icon(PhosphorIconsRegular.arrowLeft),
+            onPressed: () => context.pop(),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -159,7 +234,7 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
           child: ShadForm(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: 16,
               children: [
                 Text(
@@ -179,7 +254,7 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
                   },
                 ),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     GestureDetector(
                       onTap: _pickLocation,
@@ -208,18 +283,21 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
                   id: 'status',
                   label: const Text('สถานะสาขา'),
                   placeholder: const Text('เลือกสถานะ...'),
+                  minWidth: double.infinity,
                   initialValue: _selectedStatus,
                   onChanged: (value) {
                     setState(() {
                       _selectedStatus = value;
                     });
                   },
-                  options: BranchStatus.values.map(
-                    (status) => ShadOption(
-                      value: status,
-                      child: Text(status.thaiStatus),
-                    ),
-                  ).toList(),
+                  options: BranchStatus.values
+                      .map(
+                        (status) => ShadOption(
+                          value: status,
+                          child: Text(status.thaiStatus),
+                        ),
+                      )
+                      .toList(),
                   selectedOptionBuilder: (context, value) {
                     return Text(value.thaiStatus);
                   },
@@ -236,10 +314,26 @@ class _PartnerAddEditBranchScreenState extends ConsumerState<PartnerAddEditBranc
                   child: ShadButton(
                     onPressed: _isLoading ? null : _submit,
                     child: _isLoading
-                        ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+                        ? const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          )
                         : const Text('บันทึกข้อมูล'),
                   ),
                 ),
+                if (widget.branch != null)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ShadButton.ghost(
+                      onPressed: _isLoading ? null : _confirmDelete,
+                      child: Text(
+                        'ลบสาขา',
+                        style: textTheme.small.copyWith(
+                          color: colorScheme.destructive,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

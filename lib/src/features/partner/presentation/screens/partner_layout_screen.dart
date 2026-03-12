@@ -45,31 +45,36 @@ class PartnerLayoutScreen extends ConsumerWidget {
       context: context,
       builder: (BuildContext ctx) {
         return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: Icon(PhosphorIconsRegular.storefront),
-                title: Text(
-                  'เพิ่มสาขาใหม่',
-                  style: ShadTheme.of(context).textTheme.p,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+
+              children: [
+                ListTile(
+                  leading: Icon(PhosphorIconsRegular.storefront),
+                  title: Text(
+                    'เพิ่มสาขาใหม่',
+                    style: ShadTheme.of(context).textTheme.p,
+                  ),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    context.push('/partner/add-branch');
+                  },
                 ),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  context.push('/partner/add-branch');
-                },
-              ),
-              ListTile(
-                leading: Icon(PhosphorIconsRegular.newspaper),
-                title: Text(
-                  'เพิ่มโฆษณาใหม่',
-                  style: ShadTheme.of(context).textTheme.p,
+                ListTile(
+                  leading: Icon(PhosphorIconsRegular.newspaper),
+                  title: Text(
+                    'เพิ่มโฆษณาใหม่',
+                    style: ShadTheme.of(context).textTheme.p,
+                  ),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    context.push('/partner/add-advertisement');
+                  },
                 ),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  context.push('/partner/add-advertisement');
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -81,9 +86,14 @@ class PartnerLayoutScreen extends ConsumerWidget {
     final currentIndex = navigationShell.currentIndex;
 
     return SafeArea(
+      bottom: false,
       child: Scaffold(
         appBar: _buildAppBar(context, currentIndex),
         body: navigationShell,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _showAddOptions(context),
+          child: Icon(PhosphorIconsRegular.plus),
+        ),
         bottomNavigationBar: NavigationBar(
           selectedIndex: currentIndex,
           onDestinationSelected: (index) {
@@ -93,10 +103,6 @@ class PartnerLayoutScreen extends ConsumerWidget {
             );
           },
           destinations: _destinations,
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showAddOptions(context),
-          child: Icon(PhosphorIconsRegular.plus),
         ),
       ),
     );

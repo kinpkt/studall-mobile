@@ -6,88 +6,133 @@ import 'package:studall/src/features/admin/approval/data/repositories/request_fi
 import 'package:studall/src/features/partner/requests/presentation/widgets/partner_request_list_tile.dart';
 
 import '../../../../admin/approval/data/models/request_model.dart';
-import '../../../../admin/approval/presentation/widgets/request_list_tile.dart';
 
 final requestsProvider = StreamProvider<List<RequestModel>>((ref) {
   final currentUser = FirebaseAuth.instance.currentUser;
 
-  if (currentUser == null)
-    return Stream.value([]);
+  if (currentUser == null) return Stream.value([]);
 
   final repository = ref.watch(requestFirestoreRepositoryProvider);
   return repository.getRequestsByUserId(currentUser.uid);
 });
 
-class PartnerRequestsScreen extends ConsumerWidget {
+class PartnerRequestsScreen extends ConsumerStatefulWidget {
   const PartnerRequestsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PartnerRequestsScreen> createState() =>
+      _PartnerRequestsScreenState();
+}
+
+class _PartnerRequestsScreenState extends ConsumerState<PartnerRequestsScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
 
     final requestsAsyncValue = ref.watch(requestsProvider);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      color: colorScheme.background,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('คำขอของฉัน', style: theme.textTheme.h2,),
-          const SizedBox(height: 16,),
-          Text('คำขอที่รอดำเนินการ', style: theme.textTheme.h3,),
-          const SizedBox(height: 16,),
-          requestsAsyncValue.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Text('เกิดข้อผิดพลาด: $error', style: theme.textTheme.p,),
-            data: (requests) {
-              final pendingRequests = requests.where((request) => request.status == RequestStatus.pending).toList();
-
-              if (pendingRequests.isEmpty) {
-                return Text('ไม่มีคำขอในขณะนี้', style: theme.textTheme.p,);
-              }
-
-              return Column(
-                children: pendingRequests.map((request) => PartnerRequestListTile(request: request)).toList(),
-              );
-            },
+          TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'รอดำเนินการ'),
+              Tab(text: 'ถูกปฏิเสธ'),
+              Tab(text: 'อนุมัติแล้ว'),
+            ],
           ),
-          const SizedBox(height: 16,),
-          Text('คำขอที่ถูกปฏิเสธ', style: theme.textTheme.h3,),
-          const SizedBox(height: 16,),
-          requestsAsyncValue.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Text('เกิดข้อผิดพลาด: $error', style: theme.textTheme.p,),
-            data: (requests) {
-              final declinedRequests = requests.where((request) => request.status == RequestStatus.declined).toList();
+          Expanded(
+            child: requestsAsyncValue.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) => Center(
+                child: Text('เกิดข้อผิดพลาด: $error', style: theme.textTheme.p),
+              ),
+              data: (requests) {
+                final pending = requests
+                    .where((r) => r.status == RequestStatus.pending)
+                    .toList();
+                final declined = requests
+                    .where((r) => r.status == RequestStatus.declined)
+                    .toList();
+                final approved = requests
+                    .where((r) => r.status == RequestStatus.approved)
+                    .toList();
 
-              if (declinedRequests.isEmpty) {
-                return Text('ไม่มีคำขอในขณะนี้', style: theme.textTheme.p,);
-              }
-
-              return Column(
-                children: declinedRequests.map((request) => PartnerRequestListTile(request: request)).toList(),
-              );
-            },
-          ),
-          const SizedBox(height: 16,),
-          Text('คำขอที่ได้รับการอนุมัติ', style: theme.textTheme.h3,),
-          const SizedBox(height: 16,),
-          requestsAsyncValue.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Text('เกิดข้อผิดพลาด: $error', style: theme.textTheme.p,),
-            data: (requests) {
-              final approvedRequests = requests.where((request) => request.status == RequestStatus.approved).toList();
-
-              if (approvedRequests.isEmpty)
-                return Text('ไม่มีคำขอในขณะนี้', style: theme.textTheme.p,);
-
-              return Column(
-                children: approvedRequests.map((request) => PartnerRequestListTile(request: request)).toList(),
-              );
-            },
+                return TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildRequestList(
+                      context,
+                      pending,
+                      'ไม่มีคำขอที่รอดำเนินการ',
+                    ),
+                    _buildRequestList(
+                      context,
+                      declined,
+                      'ไม่มีคำขอที่ถูกปฏิเสธ',
+                    ),
+                    _buildRequestList(
+                      context,
+                      approved,
+                      'ไม่มีคำขอที่ได้รับการอนุมัติ',
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildRequestList(
+    BuildContext context,
+    List<RequestModel> requests,
+    String emptyMessage,
+  ) {
+    final theme = ShadTheme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    if (requests.isEmpty) {
+      return Center(
+        child: Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            emptyMessage,
+            style: textTheme.p.copyWith(color: colorScheme.mutedForeground),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: requests.length,
+      itemBuilder: (context, index) {
+        return PartnerRequestListTile(request: requests[index]);
+      },
     );
   }
 }
