@@ -19,6 +19,7 @@ import 'package:studall/src/features/auth/presentation/screens/register_student_
 import 'package:studall/src/features/auth/presentation/screens/register_partner_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/select_role_screen.dart';
 import 'package:studall/src/features/auth/presentation/screens/setting_screen.dart';
+import 'package:studall/src/features/auth/presentation/screens/banned_profile_screen.dart';
 
 // ── Student layout & screens ─────────────────────────────────────────────────
 import 'package:studall/src/features/student/presentation/screens/student_layout_screen.dart';
@@ -128,9 +129,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (profile.isBanned) {
-        return '/login';
-      }
-
+          if (path == '/banned-profile') return null;
+          return '/banned-profile';
+        }
       final isRegisteringPath =
           path == '/register-role' ||
           path == '/register-student' ||
@@ -176,6 +177,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/',
         builder: (_, _) =>
             const Scaffold(body: Center(child: CircularProgressIndicator())),
+      ),
+      GoRoute(
+        path: '/banned-profile',
+        builder: (_, _) => const BannedProfileScreen(),
       ),
 
       GoRoute(path: '/login', builder: (_, _) => const LogInScreen()),

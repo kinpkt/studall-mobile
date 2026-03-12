@@ -74,7 +74,7 @@ class _StudentAddEditTaskScreenState
         const SizedBox(height: 8),
         TimePickerSpinnerPopUp(
           mode: CupertinoDatePickerMode.time,
-          initTime: null,
+          initTime: _toDateTime(time),
           timeFormat: 'HH:mm',
           pressType: PressType.singlePress,
           locale: const Locale('th'),

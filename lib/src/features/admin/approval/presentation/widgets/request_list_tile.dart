@@ -36,17 +36,22 @@ class _RequestListTileState extends ConsumerState<RequestListTile> {
 
     Future<void> handleApprove() async {
       if (request.type == RequestType.advertise) {
-        final ad = await ref.read(singleAdvertisementProvider(request.id).future);
+        final ad = await ref.read(
+          singleAdvertisementProvider(request.id).future,
+        );
 
         if (ad != null) {
           final updatedAd = ad.copyWith(isPublished: true);
 
-          await ref.read(advertisementFirestoreRepositoryProvider).updateAdvertisement(updatedAd);
+          await ref
+              .read(advertisementFirestoreRepositoryProvider)
+              .updateAdvertisement(updatedAd);
         }
-      }
-      else {
+      } else {
         final branchRepo = ref.read(branchFirestoreRepositoryProvider);
-        final branches = await branchRepo.getBranchesByUserId(request.requestedUserId).first;
+        final branches = await branchRepo
+            .getBranchesByUserId(request.requestedUserId)
+            .first;
 
         for (BranchModel branch in branches) {
           final updatedBranch = branch.copyWith(partnerIsPermitted: true);
@@ -56,70 +61,96 @@ class _RequestListTileState extends ConsumerState<RequestListTile> {
 
       final updatedRequest = request.copyWith(status: RequestStatus.approved);
 
-      await ref.read(requestFirestoreRepositoryProvider).updateRequest(request.id, updatedRequest);
+      await ref
+          .read(requestFirestoreRepositoryProvider)
+          .updateRequest(request.id, updatedRequest);
     }
 
     Future<void> handleDecline(String reason) async {
-      final updatedRequest = request.copyWith(status: RequestStatus.declined, reason: reason.isNotEmpty ? reason : null);
+      final updatedRequest = request.copyWith(
+        status: RequestStatus.declined,
+        reason: reason.isNotEmpty ? reason : null,
+      );
 
-      await ref.read(requestFirestoreRepositoryProvider).updateRequest(request.id, updatedRequest);
+      await ref
+          .read(requestFirestoreRepositoryProvider)
+          .updateRequest(request.id, updatedRequest);
     }
 
     void showDeclineReasonDialog() {
       _reasonController.clear();
       showDialog(
         context: context,
-        builder: (context) => ShadDialog(
-          title: Text('เหตุผลการปฏิเสธ', style: theme.textTheme.h3),
-          description: Text('กรุณาระบุเหตุผลที่ปฏิเสธคำขอนี้', style: theme.textTheme.p),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              ShadInput(
-                controller: _reasonController,
-                placeholder: const Text('ระบุเหตุผล...'),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ShadButton.outline(
-                    child: const Text('ยกเลิก'),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  const SizedBox(width: 16),
-                  ShadButton.destructive(
-                    child: const Text('ยืนยัน'),
-                    onPressed: () async {
-                      await handleDecline(_reasonController.text);
-                      if (context.mounted) {
-                        Navigator.of(context).pop();
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ],
+        builder: (context) => Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ShadDialog(
+            title: Text('เหตุผลการปฏิเสธ', style: theme.textTheme.h3),
+            description: Text(
+              'กรุณาระบุเหตุผลที่ปฏิเสธคำขอนี้',
+              style: theme.textTheme.p,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                ShadInput(
+                  controller: _reasonController,
+                  placeholder: const Text('ระบุเหตุผล...'),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ShadButton.outline(
+                      child: const Text('ยกเลิก'),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    const SizedBox(width: 16),
+                    ShadButton.destructive(
+                      child: const Text('ยืนยัน'),
+                      onPressed: () async {
+                        await handleDecline(_reasonController.text);
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       );
     }
 
-    final partnerAsync = ref.watch(partnerStoreDataProvider(request.requestedUserId));
+    final partnerAsync = ref.watch(
+      partnerStoreDataProvider(request.requestedUserId),
+    );
 
     return Material(
       child: ListTile(
-        leading: Icon(request.type == RequestType.advertise ? PhosphorIconsRegular.newspaper : PhosphorIconsRegular.storefront),
+        leading: Icon(
+          request.type == RequestType.advertise
+              ? PhosphorIconsRegular.newspaper
+              : PhosphorIconsRegular.storefront,
+        ),
         title: Text(request.type.thaiType, style: theme.textTheme.list),
         subtitle: Consumer(
           builder: (context, ref, child) {
             return partnerAsync.when(
-              loading: () => Text('กำลังโหลดชื่อร้าน...', style: theme.textTheme.muted),
-              error: (err, stack) => Text('ส่งคำขอโดย ไม่ทราบชื่อร้าน', style: theme.textTheme.muted),
-              data: (partner) => Text('ส่งคำขอโดย ${partner!.name}', style: theme.textTheme.muted),
+              loading: () =>
+                  Text('กำลังโหลดชื่อร้าน...', style: theme.textTheme.muted),
+              error: (err, stack) => Text(
+                'ส่งคำขอโดย ไม่ทราบชื่อร้าน',
+                style: theme.textTheme.muted,
+              ),
+              data: (partner) => Text(
+                'ส่งคำขอโดย ${partner?.name ?? 'ไม่ทราบชื่อร้าน'}',
+                style: theme.textTheme.muted,
+              ),
             );
           },
         ),
@@ -130,98 +161,130 @@ class _RequestListTileState extends ConsumerState<RequestListTile> {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => ShadDialog(
-                    title: Text(request.type.thaiType, style: theme.textTheme.h3),
-                    description: Text('สถานะ: ${request.status.thaiStatus}', style: theme.textTheme.p),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (request.type == RequestType.store)
-                          partnerAsync.when(
-                            loading: () => Text('...'),
-                            error: (error, stack) => Text('-'),
-                            data: (partner) => Text('ชื่อร้าน: ${partner!.name}\nรายละเอียดร้าน: ${partner.description}'),
-                          ),
+                  builder: (context) => Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ShadDialog(
+                      title: Text(
+                        request.type.thaiType,
+                        style: theme.textTheme.h3,
+                      ),
+                      description: Text(
+                        'สถานะ: ${request.status.thaiStatus}',
+                        style: theme.textTheme.p,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (request.type == RequestType.store)
+                            partnerAsync.when(
+                              loading: () => Text('...'),
+                              error: (error, stack) => Text('-'),
+                              data: (partner) => Text(
+                                'ชื่อร้าน: ${partner?.name ?? 'ไม่ทราบ'}\nรายละเอียดร้าน: ${partner?.description ?? 'ไม่มีข้อมูล'}',
+                              ),
+                            ),
 
-                        if (request.type == RequestType.advertise)
-                          Consumer(
-                            builder: (context, ref, child) {
-                              final adAsyncValue = ref.watch(singleAdvertisementProvider(request.id));
+                          if (request.type == RequestType.advertise)
+                            Consumer(
+                              builder: (context, ref, child) {
+                                final adAsyncValue = ref.watch(
+                                  singleAdvertisementProvider(request.id),
+                                );
 
-                              return adAsyncValue.when(
-                                loading: () => const Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Center(child: CircularProgressIndicator()),
-                                ),
-                                error: (error, stack) => Text(
-                                  'เกิดข้อผิดพลาด: $error',
-                                  style: theme.textTheme.p,
-                                ),
-                                data: (ad) {
-                                  if (ad == null) {
-                                    return const Text('ไม่พบข้อมูลโฆษณา');
-                                  }
+                                return adAsyncValue.when(
+                                  loading: () => const Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
+                                  error: (error, stack) => Text(
+                                    'เกิดข้อผิดพลาด: $error',
+                                    style: theme.textTheme.p,
+                                  ),
+                                  data: (ad) {
+                                    if (ad == null) {
+                                      return const Text('ไม่พบข้อมูลโฆษณา');
+                                    }
 
-                                  return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Center(child: AdvertisementBanner(ads: ad)),
+                                        Center(
+                                          child: AdvertisementBanner(ads: ad),
+                                        ),
                                         const SizedBox(height: 16),
                                         Text(ad.topic),
                                         const SizedBox(height: 8),
-                                        Text(ad.description)
-                                      ]
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        const SizedBox(height: 12),
-                        if (request.status == RequestStatus.declined && request.reason != null)
-                          Text('สาเหตุการปฏิเสธ: ${request.reason}', style: theme.textTheme.p.copyWith(color: Colors.red, fontWeight: FontWeight.bold)),
-                        if (request.status == RequestStatus.pending)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              ShadButton.destructive(
-                                child: Text('ปฏิเสธ'),
-                                onPressed: () async {
-                                  Navigator.of(context).pop();
-                                  showDeclineReasonDialog();
-                                },
+                                        Text(ad.description),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          const SizedBox(height: 12),
+                          if (request.status == RequestStatus.declined &&
+                              request.reason != null)
+                            Text(
+                              'สาเหตุการปฏิเสธ: ${request.reason}',
+                              style: theme.textTheme.p.copyWith(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
                               ),
-                              SizedBox(width: 16,),
-                              ShadButton(
-                                backgroundColor: theme.colorScheme.custom['green'],
-                                child: Text('อนุมัติ'),
-                                onPressed: () async {
-                                  await handleApprove();
-                                  if (context.mounted)
+                            ),
+                          if (request.status == RequestStatus.pending)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                ShadButton.destructive(
+                                  child: Text('ปฏิเสธ'),
+                                  onPressed: () async {
                                     Navigator.of(context).pop();
-                                },
-                              )
-                            ],
-                          )
-                      ],
+                                    showDeclineReasonDialog();
+                                  },
+                                ),
+                                SizedBox(width: 16),
+                                ShadButton(
+                                  backgroundColor:
+                                      theme.colorScheme.custom['green'],
+                                  child: Text('อนุมัติ'),
+                                  onPressed: () async {
+                                    await handleApprove();
+                                    if (context.mounted)
+                                      Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
                     ),
-                  )
+                  ),
                 );
               },
-              icon: const Icon(PhosphorIconsRegular.eye)
+              icon: const Icon(PhosphorIconsRegular.eye),
             ),
             if (request.status == RequestStatus.pending)
               IconButton(
-                  onPressed: handleApprove,
-                  icon: Icon(PhosphorIconsRegular.check, color: theme.colorScheme.custom['green'])
+                onPressed: handleApprove,
+                icon: Icon(
+                  PhosphorIconsRegular.check,
+                  color: theme.colorScheme.custom['green'],
+                ),
               ),
             if (request.status == RequestStatus.pending)
               IconButton(
-                  onPressed: showDeclineReasonDialog,
-                  icon: Icon(PhosphorIconsRegular.x, color: theme.colorScheme.destructive)
+                onPressed: showDeclineReasonDialog,
+                icon: Icon(
+                  PhosphorIconsRegular.x,
+                  color: theme.colorScheme.destructive,
+                ),
               ),
           ],
-        )
+        ),
       ),
     );
   }
