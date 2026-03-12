@@ -207,9 +207,8 @@ class _StudentAppbarState extends ConsumerState<StudentAppbar>
 
       try {
         nextCourse = schedules.firstWhere((schedule) {
-          final endMinutes =
-              schedule.endTime.hour * 60 + schedule.endTime.minute;
-          return endMinutes > currentMinutes;
+          final startMinutes = schedule.startTime.hour * 60 + schedule.startTime.minute;
+          return startMinutes > currentMinutes;
         });
       } catch (e) {
         nextCourse = null;
